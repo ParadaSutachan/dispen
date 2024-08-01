@@ -183,7 +183,7 @@ with open(output_file_path, 'w') as output_file:
         ek_int = ek_1 + ek_int_1
         uik = ek_int*Ki
         ux_k=K@xk
-        uk = -uik-float(ux_k[0]) #Accion de Control
+        uk = abs(-uik-float(ux_k[0])) #Accion de Control
 
         if uk >= 100:
 
