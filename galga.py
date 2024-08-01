@@ -176,12 +176,12 @@ with open(output_file_path, 'w') as output_file:
         ##
 
         ## Controlador
-        ek = abs(rk - fk)
+        ek = rk - fk
         print("ek: "+str(ek))
         ek_int = ek_1 + ek_int_1
         uik = ek_int*Ki
         ux_k=K@xk
-        uk = 50 #abs(-uik-float(ux_k[0])) #Accion de Control
+        uk = abs(-uik-float(ux_k[0])) #Accion de Control
 
         if uk >= 100:
 
