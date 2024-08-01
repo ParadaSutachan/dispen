@@ -183,11 +183,13 @@ with open(output_file_path, 'w') as output_file:
         ux_k=K@xk
         uk = -uik-float(ux_k[0]) #Accion de Control
 
-        if uk >= 100:
+        if uk < 0 or uk > 100:
+            if uk < 0 :
+                uik = 0 - float(ux_k[0])
+            if uk >100:
+                uik = -100 - float(ux_k[0])
 
-            motor1_speed = 100
-        else:
-            motor1_speed = uk
+        uk = -uik-float(ux_k[0])        
             
         print("uk = " + str(uk))
 
