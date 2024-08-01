@@ -139,6 +139,7 @@ xk1 = np.array([[0],
 start_time = time.time()
 rk = float(input("Ingrese la referencia:  "))
 motor1_speed = 50
+control_motor(motor1_pwm_pin, motor1_dir_pin, motor1_speed, 'forward')
 # Crear el archivo de salida para guardar los datos
 output_file_path = '/home/santiago/Documents/dispensador/dispensador/test_controlador_ss.txt'
 with open(output_file_path, 'w') as output_file:
@@ -184,7 +185,6 @@ with open(output_file_path, 'w') as output_file:
         print("uk = " + str(uk))
 
         control_motor(motor1_pwm_pin, motor1_dir_pin, motor1_speed, 'forward')
-        control_motor(motor1_pwm_pin, motor1_dir_pin, 100, 'forward')
         
         delta_f_2 = delta_f_1
         delta_f_1 = delta_f
