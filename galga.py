@@ -13,6 +13,10 @@ pi = pigpio.pi()
 pi_m = math.pi 
 
 # Configuración de pines de motor y encoder
+
+## Probando cositas
+
+
 motor1_pwm_pin = 12
 motor1_dir_pin = 24
 motor1_en_pin = 22
