@@ -142,6 +142,11 @@ xk1 = np.array([[0],
 # Loop de Control
 start_time = time.time()
 rk = float(input("Ingrese la referencia:  "))
+
+# Habilitar motores
+pi.write(motor1_en_pin, 1)
+pi.write(motor2_en_pin, 1)
+
 motor1_speed = 50
 control_motor(motor1_pwm_pin, motor1_dir_pin, motor1_speed, 'forward')
 # Crear el archivo de salida para guardar los datos
