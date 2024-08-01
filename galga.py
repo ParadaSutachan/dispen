@@ -163,9 +163,9 @@ with open(output_file_path, 'w') as output_file:
         W = FPS * ((2 * pi_m) / T)      #Velocidad del motor
         print("Velocidad: " + str(W))
         # Soft Sensor
-        delta_w = W - set_point_w
+        delta_w = W 
         delta_f = 0.1969*delta_w_1 + 1.359*delta_f_1 -0.581*delta_f_2
-        fk = delta_f + set_point_f
+        fk = delta_f
         ##
 
         ##Observador
