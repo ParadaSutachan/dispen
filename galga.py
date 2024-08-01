@@ -190,7 +190,7 @@ with open(output_file_path, 'w') as output_file:
                 uik = -100 - float(ux_k[0])
 
         uk = -uik-float(ux_k[0])        
-            
+        motor1_speed = uk  
         print("uk = " + str(uk))
 
         control_motor(motor1_pwm_pin, motor1_dir_pin, motor1_speed, 'forward')
