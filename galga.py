@@ -178,7 +178,7 @@ with open(output_file_path, 'w') as output_file:
         ##
 
         ## Controlador
-        ek = rk - fk
+        ek = abs(rk - fk)
         print("ek: "+str(ek))
         ek_int = ek_1 + ek_int_1
         uik = ek_int*Ki
