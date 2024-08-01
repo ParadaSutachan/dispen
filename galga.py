@@ -147,8 +147,6 @@ rk = float(input("Ingrese la referencia:  "))
 pi.write(motor1_en_pin, 1)
 pi.write(motor2_en_pin, 1)
 
-motor1_speed = 50
-control_motor(motor1_pwm_pin, motor1_dir_pin, motor1_speed, 'forward')
 # Crear el archivo de salida para guardar los datos
 output_file_path = '/home/santiago/Documents/dispensador/dispen/test_controlador_ss.txt'
 with open(output_file_path, 'w') as output_file:
