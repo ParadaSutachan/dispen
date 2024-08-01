@@ -107,7 +107,7 @@ def main():
         start_time = time.time()
         
         # Bucle principal
-        while time.time() - start_time <= 100:  # Ejecutar durante 40 segundos
+        while time.time() - start_time <= 5:  # Ejecutar durante 40 segundos
             tiempo_actual = time.time()
             tiempo_actual2 = time.time()
 
