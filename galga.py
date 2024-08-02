@@ -145,17 +145,17 @@ xk1 = np.array([[0],
 
 # Loop de Control
 start_time = time.time()
-rk = float(input("Ingrese la referencia:  "))
+# rk = float(input("Ingrese la referencia:  "))
 # Habilitar motores
 pi.write(motor1_en_pin, 1)
 pi.write(motor2_en_pin, 1)
-
+rk=15
 # Crear el archivo de salida para guardar los datos
 output_file_path = '/home/santiago/Documents/dispensador/dispen/test_controlador_ss_100.txt'
 with open(output_file_path, 'w') as output_file:
     output_file.write("Tiempo \t PWM \t W \tFlujo \n")
 
-    while(time.time()-start_time <= 30):
+    while(time.time()-start_time <= 60):
         
         t1 = TicToc()       # Tic
         t1.tic()
@@ -174,6 +174,9 @@ with open(output_file_path, 'w') as output_file:
             fk = 0
         else :
             fk = delta_f + F_b
+
+        if k == 150:
+            rk=30
 
         print(delta_f)
 
