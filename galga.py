@@ -149,7 +149,7 @@ start_time = time.time()
 # Habilitar motores
 pi.write(motor1_en_pin, 1)
 pi.write(motor2_en_pin, 1)
-rk=15
+rk=35
 # Crear el archivo de salida para guardar los datos
 output_file_path = '/home/santiago/Documents/dispensador/dispen/test_controlador_ss_100.txt'
 with open(output_file_path, 'w') as output_file:
@@ -176,7 +176,7 @@ with open(output_file_path, 'w') as output_file:
             fk = delta_f + F_b
 
         if k == 150:
-            rk=30
+            rk=60
 
         print(delta_f)
 
