@@ -155,10 +155,10 @@ with open(output_file_path, 'w') as output_file:
 
         delta_fn= 0.1969*W_1 + 1.359 * fm_n_1 - 0.581*fm_n_2 
 
-        if k <= 1:
-            fm_n= 0
-        else :
-            fm_n = delta_fn + setpoint_f
+        # if k <= 1:
+        #     fm_n= 0
+        # else :
+        #     fm_n = delta_fn + setpoint_f
 
 
         
