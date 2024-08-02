@@ -168,63 +168,65 @@ with open(output_file_path, 'w') as output_file:
         delta_w = W-W_b
         delta_f = 0.1969*delta_w_1 + 1.359*delta_f_1 -0.581*delta_f_2
 
-        if k <=3 :
-            fk = 0
-        else:    
-            fk = delta_f+F_b
-
-        if fk < 0:
-            fk=0
-        ##
-
-        print(delta_f)
-
-        ##Observador
-        uo = np.array([[uk],
-                       [fk]])
-        
-        xk1 = Ao@xk + Bo@uo
-        ##
-
-        ## Controlador
-        ek = rk - fk
-        print("ek: "+str(ek))
-        ek_int = ek_1 + ek_int_1
-        uik = ek_int*Ki
-        ux_k=K@xk
-        uk = -uik-float(ux_k[0]) #Accion de Control
-
-        if uk < 0 or uk > 100:
-            if uk < 0 :
-                uik = 0 - float(ux_k[0])
-            if uk >100:
-                uik = -100 - float(ux_k[0])
-
-        uk = -uik-float(ux_k[0])        
-        motor1_speed = uk  
-        print("uk = " + str(uk))
-
-        control_motor(motor1_pwm_pin, motor1_dir_pin, motor1_speed, 'forward')
-        
         delta_f_2 = delta_f_1
         delta_f_1 = delta_f
-        xk = xk1
-        ek_int_1=ek_int
-        ek_1 = ek
-        delta_w_1 = delta_w 
 
-        # Registrar los datos en el archivo
-        ts = time.time() - start_time
-        output_file.write(f"{ts:.2f}\t{uk:.2f}\t{W:.2f}\t{fk:.2f}\n")
+        if k > 3:
+           
+            fk = delta_f+F_b
 
-        # Restablecer contadores
-        numero_flancos_A = 0
-        numero_flancos_B = 0
-        numero_flancos_A2 = 0
-        numero_flancos_B2 = 0
+            if fk < 0:
+                fk=0
 
-        
-        print("Flujo = "+ str(fk))
+            ##
+
+            print(delta_f)
+
+            ##Observador
+            uo = np.array([[uk],
+                        [fk]])
+            
+            xk1 = Ao@xk + Bo@uo
+            ##
+
+            ## Controlador
+            ek = rk - fk
+            print("ek: "+str(ek))
+            ek_int = ek_1 + ek_int_1
+            uik = ek_int*Ki
+            ux_k=K@xk
+            uk = -uik-float(ux_k[0]) #Accion de Control
+
+            if uk < 0 or uk > 100:
+                if uk < 0 :
+                    uik = 0 - float(ux_k[0])
+                if uk >100:
+                    uik = -100 - float(ux_k[0])
+
+            uk = -uik-float(ux_k[0])        
+            motor1_speed = uk  
+            print("uk = " + str(uk))
+
+            control_motor(motor1_pwm_pin, motor1_dir_pin, motor1_speed, 'forward')
+            
+            
+            xk = xk1
+            ek_int_1=ek_int
+            ek_1 = ek
+            delta_w_1 = delta_w 
+
+            # Registrar los datos en el archivo
+            ts = time.time() - start_time
+            output_file.write(f"{ts:.2f}\t{uk:.2f}\t{W:.2f}\t{fk:.2f}\n")
+
+            # Restablecer contadores
+            numero_flancos_A = 0
+            numero_flancos_B = 0
+            numero_flancos_A2 = 0
+            numero_flancos_B2 = 0
+
+            
+            print("Flujo = "+ str(fk))
 
         e_time = t1.tocvalue()
         toc = abs(T-e_time)         #Toc
