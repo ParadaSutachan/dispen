@@ -160,9 +160,6 @@ with open(output_file_path, 'w') as output_file:
         else :
             fm_n = delta_fn + setpoint_f
 
-        fm_n_2 = fm_n_1
-        fm_n_1 = fm_n
-        W_1 = delta_W
 
         
 
@@ -180,7 +177,7 @@ with open(output_file_path, 'w') as output_file:
             if upi_m >100:
                 ui_m = 100 - up_m
 
-        upi_m= iek_m + ui_m
+        upi_m= iek_m + up_m
 
         #Control esclavo
         rk_s = upi_m
@@ -197,7 +194,7 @@ with open(output_file_path, 'w') as output_file:
             if upi_s >100:
                 ui_s = 100 - up_s
 
-        upi_s = iek_s+upi_s
+        upi_s = iek_s+up_s
     
         print("eks = "+ str(ek_s))
         print("ekm = "+ str(ek_m))
@@ -209,6 +206,10 @@ with open(output_file_path, 'w') as output_file:
 
         motor1_speed = upi_s  # Asegurar que motor1_speed esté en el rango 0-100
         control_motor(motor1_pwm_pin, motor1_dir_pin, motor1_speed, 'forward')
+
+        fm_n_2 = fm_n_1
+        fm_n_1 = fm_n
+        W_1 = delta_W
 
         iek_m_1 = iek_m
 
