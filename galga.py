@@ -143,7 +143,6 @@ xk1 = np.array([[0],
 # Loop de Control
 start_time = time.time()
 rk = float(input("Ingrese la referencia:  "))
-
 # Habilitar motores
 pi.write(motor1_en_pin, 1)
 pi.write(motor2_en_pin, 1)
@@ -168,6 +167,7 @@ with open(output_file_path, 'w') as output_file:
         delta_w = W
         delta_f = 0.1969*delta_w_1 + 1.359*delta_f_1 -0.581*delta_f_2
         ##
+        fk = delta_f
 
         print(delta_f)
 
