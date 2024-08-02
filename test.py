@@ -160,7 +160,7 @@ with open(output_file_path, 'w') as output_file:
         fm_n_1 = fm_n
         W_1 = delta_W
 
-        print("flujo = "+ str(fm_n))
+        
 
         #Control maestro
         yk_m = fm_n
@@ -183,8 +183,13 @@ with open(output_file_path, 'w') as output_file:
             if upi_s >100:
                 iek_s = -100 - float(ki_s*iek_s)
 
-        upi_s = iek_s+float(upi_s) 
+        upi_s = iek_s+float(upi_s)
+        
+        print("eks = "+ str(ek_s))
+        print("ekm = "+ str(ek_m))
+        print("rks = "+ str(rk_s))
         print("pwm = "+ str(upi_s))
+        print("flujo = "+ str(fm_n))
 
         
 
