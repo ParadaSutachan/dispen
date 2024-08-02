@@ -155,10 +155,10 @@ with open(output_file_path, 'w') as output_file:
 
         delta_fn= 0.1969*W_1 + 1.359 * fm_n_1 - 0.581*fm_n_2 
 
-        # if k <= 1:
-        #     fm_n= 0
-        # else :
-        #     fm_n = delta_fn + setpoint_f
+        if k <= 3:
+             fm_n= 0
+        else :
+             fm_n = delta_fn + setpoint_f
 
 
         
@@ -169,7 +169,7 @@ with open(output_file_path, 'w') as output_file:
         iek_m = ek_m + iek_m_1
         up_m = Kp_m*ek_m
         ui_m = ki_m*iek_m
-        upi_m = up_m  + up_m
+        upi_m = up_m  + ui_m
 
         if upi_m < 0 or upi_m > 100:
             if upi_m < 0 :
@@ -177,7 +177,7 @@ with open(output_file_path, 'w') as output_file:
             if upi_m >100:
                 ui_m = 100 - up_m
 
-        upi_m= iek_m  + up_m
+        upi_m= ui_m  + up_m
 
         #Control esclavo
         rk_s = upi_m
@@ -194,7 +194,13 @@ with open(output_file_path, 'w') as output_file:
             if upi_s >100:
                 ui_s = 100 - up_s
 
-        upi_s = iek_s + up_s
+        upi_s = ui_s + up_s
+
+        if upi_s < 0:
+            upi_s = 0
+        elif upi_s > 100:
+            upi_s = 100
+
     
         print("eks = "+ str(ek_s))
         print("ekm = "+ str(ek_m))
