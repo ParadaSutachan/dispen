@@ -68,9 +68,11 @@ ek_s= 0.0
 iek_s= 0.0
 iek_s_1= 0.0
 upi_s= 0.0
+k= 0.0
 
 setpoint_f= 35.0
 setpoint_W = 25.0
+delta_fn= 0.0
 
 # Variable Voltaje
 v1 = 0.0
@@ -122,7 +124,8 @@ def control_motor(pin_pwm, pin_dir, speed_percent, direction):
         raise ValueError("Dirección no válida. Usa 'forward' o 'backward'.")
 
 
-
+pi.write(motor1_en_pin, 1)
+pi.write(motor2_en_pin, 1)
 
 
 # Loop de Control
@@ -136,18 +139,36 @@ with open(output_file_path, 'w') as output_file:
     while(time.time()-start_time <= 20):
         
         t1 = TicToc()  
-        t1.tic()          # Tic
+        t1.tic()   
+        k += 1       # Tic
 
-        #Medicion flujo 
+        flancos_totales_1 = numero_flancos_A + numero_flancos_B
+        RPS = flancos_totales_1 / (600.0)
+        W = RPS * ((2 * pi_m) / INTERVALO)
+
+        #Msoft sensor 
         delta_W = W - setpoint_W
-        fm_n= fm_n - setpoint_W
-        fm_n= 0.1969*W_1 + 1.359 * fm_n_1 - 0.581*fm_n_2 
+
+        delta_fn= 0.1969*W_1 + 1.359 * fm_n_1 - 0.581*fm_n_2 
+
+        if k <= 3:
+            fm_n= 0
+        else :
+            fm_n = delta_fn + setpoint_f
+
         fm_n_2 = fm_n_1
         fm_n_1 = fm_n
         W_1 = delta_W
 
-        fm_n= fm_n + setpoint_f
         print("flujo = "+ str(fm_n))
+
+        #Control maestro
+        yk_m = fm_n
+        ek_m= rk_m - yk_m
+        iek_m = ek_m + iek_m_1
+        upi_m = (Kp_m*ek_m)  + (ki_m*iek_m)
+
+        iek_m_1 = iek_m
 
         #Control esclavo
         rk_s = upi_m
@@ -155,26 +176,14 @@ with open(output_file_path, 'w') as output_file:
         ek_s= rk_s - yk_s
         iek_s = ek_s + iek_s_1
         upi_s = (kp_s*ek_s) + (ki_s*iek_s)
+
         print("pwm = "+ str(upi_s))
 
         iek_s_1 = iek_s
-        iek_s=0
 
-        #Control maestro
-        yk_m = fm_n
-        ek_m= rk_m - yk_m
-        iek_m = ek_m + iek_m_1
-        upi_m = Kp_m*ek_m + ki_m*iek_m
-
-        iek_m_1 = iek_m
-        iek_m= 0
-
-        motor1_speed = max(0, min(100, upi_s))  # Asegurar que motor1_speed esté en el rango 0-100
+        motor1_speed = (upi_s)  # Asegurar que motor1_speed esté en el rango 0-100
         control_motor(motor1_pwm_pin, motor1_dir_pin, motor1_speed, 'forward')
 
-        flancos_totales_1 = numero_flancos_A + numero_flancos_B
-        RPS = flancos_totales_1 / (600.0)
-        W = RPS * ((2 * pi_m) / INTERVALO)
 
         # Registrar los datos en el archivo
         ts = time.time() - start_time
