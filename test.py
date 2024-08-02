@@ -166,7 +166,15 @@ with open(output_file_path, 'w') as output_file:
         yk_m = fm_n
         ek_m= rk_m - yk_m
         iek_m = ek_m + iek_m_1
-        upi_m = (Kp_m*ek_m)  + (ki_m*iek_m)
+        up_m = Kp_m*ek_m
+        ui_m = ki_m*iek_m
+        upi_m = up_m  + up_m
+
+        if upi_m < 0 or upi_m > 100:
+            if upi_m < 0 :
+                ui_m = 0 - up_m
+            if upi_m >100:
+                ui_m = 100 - up_m
 
         
 
@@ -175,15 +183,18 @@ with open(output_file_path, 'w') as output_file:
         yk_s = W
         ek_s= rk_s - yk_s
         iek_s = ek_s + iek_s_1
-        upi_s = (kp_s*ek_s) + (ki_s*iek_s)
+        ui_s = ki_s*iek_s
+        up_s= kp_s*ek_s
+        upi_s = up_s + ui_s
 
         if upi_s < 0 or upi_s > 100:
             if upi_s < 0 :
-                iek_s = 0 - float(ki_s*iek_s)
+                ui_s = 0 - up_s
             if upi_s >100:
-                iek_s = -100 - float(ki_s*iek_s)
+                ui_s = 100 - up_s
 
         upi_s = iek_s+float(upi_s)
+        
         print("W = "+ str(W))
         print("eks = "+ str(ek_s))
         print("ekm = "+ str(ek_m))
