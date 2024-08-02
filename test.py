@@ -50,10 +50,10 @@ W=0.0
 
 # Variables control maestro esclavo
 
-Kp_m = 0.4987
-ki_m = 0.3766
-kp_s = 0.891
-ki_s = 0.657
+Kp_m = 0.049398
+ki_m = 0.241
+kp_s = 0.36612
+ki_s = 1.097
 
 rk_m= 0.0
 yk_m= 0.0
