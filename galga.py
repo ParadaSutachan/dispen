@@ -152,7 +152,7 @@ output_file_path = '/home/santiago/Documents/dispensador/dispen/test_controlador
 with open(output_file_path, 'w') as output_file:
     output_file.write("Tiempo \t PWM \t W \tFlujo \n")
 
-    while(time.time()-start_time <= 150):
+    while(time.time()-start_time <= 25):
         
         t1 = TicToc()       # Tic
         t1.tic()
