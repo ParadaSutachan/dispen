@@ -168,7 +168,7 @@ with open(output_file_path, 'w') as output_file:
         delta_w = W-W_b
         delta_f = 0.1969*delta_w_1 + 1.359*delta_f_1 -0.581*delta_f_2
 
-        if k == 1:
+        if k <=3 :
             fk = 0
         else:    
             fk = delta_f+F_b
