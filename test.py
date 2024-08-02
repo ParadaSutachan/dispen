@@ -168,7 +168,7 @@ with open(output_file_path, 'w') as output_file:
         iek_m = ek_m + iek_m_1
         upi_m = (Kp_m*ek_m)  + (ki_m*iek_m)
 
-        iek_m_1 = iek_m
+        
 
         #Control esclavo
         rk_s = upi_m
@@ -177,13 +177,23 @@ with open(output_file_path, 'w') as output_file:
         iek_s = ek_s + iek_s_1
         upi_s = (kp_s*ek_s) + (ki_s*iek_s)
 
+        if upi_s < 0 or upi_s > 100:
+            if upi_s < 0 :
+                iek_s = 0 - float(ki_s*iek_s)
+            if upi_s >100:
+                iek_s = -100 - float(ki_s*iek_s)
+
+        upi_s = iek_s+float(upi_s) 
         print("pwm = "+ str(upi_s))
 
-        iek_s_1 = iek_s
+        
 
         motor1_speed = (upi_s)  # Asegurar que motor1_speed esté en el rango 0-100
         control_motor(motor1_pwm_pin, motor1_dir_pin, motor1_speed, 'forward')
 
+        iek_m_1 = iek_m
+
+        iek_s_1 = iek_s
 
         # Registrar los datos en el archivo
         ts = time.time() - start_time
