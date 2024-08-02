@@ -6,16 +6,19 @@ import math
 from pytictoc import TicToc #type: ignore
 import numpy as np # type: ignore
 from numpy import array  #type: ignore
-#import serial #type:ignore
+import serial #type:ignore
+import RPi.GPIO as GPIO #type:ignore
 
 # Inicialización de Pigpio
 pi = pigpio.pi()
 pi_m = math.pi 
 
+#Puerto arduino
+
+arduino_port = '/dev/ttyACM0'  # Puerto donde está conectada la placa Arduino
+arduino_baud = 9600
+
 # Configuración de pines de motor y encoder
-
-## Probando cositas
-
 
 motor1_pwm_pin = 12
 motor1_dir_pin = 24
@@ -81,6 +84,13 @@ numero_flancos_B = 0
 numero_flancos_A2 = 0
 numero_flancos_B2 = 0
 
+#variables galga
+wg = 0.0
+GPIO.setwarnings(False)
+arduino = serial.Serial(arduino_port, arduino_baud)
+time.sleep(10)  # Esperar a que la conexión serial se establezca
+
+
 # Matrices A,B,C,D del modelo
 
 A = np.array([[0.894130801660748, 0.145973156319373, 0.066225686842812, 0.067086287188154],
@@ -143,23 +153,46 @@ xk1 = np.array([[0],
                    [0],
                    [0]]) 
 
+#Inicializacion del arduino
+
+while True:
+    if arduino.in_waiting > 0:
+        mensaje = arduino.readline().decode('utf-8').strip()
+        if mensaje == "Listo para pesar":
+            print("Arduino ha completado la inicialización.")
+            break
+        else:
+            print(f"Mensaje de Arduino: {mensaje}")
+
 # Loop de Control
-start_time = time.time()
-# rk = float(input("Ingrese la referencia:  "))
+
 # Habilitar motores
 pi.write(motor1_en_pin, 1)
 pi.write(motor2_en_pin, 1)
 rk=35
+
 # Crear el archivo de salida para guardar los datos
 output_file_path = '/home/santiago/Documents/dispensador/dispen/test_controlador_ss_100.txt'
+
+
 with open(output_file_path, 'w') as output_file:
-    output_file.write("Tiempo \t PWM \t W \tFlujo \n")
+    output_file.write("Tiempo \t PWM \t W \tFlujo \t Peso \n")
+
+    wg = arduino.readline().decode('utf-8')
+    print(wg)
+
+    start_time = time.time()
 
     while(time.time()-start_time <= 60):
         
         t1 = TicToc()       # Tic
         t1.tic()
         k += 1
+
+        # Medir peso
+        if arduino.in_waiting > 0:
+            wg = arduino.readline().decode('utf-8')
+            print(wg)
 
         #Lectura de Flancos para medir velocidad
         flancos_totales_1 = numero_flancos_A + numero_flancos_B
@@ -178,8 +211,6 @@ with open(output_file_path, 'w') as output_file:
         if k == 150:
             rk=60
 
-        print(delta_f)
-
         ##Observador
         uo = np.array([[uk],
                        [fk]])
@@ -192,7 +223,7 @@ with open(output_file_path, 'w') as output_file:
         print("ek: "+str(ek))
         ek_int = ek_1 + ek_int_1
         uik = ek_int*Ki
-        ux_k=K@xk
+        ux_k= K@xk
         uk = -uik-float(ux_k[0]) #Accion de Control
         print("uk antes: "+ str(uk))
         if uk < 0 or uk > 100:
@@ -217,7 +248,8 @@ with open(output_file_path, 'w') as output_file:
 
         # Registrar los datos en el archivo
         ts = time.time() - start_time
-        output_file.write(f"{ts:.2f}\t{uk:.2f}\t{W:.2f}\t{fk:.2f}\n")
+        output_file.write(f"{ts:.2f}\t{uk:.2f}\t{W:.2f}\t{fk:.2f}\t{wg:.2f}\n")
+        output_file.flush()
 
         # Restablecer contadores
         numero_flancos_A = 0
