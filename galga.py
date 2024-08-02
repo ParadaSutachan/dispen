@@ -148,7 +148,7 @@ pi.write(motor1_en_pin, 1)
 pi.write(motor2_en_pin, 1)
 
 # Crear el archivo de salida para guardar los datos
-output_file_path = '/home/santiago/Documents/dispensador/dispen/test_controlador_ss.txt'
+output_file_path = '/home/santiago/Documents/dispensador/dispen/test_controlador_ss_100.txt'
 with open(output_file_path, 'w') as output_file:
     output_file.write("Tiempo \t PWM \t W \tFlujo \n")
 
@@ -181,7 +181,7 @@ with open(output_file_path, 'w') as output_file:
         ek_int = ek_1 + ek_int_1
         uik = ek_int*Ki
         ux_k=K@xk
-        uk = 50 # -uik-float(ux_k[0]) #Accion de Control
+        uk = 100 # -uik-float(ux_k[0]) #Accion de Control
 
         if uk < 0 or uk > 100:
             if uk < 0 :
