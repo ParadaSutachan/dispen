@@ -128,6 +128,7 @@ delta_w_1 = 0.0
 delta_f = 0.0
 delta_f_1 = 0.0 
 delta_f_2 = 0.0
+k=0
 
 xk = np.array([[0],
                [0],
@@ -156,6 +157,7 @@ with open(output_file_path, 'w') as output_file:
         
         t1 = TicToc()       # Tic
         t1.tic()
+        k += 1
 
         #Lectura de Flancos para medir velocidad
         flancos_totales_1 = numero_flancos_A + numero_flancos_B
@@ -165,11 +167,17 @@ with open(output_file_path, 'w') as output_file:
         # Soft Sensor
         delta_w = W-W_b
         delta_f = 0.1969*delta_w_1 + 1.359*delta_f_1 -0.581*delta_f_2
-        fk = delta_f+F_b
+        
+        if k == 1:
+            fk =0
+        else:    
+            fk = delta_f+F_b
 
         if fk < 0:
             fk=0
         ##
+
+        print(delta_f)
 
         ##Observador
         uo = np.array([[uk],
@@ -179,7 +187,6 @@ with open(output_file_path, 'w') as output_file:
         ##
 
         ## Controlador
-        ek = rk - fk
         print("ek: "+str(ek))
         ek_int = ek_1 + ek_int_1
         uik = ek_int*Ki
