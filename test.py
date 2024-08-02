@@ -61,6 +61,8 @@ ek_m= 0.0
 iek_m= 0.0
 iek_m_1= 0.0
 upi_m= 0.0
+up_m = 0.0
+ui_m = 0.0
 
 rk_s= 0.0
 yk_s= 0.0
@@ -68,6 +70,8 @@ ek_s= 0.0
 iek_s= 0.0
 iek_s_1= 0.0
 upi_s= 0.0
+up_s = 0.0
+ui_s = 0.0
 k= 0.0
 
 setpoint_f= 35.0
@@ -113,7 +117,6 @@ cb3 = pi.callback(PIN_ENCODER2_A, pigpio.EITHER_EDGE, contador_flancos_encoder2)
 # Función para controlar el motor
 def control_motor(pin_pwm, pin_dir, speed_percent, direction):
     duty_cycle = int(speed_percent * 255 / 100)
-    duty_cycle = max(0, min(255, duty_cycle))  # Asegurar que duty_cycle esté en el rango 0-255
     pi.set_PWM_dutycycle(pin_pwm, duty_cycle)
 
     if direction == 'forward':
@@ -124,19 +127,20 @@ def control_motor(pin_pwm, pin_dir, speed_percent, direction):
         raise ValueError("Dirección no válida. Usa 'forward' o 'backward'.")
 
 
-pi.write(motor1_en_pin, 1)
-pi.write(motor2_en_pin, 1)
 
 
 # Loop de Control
 start_time = time.time()
 rk_m= float(input("Ingrese la referencia:  "))
+# Habilitar motores
+pi.write(motor1_en_pin, 1)
+pi.write(motor2_en_pin, 1)
 # Crear el archivo de salida para guardar los datos
 output_file_path = '/home/santiago/Documents/dispensador/dispensador/test_PI_MS.txt'
 with open(output_file_path, 'w') as output_file:
     output_file.write("Tiempo \t PWM \t W \tFlujo \n")
 
-    while(time.time()-start_time <= 20):
+    while(time.time()-start_time <= 25):
         
         t1 = TicToc()  
         t1.tic()   
@@ -145,6 +149,7 @@ with open(output_file_path, 'w') as output_file:
         flancos_totales_1 = numero_flancos_A + numero_flancos_B
         RPS = flancos_totales_1 / (600.0)
         W = RPS * ((2 * pi_m) / INTERVALO)
+        print("Velocidad: " + str(W))
 
         #Msoft sensor 
         delta_W = W - setpoint_W
@@ -176,7 +181,7 @@ with open(output_file_path, 'w') as output_file:
             if upi_m >100:
                 ui_m = 100 - up_m
 
-        
+        upi_m= iek_m + ui_m
 
         #Control esclavo
         rk_s = upi_m
@@ -193,9 +198,8 @@ with open(output_file_path, 'w') as output_file:
             if upi_s >100:
                 ui_s = 100 - up_s
 
-        upi_s = iek_s+float(upi_s)
-        
-        print("W = "+ str(W))
+        upi_s = iek_s+upi_s
+    
         print("eks = "+ str(ek_s))
         print("ekm = "+ str(ek_m))
         print("rks = "+ str(rk_s))
@@ -204,7 +208,7 @@ with open(output_file_path, 'w') as output_file:
 
         
 
-        motor1_speed = (upi_s)  # Asegurar que motor1_speed esté en el rango 0-100
+        motor1_speed = upi_s  # Asegurar que motor1_speed esté en el rango 0-100
         control_motor(motor1_pwm_pin, motor1_dir_pin, motor1_speed, 'forward')
 
         iek_m_1 = iek_m
