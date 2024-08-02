@@ -184,7 +184,7 @@ with open(output_file_path, 'w') as output_file:
                 iek_s = -100 - float(ki_s*iek_s)
 
         upi_s = iek_s+float(upi_s)
-        
+        print("W = "+ str(W))
         print("eks = "+ str(ek_s))
         print("ekm = "+ str(ek_m))
         print("rks = "+ str(rk_s))
