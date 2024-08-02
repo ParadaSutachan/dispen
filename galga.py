@@ -184,7 +184,7 @@ with open(output_file_path, 'w') as output_file:
         ek_int = ek_1 + ek_int_1
         uik = ek_int*Ki
         ux_k=K@xk
-        uk = 100 # -uik-float(ux_k[0]) #Accion de Control
+        uk = -uik-float(ux_k[0]) #Accion de Control
 
         if uk < 0 or uk > 100:
             if uk < 0 :
@@ -192,7 +192,7 @@ with open(output_file_path, 'w') as output_file:
             if uk >100:
                 uik = -100 - float(ux_k[0])
 
-        #uk = -uik-float(ux_k[0])        
+        uk = -uik-float(ux_k[0])        
         motor1_speed = uk  
         print("uk = " + str(uk))
 
