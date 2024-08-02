@@ -128,7 +128,6 @@ def control_motor(pin_pwm, pin_dir, speed_percent, direction):
 
 
 
-
 # Loop de Control
 start_time = time.time()
 rk_m= float(input("Ingrese la referencia:  "))
