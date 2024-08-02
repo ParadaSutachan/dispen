@@ -177,7 +177,8 @@ with open(output_file_path, 'w') as output_file:
             if upi_m >100:
                 ui_m = 100 - up_m
 
-        upi_m= ui_m  + up_m
+        upi_m = ui_m  + up_m
+        print("upi_m = "+ str(upi_m))
 
         #Control esclavo
         rk_s = upi_m
@@ -196,10 +197,6 @@ with open(output_file_path, 'w') as output_file:
 
         upi_s = ui_s + up_s
 
-        if upi_s < 0:
-            upi_s = 0
-        elif upi_s > 100:
-            upi_s = 100
 
     
         print("eks = "+ str(ek_s))
