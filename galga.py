@@ -152,7 +152,7 @@ output_file_path = '/home/santiago/Documents/dispensador/dispen/test_controlador
 with open(output_file_path, 'w') as output_file:
     output_file.write("Tiempo \t PWM \t W \tFlujo \n")
 
-    while(time.time()-start_time <= 25):
+    while(time.time()-start_time <= 30):
         
         t1 = TicToc()       # Tic
         t1.tic()
@@ -188,7 +188,7 @@ with open(output_file_path, 'w') as output_file:
         uik = ek_int*Ki
         ux_k=K@xk
         uk = -uik-float(ux_k[0]) #Accion de Control
-
+        print("uk antes: "+ str(uk))
         if uk < 0 or uk > 100:
             if uk < 0 :
                 uik = 0 - float(ux_k[0])
@@ -198,6 +198,7 @@ with open(output_file_path, 'w') as output_file:
         uk = -uik-float(ux_k[0])        
         motor1_speed = uk  
         print("uk = " + str(uk))
+        print("uik: "+str(uik))
 
         control_motor(motor1_pwm_pin, motor1_dir_pin, motor1_speed, 'forward')
         
