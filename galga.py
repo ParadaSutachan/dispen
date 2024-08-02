@@ -84,13 +84,6 @@ numero_flancos_B = 0
 numero_flancos_A2 = 0
 numero_flancos_B2 = 0
 
-#variables galga
-wg = 0.0
-GPIO.setwarnings(False)
-arduino = serial.Serial(arduino_port, arduino_baud)
-time.sleep(10)  # Esperar a que la conexión serial se establezca
-
-
 # Matrices A,B,C,D del modelo
 
 A = np.array([[0.894130801660748, 0.145973156319373, 0.066225686842812, 0.067086287188154],
@@ -155,6 +148,12 @@ xk1 = np.array([[0],
 
 #Inicializacion del arduino
 
+#variables galga
+wg = 0.0
+GPIO.setwarnings(False)
+arduino = serial.Serial(arduino_port, arduino_baud)
+time.sleep(10)  # Esperar a que la conexión serial se establezca
+
 while True:
     if arduino.in_waiting > 0:
         mensaje = arduino.readline().decode('utf-8').strip()
@@ -188,11 +187,6 @@ with open(output_file_path, 'w') as output_file:
         t1 = TicToc()       # Tic
         t1.tic()
         k += 1
-
-        # Medir peso
-        if arduino.in_waiting > 0:
-            wg = arduino.readline().decode('utf-8')
-            print(wg)
 
         #Lectura de Flancos para medir velocidad
         flancos_totales_1 = numero_flancos_A + numero_flancos_B
@@ -245,6 +239,11 @@ with open(output_file_path, 'w') as output_file:
         ek_int_1=ek_int
         ek_1 = ek
         delta_w_1 = delta_w 
+
+        # Medir peso
+        if arduino.in_waiting > 0:
+            wg = arduino.readline().decode('utf-8')
+            print(wg)
 
         # Registrar los datos en el archivo
         ts = time.time() - start_time
