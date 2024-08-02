@@ -42,10 +42,6 @@ RPM2 = 0.0
 
 # Variables de flujo
 fm_n= 0.0
-w_n_1= 0.0
-fm_n_1= 0.0
-fm_n_2= 0.0
-W_1 = 0.0
 W=0.0
 
 # Variables control maestro esclavo
@@ -134,6 +130,10 @@ rk_m= float(input("Ingrese la referencia:  "))
 # Habilitar motores
 pi.write(motor1_en_pin, 1)
 pi.write(motor2_en_pin, 1)
+
+delta_W_1= 0.0
+delta_fn_1 =0.0
+delta_fn_2 = 0.0
 # Crear el archivo de salida para guardar los datos
 output_file_path = '/home/santiago/Documents/dispensador/dispensador/test_PI_MS.txt'
 with open(output_file_path, 'w') as output_file:
@@ -153,7 +153,7 @@ with open(output_file_path, 'w') as output_file:
         #Msoft sensor 
         delta_W = W - setpoint_W
 
-        delta_fn= 0.1969*W_1 + 1.359 * fm_n_1 - 0.581*fm_n_2 
+        delta_fn= 0.1969*delta_W_1 + 1.359 * delta_fn_1 - 0.581*delta_fn_2 
 
         if k <= 3:
              fm_n= 0
@@ -210,9 +210,9 @@ with open(output_file_path, 'w') as output_file:
         motor1_speed = upi_s  # Asegurar que motor1_speed esté en el rango 0-100
         control_motor(motor1_pwm_pin, motor1_dir_pin, motor1_speed, 'forward')
 
-        fm_n_2 = fm_n_1
-        fm_n_1 = fm_n
-        W_1 = delta_W
+        delta_fn_2 = delta_fn_1
+        delta_fn_1 = delta_fn
+        delta_W_1 = delta_W
 
         iek_m_1 = iek_m
 
