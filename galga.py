@@ -196,7 +196,7 @@ with open(output_file_path, 'w') as output_file:
         # Soft Sensor
         delta_w = W
         delta_f = 0.1969*delta_w_1 + 1.359*delta_f_1 -0.581*delta_f_2
-        delta_f= fk
+        fk=delta_f
         ##
 
         if k == 150:
