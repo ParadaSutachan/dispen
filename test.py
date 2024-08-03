@@ -220,7 +220,7 @@ with open(output_file_path, 'w') as output_file:
 
         # Registrar los datos en el archivo
         ts = time.time() - start_time
-        output_file.write(f"{ts:.2f}\t{upi_s:.2f}\t{W:.2f}\t{fm_n:.2f}")
+        output_file.write(f"{ts:.2f}\t{upi_s:.2f}\t{W:.2f}\t{fm_n:.2f}\n")
 
 
         # Restablecer contadores
