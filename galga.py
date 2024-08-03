@@ -194,13 +194,10 @@ with open(output_file_path, 'w') as output_file:
         W = FPS * ((2 * pi_m) / T)      #Velocidad del motor
         print("Velocidad: " + str(W))
         # Soft Sensor
-        delta_w = W - W_b
+        delta_w = W
         delta_f = 0.1969*delta_w_1 + 1.359*delta_f_1 -0.581*delta_f_2
+
         ##
-        if k <= 3:
-            fk = 0
-        else :
-            fk = delta_f + F_b
 
         if k == 150:
             rk=60
@@ -243,11 +240,11 @@ with open(output_file_path, 'w') as output_file:
         # Medir peso
         if arduino.in_waiting > 0:
             wg = arduino.readline().decode('utf-8')
-            print(wg)
+            print("Peso: " +str(wg))
 
         # Registrar los datos en el archivo
         ts = time.time() - start_time
-        output_file.write(f"{ts:.2f}\t{uk:.2f}\t{W:.2f}\t{fk:.2f}\t{wg}\n")
+        output_file.write(f"{ts:.2f}\t{uk:.2f}\t{W:.2f}\t{fk:.2f}\t{wg}")
         output_file.flush()
 
         # Restablecer contadores
