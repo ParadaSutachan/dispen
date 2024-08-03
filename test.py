@@ -159,7 +159,7 @@ with open(output_file_path, 'w') as output_file:
     print("peso" + str(wg))
     start_time = time.time()
 
-    while(time.time()-start_time <= 25):
+    while(time.time()-start_time <= 60):
         
         t1 = TicToc()  
         t1.tic()   
