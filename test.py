@@ -11,7 +11,10 @@ from pytictoc import TicToc
 pi = pigpio.pi()
 pi_m = math.pi
 
-## Probando git
+#Puerto arduino
+
+arduino_port = '/dev/ttyACM0'  # Puerto donde está conectada la placa Arduino
+arduino_baud = 9600
 
 # Configuración de pines de motor y encoder
 motor1_pwm_pin = 12
@@ -122,11 +125,24 @@ def control_motor(pin_pwm, pin_dir, speed_percent, direction):
     else:
         raise ValueError("Dirección no válida. Usa 'forward' o 'backward'.")
 
+#variables galga
+wg = 0.0
+GPIO.setwarnings(False)
+arduino = serial.Serial(arduino_port, arduino_baud)
+time.sleep(10)  # Esperar a que la conexión serial se establezca
 
+while True:
+    if arduino.in_waiting > 0:
+        mensaje = arduino.readline().decode('utf-8').strip()
+        if mensaje == "Listo para pesar":
+            print("Arduino ha completado la inicialización.")
+            break
+        else:
+            print(f"Mensaje de Arduino: {mensaje}")
 
 # Loop de Control
 start_time = time.time()
-rk_m= float(input("Ingrese la referencia:  "))
+rk_m= float(35)
 # Habilitar motores
 pi.write(motor1_en_pin, 1)
 pi.write(motor2_en_pin, 1)
@@ -137,7 +153,11 @@ delta_fn_2 = 0.0
 # Crear el archivo de salida para guardar los datos
 output_file_path = '/home/santiago/Documents/dispensador/dispen/prueba_35.txt'
 with open(output_file_path, 'w') as output_file:
-    output_file.write("Tiempo \t PWM \t W \tFlujo \n")
+    output_file.write("Tiempo \t PWM \t W \tFlujo \tpeso \n")
+
+    wg = arduino.readline().decode('utf-8')
+    print("peso" + str(wg))
+    start_time = time.time()
 
     while(time.time()-start_time <= 25):
         
@@ -160,8 +180,8 @@ with open(output_file_path, 'w') as output_file:
         else :
              fm_n = delta_fn + setpoint_f
 
-
-        
+        if k == 150:
+            rk=60
 
         #Control maestro
         yk_m = fm_n
@@ -217,10 +237,14 @@ with open(output_file_path, 'w') as output_file:
         iek_m_1 = iek_m
 
         iek_s_1 = iek_s
-
+# Medir peso
+        if arduino.in_waiting > 0:
+            wg = arduino.readline().decode('utf-8')
+            print(wg)
+        
         # Registrar los datos en el archivo
         ts = time.time() - start_time
-        output_file.write(f"{ts:.2f}\t{upi_s:.2f}\t{W:.2f}\t{fm_n:.2f}\n")
+        output_file.write(f"{ts:.2f}\t{upi_s:.2f}\t{W:.2f}\t{fm_n:.2f}\t{wg}\n")
 
 
         # Restablecer contadores
