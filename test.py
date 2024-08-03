@@ -181,7 +181,7 @@ with open(output_file_path, 'w') as output_file:
              fm_n = delta_fn + setpoint_f
 
         if k == 150:
-            rk=60
+            rk_m=60
 
         #Control maestro
         yk_m = fm_n
