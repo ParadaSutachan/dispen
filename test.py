@@ -74,7 +74,7 @@ ui_s = 0.0
 k= 0.0
 
 setpoint_f= 0.0
-setpoint_W = 0.0
+setpoint_W = 25
 delta_fn= 0.0
 
 # Variable Voltaje
@@ -180,7 +180,7 @@ with open(output_file_path, 'w') as output_file:
         else :
              fm_n = delta_fn + setpoint_f
 
-        if k == 150:
+        if k == 110:
             rk_m=60
 
         #Control maestro
