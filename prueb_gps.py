@@ -132,14 +132,14 @@ def control_motores_y_medicion():
         start_time = time.time()
 
         # Crear el archivo de salida para guardar los datos
-        output_file_path = '/home/santiago/Documents/dispensador/dispensador/lucho_al_100.txt'
+        output_file_path = '/home/santiago/Documents/dispensador/dispen/lucho_al_100.txt'
         with open(output_file_path, 'w') as output_file:
             output_file.write("Tiempo\t PWM \t Velocidad Angular\t RPM \tPeso (g)\n")
 
             # Bucle principal
             print('Iniciando la medición y control de los motores.')
 
-            while time.time() - start_time <= 100 :  # Ejecutar durante 120 segundos
+            while time.time() - start_time <= 60 :  # Ejecutar durante 120 segundos
                 loop_start_time = time.time()
                 
                 # Obtener velocidades de los motores
