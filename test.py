@@ -73,7 +73,7 @@ up_s = 0.0
 ui_s = 0.0
 k= 0.0
 
-setpoint_f= 35
+setpoint_f= 0.0
 setpoint_W = 0.0
 delta_fn= 0.0
 
@@ -181,7 +181,7 @@ with open(output_file_path, 'w') as output_file:
              fm_n = delta_fn + setpoint_f
 
         if k == 110:
-            rk_m=60
+            rk_m=50
 
         #Control maestro
         yk_m = fm_n
