@@ -74,7 +74,7 @@ ui_s = 0.0
 k= 0.0
 
 setpoint_f= 35
-setpoint_W = 25
+setpoint_W = 0.0
 delta_fn= 0.0
 
 # Variable Voltaje
