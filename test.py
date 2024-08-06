@@ -151,7 +151,7 @@ delta_W_1= 0.0
 delta_fn_1 =0.0
 delta_fn_2 = 0.0
 # Crear el archivo de salida para guardar los datos
-output_file_path = '/home/santiago/Documents/dispensador/dispen/prueba_35_5.txt'
+output_file_path = '/home/santiago/Documents/dispensador/dispen/prueba_35_5_45.txt'
 with open(output_file_path, 'w') as output_file:
     output_file.write("Tiempo \t PWM \t W \tFlujo \tpeso \n")
 
@@ -182,6 +182,9 @@ with open(output_file_path, 'w') as output_file:
 
         if k == 60:
             rk_m= 5
+        if k == 110:
+            rk_m= 45
+
 
         #Control maestro
         yk_m = fm_n
