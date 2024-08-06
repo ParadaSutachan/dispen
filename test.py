@@ -73,8 +73,8 @@ up_s = 0.0
 ui_s = 0.0
 k= 0.0
 
-setpoint_f= 0.0
-setpoint_W = 0.0
+setpoint_f= 21.3465
+setpoint_W = 28
 delta_fn= 0.0
 
 # Variable Voltaje
@@ -151,7 +151,7 @@ delta_W_1= 0.0
 delta_fn_1 =0.0
 delta_fn_2 = 0.0
 # Crear el archivo de salida para guardar los datos
-output_file_path = '/home/santiago/Documents/dispensador/dispen/prueba_no_setpoints.txt'
+output_file_path = '/home/santiago/Documents/dispensador/dispen/prueba_god.txt'
 with open(output_file_path, 'w') as output_file:
     output_file.write("Tiempo \t PWM \t W \tFlujo \tpeso \n")
 
