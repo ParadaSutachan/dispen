@@ -142,7 +142,7 @@ while True:
 
 # Loop de Control
 start_time = time.time()
-rk_m= float(10)
+rk_m= float(35)
 # Habilitar motores
 pi.write(motor1_en_pin, 1)
 pi.write(motor2_en_pin, 1)
@@ -151,7 +151,7 @@ delta_W_1= 0.0
 delta_fn_1 =0.0
 delta_fn_2 = 0.0
 # Crear el archivo de salida para guardar los datos
-output_file_path = '/home/santiago/Documents/dispensador/dispen/prueba_10_40.txt'
+output_file_path = '/home/santiago/Documents/dispensador/dispen/prueba_35_5.txt'
 with open(output_file_path, 'w') as output_file:
     output_file.write("Tiempo \t PWM \t W \tFlujo \tpeso \n")
 
@@ -180,8 +180,8 @@ with open(output_file_path, 'w') as output_file:
         else :
              fm_n = delta_fn + setpoint_f
 
-        if k == 110:
-            rk_m=40
+        if k == 60:
+            rk_m= 5
 
         #Control maestro
         yk_m = fm_n
