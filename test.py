@@ -142,7 +142,7 @@ while True:
 
 # Loop de Control
 start_time = time.time()
-rk_m= float(20)
+rk_m= float(10)
 # Habilitar motores
 pi.write(motor1_en_pin, 1)
 pi.write(motor2_en_pin, 1)
@@ -181,7 +181,7 @@ with open(output_file_path, 'w') as output_file:
              fm_n = delta_fn + setpoint_f
 
         if k == 110:
-            rk_m=45
+            rk_m=40
 
         #Control maestro
         yk_m = fm_n
