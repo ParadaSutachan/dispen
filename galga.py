@@ -199,7 +199,7 @@ with open(output_file_path, 'w') as output_file:
         fk=delta_f
         ##
 
-        if k == 150:
+        if k == 110:
             rk=60
 
         ##Observador
