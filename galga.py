@@ -127,8 +127,8 @@ rk = 0.0
 fk = 0.0
 W = 0.0
 uk = 0.0
-F_b = 35.0
-W_b = 25.0
+F_b = 21.3465
+W_b = 28
 delta_w = 0.0
 delta_w_1 = 0.0
 delta_f = 0.0
@@ -168,7 +168,7 @@ while True:
 # Habilitar motores
 pi.write(motor1_en_pin, 1)
 pi.write(motor2_en_pin, 1)
-rk=35
+rk=20
 
 # Crear el archivo de salida para guardar los datos
 output_file_path = '/home/santiago/Documents/dispensador/dispen/test_controlador_ss_100.txt'
@@ -200,7 +200,7 @@ with open(output_file_path, 'w') as output_file:
         ##
 
         if k == 110:
-            rk=60
+            rk=40
 
         ##Observador
         uo = np.array([[uk],
