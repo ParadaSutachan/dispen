@@ -185,7 +185,7 @@ with open(output_file_path, 'w') as output_file:
     output_file.write("Tiempo \t PWM \t W \t Referencia \tFlujo \t Peso \n")
 
     wg = arduino.readline().decode('utf-8')
-    print(wg)
+    print("Peso: " +str(wg))
 
     start_time = time.time()
 
@@ -201,9 +201,13 @@ with open(output_file_path, 'w') as output_file:
         W = FPS * ((2 * pi_m) / T)      #Velocidad del motor
         print("Velocidad: " + str(W))
         # Soft Sensor
-        delta_w = W
+        delta_w = W-W_b
         delta_f = 0.1969*delta_w_1 + 1.359*delta_f_1 -0.581*delta_f_2
-        fk=delta_f
+
+        if k <= 3:
+             fk= 0
+        else :
+             fk=delta_f+F_b
         ##
 
         if k == 100:
@@ -225,7 +229,6 @@ with open(output_file_path, 'w') as output_file:
         uik = ek_int*Ki
         ux_k= K@xk
         uk = -uik-float(ux_k[0]) #Accion de Control
-        print("uk antes: "+ str(uk))
         if uk < 0 or uk > 100:
             if uk < 0 :
                 uik = 0 - float(ux_k[0])
@@ -235,7 +238,6 @@ with open(output_file_path, 'w') as output_file:
         uk = -uik-float(ux_k[0])        
         motor1_speed = uk  
         print("uk = " + str(uk))
-        print("uik: "+str(uik))
 
         control_motor(motor1_pwm_pin, motor1_dir_pin, motor1_speed, 'forward')
         
@@ -262,7 +264,6 @@ with open(output_file_path, 'w') as output_file:
         numero_flancos_A2 = 0
         numero_flancos_B2 = 0
 
-        
         print("Flujo = "+ str(fk))
 
         e_time = t1.tocvalue()
