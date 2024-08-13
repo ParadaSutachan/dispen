@@ -180,7 +180,7 @@ output_file_path = '/home/santiago/Documents/dispensador/dispen/test_control_ss.
 
 
 with open(output_file_path, 'w') as output_file:
-    output_file.write("Tiempo \t PWM \t W \tFlujo \t Peso \n")
+    output_file.write("Tiempo \t PWM \t W \t Referencia \tFlujo \t Peso \n")
 
     wg = arduino.readline().decode('utf-8')
     print(wg)
@@ -204,8 +204,10 @@ with open(output_file_path, 'w') as output_file:
         fk=delta_f
         ##
 
-        if k == 110:
+        if k == 100:
             rk=40
+        if k == 200:
+            rk =30
 
         ##Observador
         uo = np.array([[uk],
@@ -249,7 +251,7 @@ with open(output_file_path, 'w') as output_file:
 
         # Registrar los datos en el archivo
         ts = time.time() - start_time
-        output_file.write(f"{ts:.2f}\t{uk:.2f}\t{W:.2f}\t{fk:.2f}\t{wg}")
+        output_file.write(f"{ts:.2f}\t{uk:.2f}\t{W:.2f}\{rk}\t{fk:.2f}\t{wg}")
         output_file.flush()
 
         # Restablecer contadores
