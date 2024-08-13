@@ -176,7 +176,7 @@ pi.write(motor2_en_pin, 1)
 rk=20
 
 # Crear el archivo de salida para guardar los datos
-output_file_path = '/home/santiago/Documents/dispensador/dispen/test_controlador_ss_100.txt'
+output_file_path = '/home/santiago/Documents/dispensador/dispen/test_control_ss.txt'
 
 
 with open(output_file_path, 'w') as output_file:
