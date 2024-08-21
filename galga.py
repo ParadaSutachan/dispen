@@ -105,9 +105,16 @@ D = 0
 #K = np.array([[-96.894235555587898, -54.978236188808395, -16.510278445545580, 0.225397518945667]])
 # la que tenia al inicio K = np.array([[ -28.943823250907375,-14.916476691659597,  -5.284958871641084,  0.606037301182901]])
 #K = np.array([[ -46.687992146378335, -25.234466885110013,  -8.383515963162855,   0.735588807482883]])
-K = np.array([[ -39.182988561814568, -20.829192398061014,  -7.083573262725010,   0.700789477478013]])
+#K = np.array([[ -39.182988561814568, -20.829192398061014,  -7.083573262725010,   0.700789477478013]]) #Mejor respuesta segun Santiago
+#K = np.array([[ -41.629745839451004, -22.260482684956859,  -7.509364454424423,   0.715540695413975 ]])
+K = np.array([[ -40.836100468904952, -21.795633546054280,  -7.371481681852714,   0.711152516724570 ]])
 
-Ki = -0.286889068064602
+#Ki = -0.344608368322768 # no puede ser mayor
+#Ki = -0.286889068064602  #best response
+#Ki = -0.305710358015974
+Ki= -0.299605441621511
+
+
 L = np.array([[-0.001633156413536],
               [0.000304322683582],
               [0.002212041259930],
@@ -172,14 +179,14 @@ pi.write(motor2_en_pin, 1)
 rk=20
 
 # Crear el archivo de salida para guardar los datos
-output_file_path = '/home/santiago/Documents/dispensador/dispen/test_controlador_ss_100.txt'
+output_file_path = '/home/santiago/Documents/dispensador/dispen/test_control_ss.txt'
 
 
 with open(output_file_path, 'w') as output_file:
-    output_file.write("Tiempo \t PWM \t W \tFlujo \t Peso \n")
+    output_file.write("Tiempo \t PWM \t W \t Referencia \tFlujo \t Peso \n")
 
     wg = arduino.readline().decode('utf-8')
-    print(wg)
+    print("Peso: " +str(wg))
 
     start_time = time.time()
 
@@ -195,13 +202,19 @@ with open(output_file_path, 'w') as output_file:
         W = FPS * ((2 * pi_m) / T)      #Velocidad del motor
         print("Velocidad: " + str(W))
         # Soft Sensor
-        delta_w = W
+        delta_w = W-W_b
         delta_f = 0.1969*delta_w_1 + 1.359*delta_f_1 -0.581*delta_f_2
-        fk=delta_f
+
+        if k <= 3:
+             fk= 0
+        else :
+             fk=delta_f+F_b
         ##
 
-        if k == 110:
+        if k == 100:
             rk=40
+        if k == 200:
+            rk =30
 
         ##Observador
         uo = np.array([[uk],
@@ -217,7 +230,6 @@ with open(output_file_path, 'w') as output_file:
         uik = ek_int*Ki
         ux_k= K@xk
         uk = -uik-float(ux_k[0]) #Accion de Control
-        print("uk antes: "+ str(uk))
         if uk < 0 or uk > 100:
             if uk < 0 :
                 uik = 0 - float(ux_k[0])
@@ -227,7 +239,6 @@ with open(output_file_path, 'w') as output_file:
         uk = -uik-float(ux_k[0])        
         motor1_speed = uk  
         print("uk = " + str(uk))
-        print("uik: "+str(uik))
 
         control_motor(motor1_pwm_pin, motor1_dir_pin, motor1_speed, 'forward')
         
@@ -245,7 +256,7 @@ with open(output_file_path, 'w') as output_file:
 
         # Registrar los datos en el archivo
         ts = time.time() - start_time
-        output_file.write(f"{ts:.2f}\t{uk:.2f}\t{W:.2f}\t{fk:.2f}\t{wg}")
+        output_file.write(f"{ts:.2f}\t{uk:.2f}\t{W:.2f}\t{rk} \t{fk:.2f}\t{wg}")
         output_file.flush()
 
         # Restablecer contadores
@@ -254,7 +265,6 @@ with open(output_file_path, 'w') as output_file:
         numero_flancos_A2 = 0
         numero_flancos_B2 = 0
 
-        
         print("Flujo = "+ str(fk))
 
         e_time = t1.tocvalue()
@@ -267,6 +277,7 @@ pi.set_PWM_dutycycle(motor1_pwm_pin, 0)
 pi.set_PWM_dutycycle(motor2_pwm_pin, 0)
 pi.write(motor1_en_pin, 0)
 pi.write(motor2_en_pin, 0)
+
 
 # Detener Pigpio
 pi.stop()
