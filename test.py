@@ -151,7 +151,7 @@ delta_W_1= 0.0
 delta_fn_1 =0.0
 delta_fn_2 = 0.0
 # Crear el archivo de salida para guardar los datos
-output_file_path = '/home/santiago/Documents/dispensador/dispen/prueba_35_5_45_15.txt'
+output_file_path = '/home/santiago/Documents/dispensador/dispen/prueba_control_m2_ms.txt'
 with open(output_file_path, 'w') as output_file:
     output_file.write("Tiempo \t PWM \t W \tFlujo \tpeso \n")
 
@@ -165,7 +165,7 @@ with open(output_file_path, 'w') as output_file:
         t1.tic()   
         k += 1       # Tic
 
-        flancos_totales_1 = numero_flancos_A + numero_flancos_B
+        flancos_totales_1 = numero_flancos_A2 + numero_flancos_B2
         RPS = flancos_totales_1 / (600.0)
         W = RPS * ((2 * pi_m) / INTERVALO)
         print("Velocidad: " + str(W))
@@ -232,8 +232,8 @@ with open(output_file_path, 'w') as output_file:
 
         
 
-        motor1_speed = upi_s  # Asegurar que motor1_speed esté en el rango 0-100
-        control_motor(motor1_pwm_pin, motor1_dir_pin, motor1_speed, 'forward')
+        motor2_speed = upi_s  # Asegurar que motor1_speed esté en el rango 0-100
+        control_motor(motor2_pwm_pin, motor2_dir_pin, motor2_speed, 'forward')
 
         delta_fn_2 = delta_fn_1
         delta_fn_1 = delta_fn
