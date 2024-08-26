@@ -45,7 +45,9 @@ RPM2 = 0.0
 
 # Variables de flujo
 fm_n= 0.0
+fm_n2= 0.0
 W=0.0
+W2= 0.0
 
 # Variables control maestro esclavo
 
@@ -54,28 +56,54 @@ ki_m = 0.241
 kp_s = 0.36612
 ki_s = 1.097
 
+Kp_m2 = 0.049398
+ki_m2 = 0.241
+kp_s2 = 0.36612
+ki_s2 = 1.097
+
 rk_m= 0.0
 yk_m= 0.0
 ek_m= 0.0
 iek_m= 0.0
-iek_m_1= 0.0
+iek_m_1= 0.0    #PARA M1
 upi_m= 0.0
 up_m = 0.0
 ui_m = 0.0
+
+rk_m2= 0.0
+yk_m2= 0.0
+ek_m2= 0.0
+iek_m2= 0.0     #PARA M2
+iek_m_12= 0.0
+upi_m2= 0.0
+up_m2 = 0.0
+ui_m2 = 0.0
 
 rk_s= 0.0
 yk_s= 0.0
 ek_s= 0.0
 iek_s= 0.0
-iek_s_1= 0.0
+iek_s_1= 0.0    #PARA M1
 upi_s= 0.0
 up_s = 0.0
 ui_s = 0.0
 k= 0.0
 
+rk_s2= 0.0
+yk_s2= 0.0
+ek_s2= 0.0
+iek_s2= 0.0        #PARA M2
+iek_s_12= 0.0   
+upi_s2= 0.0
+up_s2 = 0.0
+ui_s2 = 0.0
+k= 0.0
+k2=0.0
+
 setpoint_f= 21.3465
 setpoint_W = 28
 delta_fn= 0.0
+delta_fn_2= 0.0
 
 # Variable Voltaje
 v1 = 0.0
@@ -142,7 +170,9 @@ while True:
 
 # Loop de Control
 start_time = time.time()
+
 rk_m= float(35)
+rk_m2= float(35) #  M2
 # Habilitar motores
 pi.write(motor1_en_pin, 1)
 pi.write(motor2_en_pin, 1)
@@ -150,10 +180,14 @@ pi.write(motor2_en_pin, 1)
 delta_W_1= 0.0
 delta_fn_1 =0.0
 delta_fn_2 = 0.0
+
+delta_W_12= 0.0
+delta_fn_12 =0.0
+delta_fn_22 = 0.0
 # Crear el archivo de salida para guardar los datos
-output_file_path = '/home/santiago/Documents/dispensador/dispen/prueba_35_5_45_15_M2.txt'
+output_file_path = '/home/santiago/Documents/dispensador/dispen/maestro_esclavo_definitivo.txt'
 with open(output_file_path, 'w') as output_file:
-    output_file.write("Tiempo \t PWM \t W \tFlujo \tpeso \n")
+    output_file.write("Tiempo \t PWM_1 \t PWM_M2 \t W1 \t W2 \tFlujo \t Flujo2 \tpeso \n")
 
     wg = arduino.readline().decode('utf-8')
     print("peso" + str(wg))
@@ -164,11 +198,17 @@ with open(output_file_path, 'w') as output_file:
         t1 = TicToc()  
         t1.tic()   
         k += 1       # Tic
+        k2 += 1
 
-        flancos_totales_1 = numero_flancos_A2 + numero_flancos_B2
-        RPS2 = flancos_totales_1 / (600.0)
-        W = RPS2 * ((2 * pi_m) / INTERVALO)
+        flancos_totales_1 = numero_flancos_A + numero_flancos_B
+        RPS = flancos_totales_1 / (600.0)
+        W = RPS * ((2 * pi_m) / INTERVALO)
         print("Velocidad: " + str(W))
+
+        flancos_totales_2 = numero_flancos_A2 + numero_flancos_B2
+        RPS2 = flancos_totales_1 / (600.0)
+        W2 = RPS2 * ((2 * pi_m) / INTERVALO)
+        print("Velocidad: " + str(W2))
 
         #Msoft sensor 
         delta_W = W - setpoint_W
@@ -178,7 +218,7 @@ with open(output_file_path, 'w') as output_file:
         if k <= 3:
              fm_n= 0
         else :
-             fm_n = delta_fn + setpoint_f
+             fm_n = delta_fn + setpoint_f            # PARA M1
 
         if k == 60:
             rk_m= 5
@@ -187,8 +227,26 @@ with open(output_file_path, 'w') as output_file:
         if k == 160:
             rk_m= 15
 
+#-------------------------------------------------------------------------------------------------
+        delta_W2 = W2 - setpoint_W
 
-        #Control maestro
+        delta_fn2= 0.1969*delta_W_12 + 1.359 * delta_fn_12 - 0.581*delta_fn_22 
+
+        if k2 <= 3:
+             fm_n2= 0
+        else :                                                          # Softsensor PARA M2
+             fm_n2 = delta_fn2 + setpoint_f
+
+        if k2 == 60:
+            rk_m2= 5
+        if k2 == 110:
+            rk_m2= 45
+        if k2 == 160:
+            rk_m2= 15
+#----------------------------------------------------------------------------------------------------
+
+
+        #Control maestro para M1
         yk_m = fm_n
         ek_m= rk_m - yk_m
         iek_m = ek_m + iek_m_1
@@ -205,7 +263,25 @@ with open(output_file_path, 'w') as output_file:
         upi_m = ui_m  + up_m
         print("upi_m = "+ str(upi_m))
 
-        #Control esclavo
+
+        #Control maestro para M2
+        yk_m2 = fm_n2
+        ek_m2= rk_m2 - yk_m2
+        iek_m2 = ek_m2 + iek_m_12
+        up_m2 = Kp_m2*ek_m2
+        ui_m2 = ki_m2*iek_m2
+        upi_m2 = up_m2  + ui_m2
+
+        if upi_m2 < 0 or upi_m2 > 100:
+            if upi_m2 < 0 :
+                ui_m2 = 0 - up_m2
+            if upi_m2 >100:
+                ui_m2 = 100 - up_m2
+
+        upi_m2 = ui_m2  + up_m2
+        print("upi_m motor 2= "+ str(upi_m2))
+
+        #Control esclavo para M1
         rk_s = upi_m
         yk_s = W
         ek_s= rk_s - yk_s
@@ -230,11 +306,41 @@ with open(output_file_path, 'w') as output_file:
         print("pwm = "+ str(upi_s))
         print("flujo = "+ str(fm_n))
 
+
+        #Control esclavo para M2
+
+        rk_s2 = upi_m2
+        yk_s2 = W2
+        ek_s2= rk_s2 - yk_s2
+        iek_s2 = ek_s2 + iek_s_12
+        ui_s2 = ki_s2*iek_s2
+        up_s2= kp_s2*ek_s2
+        upi_s2 = up_s2 + ui_s2
+
+        if upi_s2 < 0 or upi_s2 > 100:
+            if upi_s2 < 0 :
+                ui_s2 = 0 - up_s2
+            if upi_s2 >100:
+                ui_s2 = 100 - up_s2
+
+        upi_s2 = ui_s2 + up_s2
+
+
+    
+        print("eks2 = "+ str(ek_s2))
+        print("ekm2 = "+ str(ek_m2))
+        print("rks2 = "+ str(rk_s2))
+        print("pwm2 = "+ str(upi_s2))
+        print("flujo2 = "+ str(fm_n2))
+
         
 
-        motor2_speed = upi_s  # Asegurar que motor1_speed esté en el rango 0-100
+        motor_speed = upi_s  # Asegurar que motor1_speed esté en el rango 0-100
+        control_motor(motor1_pwm_pin, motor1_dir_pin, motor_speed, 'forward')
+        motor2_speed = upi_s2  # Asegurar que motor1_speed esté en el rango 0-100
         control_motor(motor2_pwm_pin, motor2_dir_pin, motor2_speed, 'forward')
 
+#       Reemplazo Variables m1
         delta_fn_2 = delta_fn_1
         delta_fn_1 = delta_fn
         delta_W_1 = delta_W
@@ -242,6 +348,16 @@ with open(output_file_path, 'w') as output_file:
         iek_m_1 = iek_m
 
         iek_s_1 = iek_s
+
+#       Reemplazo Variables m2
+        delta_fn_22 = delta_fn_12
+        delta_fn_12 = delta_fn2
+        delta_W_12 = delta_W2
+
+        iek_m_12 = iek_m2
+
+        iek_s_12 = iek_s2
+
 # Medir peso
         if arduino.in_waiting > 0:
             wg = arduino.readline().decode('utf-8')
@@ -249,7 +365,7 @@ with open(output_file_path, 'w') as output_file:
         
         # Registrar los datos en el archivo
         ts = time.time() - start_time
-        output_file.write(f"{ts:.2f}\t{upi_s:.2f}\t{W:.2f}\t{fm_n:.2f}\t{wg}")
+        output_file.write(f"{ts:.2f}\t{upi_s:.2f}\t{upi_s2:.2f}\t{W:.2f}\t{W2:.2f}\t{fm_n}\t{fm_n2:.2f}\t{wg}")
 
 
         # Restablecer contadores
