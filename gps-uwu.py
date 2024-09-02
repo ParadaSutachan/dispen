@@ -13,7 +13,7 @@ def main():
             # Imprime los datos leídos para depuración
             print(f"Raw data: {newdata}")
 
-            # Procesa mensajes $GPRMC
+            # Procesa mensajes $GPRMC para obtener posición
             if newdata.startswith("$GPRMC"):
                 try:
                     newmsg = pynmea2.parse(newdata)
@@ -30,7 +30,7 @@ def main():
                     if newmsg.spd_over_grnd_kmph is not None:
                         speed_kmph = newmsg.spd_over_grnd_kmph
                         speed_mps = speed_kmph * (1000 / 3600)
-                     #   print(f"Speed (horizontal): {speed_mps:.2f} m/s")
+                        print(f"Speed (horizontal): {speed_mps:.2f} m/s")
                     else:
                         print("Speed data not available in $GPVTG")
                 except pynmea2.ParseError as e:
