@@ -5,7 +5,7 @@ import pynmea2
 
 while True:
 	port="/dev/ttyAMA0"
-	ser=serial.Serial(port, baudrate=9600, timeout=0.5)
+	ser=serial.Serial(port, baudrate=9600, timeout=0.1)
 	dataout = pynmea2.NMEAStreamReader()
 	newdata=ser.readline().decode('utf-8').strip()
 	
@@ -18,6 +18,7 @@ while True:
 		speed = newmsg.spd_over_grnd
 		#speed_mps= speed_kmph*(1000/3600)
 		print(f"Speed : {speed:.2f} m/s " )
+		print(newmsg.status)
 	    #speed_mps = speed_kmph * (1000 / 3600)
         #print(f"Speed (horizontal): {speed_mps:.2f} m/s")
 	
