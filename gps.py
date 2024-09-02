@@ -12,9 +12,7 @@ while True:
     # Verifica si se recibe una sentencia GPRMC  
     if newdata[0:6] == "$GPRMC":  
         newmsg = pynmea2.parse(newdata)  
-        status = newmsg.status  
-        print(status)  
-        
+        status = newmsg.status   
         # Maneja los estados A y V  
         if status == "A":  
             lat = newmsg.latitude  
