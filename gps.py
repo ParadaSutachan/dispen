@@ -15,4 +15,6 @@ while True:
 		lng=newmsg.longitude
 		gps = "Lat = " + str(lat) + " Lng = " + str(lng)
 		print(gps)
+		speed_kmph = newmsg.spd_over_grnd_kmph
+		print(speed_kmph)
 	
