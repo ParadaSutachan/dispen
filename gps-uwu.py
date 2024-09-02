@@ -3,7 +3,7 @@ import pynmea2
 
 def main():
     port = "/dev/ttyAMA0"  # Ajusta el puerto según tu configuración
-    ser = serial.Serial(port, baudrate=9600, timeout=0.2)
+    ser = serial.Serial(port, baudrate=9600, timeout=0.1)
 
     while True:
         try:
