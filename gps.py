@@ -9,4 +9,4 @@ while True:
 	dataout = pynmea2.NMEAStreamReader()
 	newdata=ser.readline()
 
-	print (newdata)
+	print (newdata[0:6])
