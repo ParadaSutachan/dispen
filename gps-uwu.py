@@ -11,7 +11,7 @@ def main():
             newdata = ser.readline().decode('utf-8').strip()
 
             # Imprime los datos leídos para depuración
-            print(f"Raw data: {newdata}")
+            #print(f"Raw data: {newdata}")
 
             # Procesa mensajes $GPRMC
             if newdata.startswith("$GPRMC"):
