@@ -11,7 +11,10 @@ while True:
 
 	if newdata[0:6] == "$GPRMC":
 		newmsg=pynmea2.parse(newdata)
+		print(newmsg)
 		lat=newmsg.latitude
+		print(lat)
 		lng=newmsg.longitude
+		print(lng)
 		gps = "Latitude=" + str(lat) + "and Longitude=" + str(lng)
 		print(gps)
