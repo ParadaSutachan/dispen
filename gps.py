@@ -10,10 +10,12 @@ while True:
     newdata=ser.readline().decode('utf-8').strip()
     newmsg=pynmea2.parse(newdata)
     if newmsg.status == 'V':
-        print('Estoy Agarrando señal Karnarl...')
+        print('Estoy Agarrando señal Krnarl...')
 
     while newmsg.status == 'A':
         if newdata[0:6] == "$GPRMC":
+            print("Ya tengo señal Krnal ....")
+            print("Toma tus datos .... ")
             newmsg=pynmea2.parse(newdata)
             lat=newmsg.latitude
             lng=newmsg.longitude
