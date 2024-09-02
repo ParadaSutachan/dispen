@@ -23,7 +23,7 @@ while True:
             print(gps)
             speed = newmsg.spd_over_grnd
             #speed_mps= speed_kmph*(1000/3600)
-            print(f"Speed : {speed:.2f} m/s " )
+            print(f"Speed : {speed:.2f} nudos " )
             #speed_mps = speed_kmph * (1000 / 3600)
             #print(f"Speed (horizontal): {speed_mps:.2f} m/s")
 		
