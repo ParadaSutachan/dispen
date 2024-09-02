@@ -18,6 +18,7 @@ pi_m = math.pi
 arduino_port = '/dev/ttyACM0'  # Puerto donde está conectada la placa Arduino
 arduino_baud = 9600
 
+
 # Configuración de pines de motor y encoder
 
 motor1_pwm_pin = 12
