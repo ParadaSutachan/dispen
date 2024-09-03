@@ -1,11 +1,11 @@
 # -- coding: utf-8 --
 #!/usr/bin/env python3
 
-import serial  
+import serial  #type: ignore
 import time  
-import pynmea2
-import shapefile
-from shapely.geometry import shape, Point  
+import pynmea2 #type: ignore
+import shapefile #type: ignore
+from shapely.geometry import shape, Point   #type: ignore
 
 # Configura el puerto serie  
 port = "/dev/ttyAMA0"  
@@ -49,6 +49,9 @@ while True:
                 if zone_def :
                     zone=k
                     print('El punto corresponde a la zona ' + str(zone+1))
+                else:
+                    print("Estas Fuera de Rango")
+
 
         elif status == "V":  
             print("Estoy Agarrando Señal, Krnal ...")  

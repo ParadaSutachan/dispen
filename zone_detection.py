@@ -6,8 +6,8 @@ Created on Mon Sep  2 18:10:33 2024
 @author: obarrero
 """
 
-import shapefile
-from shapely.geometry import shape, Point
+import shapefile #type: ignore
+from shapely.geometry import shape, Point #type: ignore
 
 
 def check(lon, lat):
