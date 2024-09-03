@@ -220,6 +220,7 @@ with open(output_file_path, 'w') as output_file:
                     
                     if not inside_zone:
                         print("Estas Fuera de Rango")
+                        
                     # Salir del bucle while True
                     break    
 
