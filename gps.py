@@ -48,7 +48,10 @@ while True:
                 zone_def = check(lon, lat)
                 if zone_def :
                     zone=k
-            print('El punto corresponde a la zona ' + str(zone+1))
+                    print('El punto corresponde a la zona ' + str(zone+1))
+                else:
+                    print("Papi no estas en la casona ... ")
+                    print("Tas meando fuera del tiesto")
 
         elif status == "V":  
             print("Estoy Agarrando Señal, Krnal ...")  
