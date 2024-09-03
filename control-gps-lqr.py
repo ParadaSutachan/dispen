@@ -9,6 +9,8 @@ from numpy import array  #type: ignore
 import serial #type:ignore
 import RPi.GPIO as GPIO #type:ignore
 import pynmea2 #type: ignore
+import shapefile #type: ignore
+from shapely.geometry import shape, Point #type: ignore
 
 # Inicialización de Pigpio
 pi = pigpio.pi()
@@ -17,6 +19,14 @@ pi_m = math.pi
 # Configura el puerto serie  
 port = "/dev/ttyAMA0"  
 ser = serial.Serial(port, baudrate=9600, timeout=0.1)  
+
+
+def check(lon, lat):
+    # build a shapely point from your geopoint
+    point = Point(lon, lat)
+
+    # the contains function does exactly what you want
+    return polygon.contains(point)
 
 # Configuración de pines de motor y encoder
 
@@ -132,6 +142,9 @@ ek_1 = 0.0
 ek_int = 0.0
 ek_int_1 = 0.0
 rk = 0.0
+dosis = 10.0
+afaja = 3.0
+vel = 0.0
 fk = 0.0
 W = 0.0
 uk = 0.0
@@ -154,7 +167,7 @@ xk1 = np.array([[0],
                    [0],
                    [0]]) 
 
-#Inicializacion del arduino
+
 
 #variables galga
 wg = 0.0
@@ -163,6 +176,11 @@ time.sleep(10)  # Esperar a que la conexión serial se establezca
 
 while True:
     newdata = ser.readline().decode('utf-8').strip()  
+    # read your shapefile
+    poly_file='poligono_casona.shp'
+    r = shapefile.Reader(poly_file)
+    # get the shapes
+    shapes = r.shapes()
     
     # Verifica si se recibe una sentencia GPRMC  
     if newdata[0:6] == "$GPRMC":  
@@ -187,18 +205,14 @@ while True:
 # Habilitar motores
 pi.write(motor1_en_pin, 1)
 pi.write(motor2_en_pin, 1)
-rk=20
 
 # Crear el archivo de salida para guardar los datos
 output_file_path = '/home/santiago/Documents/dispensador/dispen/test_control_ss.txt'
 
 
 with open(output_file_path, 'w') as output_file:
-    output_file.write("Tiempo \t PWM \t W \t Referencia \tFlujo \t Peso \n")
 
-    wg = arduino.readline().decode('utf-8')
-    print("Peso: " +str(wg))
-
+    output_file.write("Tiempo \t PWM \t W \t Referencia \t Flujo \t\n")
     start_time = time.time()
 
     while(time.time()-start_time <= 60):
@@ -220,12 +234,38 @@ with open(output_file_path, 'w') as output_file:
              fk= 0
         else :
              fk=delta_f+F_b
-        ##
 
-        if k == 100:
-            rk=40
-        if k == 200:
-            rk =30
+        #Calculo de la Referencia#
+
+        if newdata[0:6] == "$GPRMC":  
+            newmsg = pynmea2.parse(newdata)  
+            status = newmsg.status   
+            # Maneja los estados A y V  
+            if status == "A":  
+                lat = newmsg.latitude  
+                lon = newmsg.longitude  
+                gps = f"Lat = {lat} Lng = {lon}"  
+                print(gps)  
+                speed = newmsg.spd_over_grnd  # velocidad en nudos  
+                speed_mps = speed * (0.514444)  # convertimos de nudos a m/s  
+                print(f"Speed: {speed_mps:.2f} m/s")
+                for k in range(len(shapes)):
+                # build a shapely polygon from your shape
+                    polygon = shape(shapes[k])    
+                    zone_def = check(lon, lat)
+                    if zone_def :
+                        zone=k
+        
+        zona = zone+1
+
+        if zona == 1 :
+            dosis = 10.0
+        elif zona == 2 :
+            dosis = 5.0
+
+        vel = float(speed_mps)
+
+        rk = dosis*afaja*vel
 
         ##Observador
         uo = np.array([[uk],
@@ -260,14 +300,9 @@ with open(output_file_path, 'w') as output_file:
         ek_1 = ek
         delta_w_1 = delta_w 
 
-        # Medir peso
-        if arduino.in_waiting > 0:
-            wg = arduino.readline().decode('utf-8')
-            print("Peso: " +str(wg))
-
         # Registrar los datos en el archivo
         ts = time.time() - start_time
-        output_file.write(f"{ts:.2f}\t{uk:.2f}\t{W:.2f}\t{rk} \t{fk:.2f}\t{wg}")
+        output_file.write(f"{ts:.2f}\t{uk:.2f}\t{W:.2f}\t{rk} \t{fk:.2f}")
         output_file.flush()
 
         # Restablecer contadores
@@ -277,6 +312,12 @@ with open(output_file_path, 'w') as output_file:
         numero_flancos_B2 = 0
 
         print("Flujo = "+ str(fk))
+
+        if status == "V":  
+            print("Estoy Agarrando Señal, Krnal ...")  
+            print("Estoy Cansado, Jefe")
+            rk = 0.0
+            control_motor(motor1_pwm_pin, motor1_dir_pin, 0, 'forward')
 
         e_time = t1.tocvalue()
         toc = T-e_time         #Toc

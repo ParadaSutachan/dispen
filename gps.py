@@ -54,6 +54,5 @@ while True:
 
 
         elif status == "V":  
-            print("Estoy Agarrando Señal, Krnal ...")  
-            print("Estoy Cansado, Jefe")
+            print("Buscando Señal ...")  
 	
