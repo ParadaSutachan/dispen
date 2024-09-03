@@ -8,16 +8,15 @@ import numpy as np # type: ignore
 from numpy import array  #type: ignore
 import serial #type:ignore
 import RPi.GPIO as GPIO #type:ignore
+import pynmea2 #type: ignore
 
 # Inicialización de Pigpio
 pi = pigpio.pi()
 pi_m = math.pi 
 
-#Puerto arduino
-
-arduino_port = '/dev/ttyACM0'  # Puerto donde está conectada la placa Arduino
-arduino_baud = 9600
-
+# Configura el puerto serie  
+port = "/dev/ttyAMA0"  
+ser = serial.Serial(port, baudrate=9600, timeout=0.1)  
 
 # Configuración de pines de motor y encoder
 
@@ -160,17 +159,28 @@ xk1 = np.array([[0],
 #variables galga
 wg = 0.0
 GPIO.setwarnings(False)
-arduino = serial.Serial(arduino_port, arduino_baud)
 time.sleep(10)  # Esperar a que la conexión serial se establezca
 
 while True:
-    if arduino.in_waiting > 0:
-        mensaje = arduino.readline().decode('utf-8').strip()
-        if mensaje == "Listo para pesar":
-            print("Arduino ha completado la inicialización.")
+    newdata = ser.readline().decode('utf-8').strip()  
+    
+    # Verifica si se recibe una sentencia GPRMC  
+    if newdata[0:6] == "$GPRMC":  
+        newmsg = pynmea2.parse(newdata)  
+        status = newmsg.status   
+        # Maneja los estados A y V  
+        if status == "A":  
+            lat = newmsg.latitude  
+            lng = newmsg.longitude  
+            gps = f"Lat = {lat} Lng = {lng}"  
+            print(gps)  
+            speed = newmsg.spd_over_grnd  # velocidad en nudos  
+            speed_mps = speed * (0.514444)  # convertimos de nudos a m/s  
+            print(f"Speed: {speed:.2f} knots / {speed_mps:.2f} m/s")
             break
-        else:
-            print(f"Mensaje de Arduino: {mensaje}")
+        elif status == "V":  
+            print("Estoy Agarrando Señal, Krnal ...")  
+            print("Estoy Cansado, Jefe")
 
 # Loop de Control
 
