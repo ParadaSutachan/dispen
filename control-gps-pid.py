@@ -11,11 +11,6 @@ from pytictoc import TicToc
 pi = pigpio.pi()
 pi_m = math.pi
 
-#Puerto arduino
-#
-arduino_port = '/dev/ttyACM0'  # Puerto donde está conectada la placa Arduino
-arduino_baud = 9600
-
 # Configuración de pines de motor y encoder
 motor1_pwm_pin = 12
 motor1_dir_pin = 24
@@ -104,6 +99,9 @@ setpoint_f= 21.3465
 setpoint_W = 28
 delta_fn= 0.0
 delta_fn_2= 0.0
+ref= 12.0
+ancho_faja= 3.0
+velocidad =0.0
 
 # Variable Voltaje
 v1 = 0.0
@@ -153,25 +151,11 @@ def control_motor(pin_pwm, pin_dir, speed_percent, direction):
     else:
         raise ValueError("Dirección no válida. Usa 'forward' o 'backward'.")
 
-#variables galga
-wg = 0.0
-GPIO.setwarnings(False)
-arduino = serial.Serial(arduino_port, arduino_baud)
-time.sleep(10)  # Esperar a que la conexión serial se establezca
-
-while True:
-    if arduino.in_waiting > 0:
-        mensaje = arduino.readline().decode('utf-8').strip()
-        if mensaje == "Listo para pesar":
-            print("Arduino ha completado la inicialización.")
-            break
-        else:
-            print(f"Mensaje de Arduino: {mensaje}")
 
 # Loop de Control
 start_time = time.time()
 
-rk_m= float(35)
+rk_m= float(ref*ancho_faja*velocidad)
 rk_m2= float(35) #  M2
 # Habilitar motores
 pi.write(motor1_en_pin, 1)
@@ -187,10 +171,8 @@ delta_fn_22 = 0.0
 # Crear el archivo de salida para guardar los datos
 output_file_path = '/home/santiago/Documents/dispensador/dispen/maestro_esclavo_definitivo.txt'
 with open(output_file_path, 'w') as output_file:
-    output_file.write("Tiempo \t PWM_1 \t PWM_M2 \t W1 \t W2 \tFlujo \t Flujo2 \tpeso \n")
+    output_file.write("Tiempo \t PWM_1 \t PWM_M2 \t W1 \t W2 \tFlujo \t Flujo2\n")
 
-    wg = arduino.readline().decode('utf-8')
-    print("peso" + str(wg))
     start_time = time.time()
 
     while(time.time()-start_time <= 60):
@@ -299,9 +281,6 @@ with open(output_file_path, 'w') as output_file:
         upi_s = ui_s + up_s
 
 
-    
-        print("eks = "+ str(ek_s))
-        print("ekm = "+ str(ek_m))
         print("rks = "+ str(rk_s))
         print("pwm = "+ str(upi_s))
         print("flujo = "+ str(fm_n))
@@ -326,9 +305,6 @@ with open(output_file_path, 'w') as output_file:
         upi_s2 = ui_s2 + up_s2
 
 
-    
-        print("eks2 = "+ str(ek_s2))
-        print("ekm2 = "+ str(ek_m2))
         print("rks2 = "+ str(rk_s2))
         print("pwm2 = "+ str(upi_s2))
         print("flujo2 = "+ str(fm_n2))
@@ -358,14 +334,10 @@ with open(output_file_path, 'w') as output_file:
 
         iek_s_12 = iek_s2
 
-# Medir peso
-        if arduino.in_waiting > 0:
-            wg = arduino.readline().decode('utf-8')
-            print(wg)
         
         # Registrar los datos en el archivo
         ts = time.time() - start_time
-        output_file.write(f"{ts:.2f}\t{upi_s:.2f}\t{upi_s2:.2f}\t{W:.2f}\t{W2:.2f}\t{fm_n}\t{fm_n2:.2f}\t{wg}")
+        output_file.write(f"{ts:.2f}\t{upi_s:.2f}\t{upi_s2:.2f}\t{W:.2f}\t{W2:.2f}\t{fm_n}\t{fm_n2:.2f}")
 
 
         # Restablecer contadores
