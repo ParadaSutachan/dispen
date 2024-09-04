@@ -193,7 +193,7 @@ while True:
             break
 
         elif status == "V":  
-            print("")
+            print("Buscando señal . . .")
 
 # Loop de Control
 
