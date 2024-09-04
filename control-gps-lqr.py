@@ -10,7 +10,7 @@ import serial #type:ignore
 import RPi.GPIO as GPIO #type:ignore
 import pynmea2 #type: ignore
 import shapefile #type: ignore
-from shapely.geometry import shape, Point #type: ignore
+from shapely.geometry import shape, Point   #type: ignore
 
 # Inicialización de Pigpio
 pi = pigpio.pi()
@@ -19,14 +19,6 @@ pi_m = math.pi
 # Configura el puerto serie  
 port = "/dev/ttyAMA0"  
 ser = serial.Serial(port, baudrate=9600, timeout=0.1)  
-
-
-def check(lon, lat):
-    # build a shapely point from your geopoint
-    point = Point(lon, lat)
-
-    # the contains function does exactly what you want
-    return polygon.contains(point)
 
 # Configuración de pines de motor y encoder
 
@@ -87,7 +79,14 @@ def control_motor(pin_pwm, pin_dir, speed_percent, direction):
         pi.write(pin_dir, 0)  # Dirección hacia atrás
     else:
         raise ValueError("Dirección no válida. Usa 'forward' o 'backward'.")
-    
+
+def check(lon, lat):
+    # build a shapely point from your geopoint
+    point = Point(lon, lat)
+
+    # the contains function does exactly what you want
+    return polygon.contains(point)
+
 # Contadores de flancos
 numero_flancos_A = 0
 numero_flancos_B = 0
@@ -142,9 +141,6 @@ ek_1 = 0.0
 ek_int = 0.0
 ek_int_1 = 0.0
 rk = 0.0
-dosis = 10.0
-afaja = 3.0
-vel = 0.0
 fk = 0.0
 W = 0.0
 uk = 0.0
@@ -156,6 +152,9 @@ delta_f = 0.0
 delta_f_1 = 0.0 
 delta_f_2 = 0.0
 k=0
+g=0
+rate = 0.0
+faja = 3.0
 
 xk = np.array([[0],
                [0],
@@ -167,7 +166,7 @@ xk1 = np.array([[0],
                    [0],
                    [0]]) 
 
-
+#Inicializacion del arduino
 
 #variables galga
 wg = 0.0
@@ -175,12 +174,8 @@ GPIO.setwarnings(False)
 time.sleep(10)  # Esperar a que la conexión serial se establezca
 
 while True:
+
     newdata = ser.readline().decode('utf-8').strip()  
-    # read your shapefile
-    poly_file='poligono_casona.shp'
-    r = shapefile.Reader(poly_file)
-    # get the shapes
-    shapes = r.shapes()
     
     # Verifica si se recibe una sentencia GPRMC  
     if newdata[0:6] == "$GPRMC":  
@@ -189,16 +184,16 @@ while True:
         # Maneja los estados A y V  
         if status == "A":  
             lat = newmsg.latitude  
-            lng = newmsg.longitude  
-            gps = f"Lat = {lat} Lng = {lng}"  
+            lon = newmsg.longitude  
+            gps = f"Lat = {lat} Lng = {lon}"  
             print(gps)  
             speed = newmsg.spd_over_grnd  # velocidad en nudos  
             speed_mps = speed * (0.514444)  # convertimos de nudos a m/s  
             print(f"Speed: {speed:.2f} knots / {speed_mps:.2f} m/s")
             break
+
         elif status == "V":  
-            print("Estoy Agarrando Señal, Krnal ...")  
-            print("Estoy Cansado, Jefe")
+            print("")
 
 # Loop de Control
 
@@ -211,21 +206,58 @@ output_file_path = '/home/santiago/Documents/dispensador/dispen/test_control_ss.
 
 
 with open(output_file_path, 'w') as output_file:
-
-    output_file.write("Tiempo \t PWM \t W \t Referencia \t Flujo \t\n")
+    output_file.write("Tiempo \t PWM \t W \t Referencia \tFlujo \t Peso \n")
+    print("Peso: " +str(wg))
     start_time = time.time()
 
-    while(time.time()-start_time <= 60):
+    while(True):
         
         t1 = TicToc()       # Tic
         t1.tic()
         k += 1
+        g +=1
 
+        if  g == 4:
+            newdata = ser.readline().decode('utf-8').strip()    
+             # Verifica si se recibe una sentencia GPRMC  
+            if newdata[0:6] == "$GPRMC":  
+                newmsg = pynmea2.parse(newdata)  
+                status = newmsg.status
+                # read your shapefile
+                poly_file='poligono_casona.shp'
+                r = shapefile.Reader(poly_file)  
+                # Maneja los estados A y V  
+                if status == "A":  
+                    lat = newmsg.latitude  
+                    lon = newmsg.longitude  
+                    gps = f"Lat = {lat} Lng = {lon}"  
+                    print(gps)  
+                    speed = newmsg.spd_over_grnd  # velocidad en nudos  
+                    speed_mps = speed * (0.514444)  # convertimos de nudos a m/s  
+                    print(f"Speed: {speed_mps:.2f} m/s")
+                    # get the shapes
+                    shapes = r.shapes()
+                    inside_zone = False  # Bandera para verificar si está dentro de alguna zona
+                    for k in range(len(shapes)):
+                        # build a shapely polygon from your shape
+                        polygon = shape(shapes[k])    
+                        zone_def = check(lon, lat)
+                        if zone_def:
+                            zone = k
+                            print('El punto corresponde a la zona ' + str(zone+1))
+                            zona = zone+1
+                            inside_zone = True
+                            if zona == 1:
+                                rate = 15
+                            elif zona == 2:
+                                rate = 8
         #Lectura de Flancos para medir velocidad
         flancos_totales_1 = numero_flancos_A + numero_flancos_B
         FPS = flancos_totales_1 / (600.0)
         W = FPS * ((2 * pi_m) / T)      #Velocidad del motor
         print("Velocidad: " + str(W))
+
+
         # Soft Sensor
         delta_w = W-W_b
         delta_f = 0.1969*delta_w_1 + 1.359*delta_f_1 -0.581*delta_f_2
@@ -234,38 +266,14 @@ with open(output_file_path, 'w') as output_file:
              fk= 0
         else :
              fk=delta_f+F_b
+        # Calulo de la referencia #
 
-        #Calculo de la Referencia#
+        float(speed_mps)
 
-        if newdata[0:6] == "$GPRMC":  
-            newmsg = pynmea2.parse(newdata)  
-            status = newmsg.status   
-            # Maneja los estados A y V  
-            if status == "A":  
-                lat = newmsg.latitude  
-                lon = newmsg.longitude  
-                gps = f"Lat = {lat} Lng = {lon}"  
-                print(gps)  
-                speed = newmsg.spd_over_grnd  # velocidad en nudos  
-                speed_mps = speed * (0.514444)  # convertimos de nudos a m/s  
-                print(f"Speed: {speed_mps:.2f} m/s")
-                for k in range(len(shapes)):
-                # build a shapely polygon from your shape
-                    polygon = shape(shapes[k])    
-                    zone_def = check(lon, lat)
-                    if zone_def :
-                        zone=k
-        
-        zona = zone+1
+        if speed_mps <= 0.3:
+            speed_mps = 0.0
 
-        if zona == 1 :
-            dosis = 10.0
-        elif zona == 2 :
-            dosis = 5.0
-
-        vel = float(speed_mps)
-
-        rk = dosis*afaja*vel
+        rk = speed_mps*rate*faja
 
         ##Observador
         uo = np.array([[uk],
@@ -302,7 +310,7 @@ with open(output_file_path, 'w') as output_file:
 
         # Registrar los datos en el archivo
         ts = time.time() - start_time
-        output_file.write(f"{ts:.2f}\t{uk:.2f}\t{W:.2f}\t{rk} \t{fk:.2f}")
+        output_file.write(f"{ts:.2f}\t{uk:.2f}\t{W:.2f}\t{rk} \t{fk:.2f}\t{wg}")
         output_file.flush()
 
         # Restablecer contadores
@@ -312,12 +320,6 @@ with open(output_file_path, 'w') as output_file:
         numero_flancos_B2 = 0
 
         print("Flujo = "+ str(fk))
-
-        if status == "V":  
-            print("Estoy Agarrando Señal, Krnal ...")  
-            print("Estoy Cansado, Jefe")
-            rk = 0.0
-            control_motor(motor1_pwm_pin, motor1_dir_pin, 0, 'forward')
 
         e_time = t1.tocvalue()
         toc = T-e_time         #Toc
