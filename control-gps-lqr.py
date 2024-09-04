@@ -197,12 +197,11 @@ pi.write(motor1_en_pin, 1)
 pi.write(motor2_en_pin, 1)
 
 # Crear el archivo de salida para guardar los datos
-output_file_path = '/home/santiago/Documents/dispensador/dispen/test_control_ss.txt'
+output_file_path = '/home/santiago/Documents/dispensador/dispen/beta-test.txt'
 
 
 with open(output_file_path, 'w') as output_file:
-    output_file.write("Tiempo \t PWM \t W \t Referencia \tFlujo \t Peso \n")
-    print("Peso: " +str(wg))
+    output_file.write("Tiempo \t PWM \t W \t Referencia \t Flujo \n")
     start_time = time.time()
 
     while(True):
@@ -305,7 +304,7 @@ with open(output_file_path, 'w') as output_file:
 
         # Registrar los datos en el archivo
         ts = time.time() - start_time
-        output_file.write(f"{ts:.2f}\t{uk:.2f}\t{W:.2f}\t{rk} \t{fk:.2f}\t{wg}")
+        output_file.write(f"{ts:.2f}\t{uk:.2f}\t{W:.2f}\t{rk} \t{fk:.2f}\n")
         output_file.flush()
 
         # Restablecer contadores
