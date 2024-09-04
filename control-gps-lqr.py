@@ -210,7 +210,8 @@ with open(output_file_path, 'w') as output_file:
         k += 1
         g +=1
 
-        if  g == 4:
+        if g == 4:
+            print ("Entro")
             newdata = ser.readline().decode('utf-8').strip()    
              # Verifica si se recibe una sentencia GPRMC  
             if newdata[0:6] == "$GPRMC":  
