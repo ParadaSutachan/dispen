@@ -211,7 +211,6 @@ with open(output_file_path, 'w') as output_file:
         gk +=1
 
         if gk == 3:
-            print("Entré")
             newdata = ser.readline().decode('utf-8').strip()
             if newdata[0:6] == "$GPRMC":
                 newmsg = pynmea2.parse(newdata)  
@@ -234,7 +233,6 @@ with open(output_file_path, 'w') as output_file:
                     for j in range(len(shapes)):
                         polygon = shape(shapes[j])
                         zone_def = check(lon,lat)
-                        print(zone_def)
                         if zone_def:
                             zone = j
                             zona = zone+1
