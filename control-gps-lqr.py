@@ -240,21 +240,18 @@ with open(output_file_path, 'w') as output_file:
                             zona = zone+1
                             inside_zone = True
                             if zona == 1:
-                                rk = 8
-                                print(rk)
+                                rata = 8
+                                print(rata)
                             if zona == 2:
                                 rk = 10
-                                print(rk)
+                                print(rata)
                             break
                     
                     while not inside_zone:
                         print("Estas Fuera del Aerea a implementar . . .")
                         rk = 0.0
                         control_motor(motor1_pwm_pin, motor1_dir_pin, 0, 'forward')
-
-
-
-
+                        time.sleep(0.2)
             gk=0
 
         #Lectura de Flancos para medir velocidad
@@ -278,7 +275,9 @@ with open(output_file_path, 'w') as output_file:
 
         if speed_mps <= 0.3:
             speed_mps =0.0
+
         rk = speed_mps*rate*faja
+        print("rk: " + str(rk))
 
         ##Observador
         uo = np.array([[uk],
