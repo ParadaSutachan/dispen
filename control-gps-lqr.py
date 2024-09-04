@@ -210,13 +210,22 @@ with open(output_file_path, 'w') as output_file:
         k += 1
         gk +=1
 
-        if gk == 4:
+        if gk == 2:
             print("Entré")
             newdata = ser.readline().decode('utf-8').strip()
             if newdata[0:6] == "$GPRMC":
                 newmsg = pynmea2.parse(newdata)  
                 status = newmsg.status
-                print(newmsg)
+                # read your shapefile
+                poly_file='poligono_casona.shp'
+                r = shapefile.Reader(poly_file)
+                # Maneja los estados A y V
+                if status == "A":
+                    lat = newmsg.latitude
+                    lon = newmsg.longitude
+                    gps = f"Lat = {lat} Lng = {lon}"
+                    print(gps)
+
             gk=0
 
         #Lectura de Flancos para medir velocidad
