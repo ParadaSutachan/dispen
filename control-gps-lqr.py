@@ -235,6 +235,10 @@ with open(output_file_path, 'w') as output_file:
                         polygon = shape(shapes[j])
                         zone_def = check(lon,lat)
                         print(zone_def)
+                        if not zone_def:
+                            zone = j
+                            inside_zone = True
+                            print("No es la zona, solo prueba ")
 
 
             gk=0
