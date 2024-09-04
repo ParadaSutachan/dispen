@@ -213,7 +213,10 @@ with open(output_file_path, 'w') as output_file:
         if gk == 4:
             print("Entré")
             newdata = ser.readline().decode('utf-8').strip()
-            print(newdata)
+            if newdata[0:6] == "$GPRMC":
+                newmsg = pynmea2.parse(newdata)  
+                status = newmsg.status
+                print(newmsg)
             gk=0
 
         #Lectura de Flancos para medir velocidad
