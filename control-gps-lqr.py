@@ -211,49 +211,10 @@ with open(output_file_path, 'w') as output_file:
         gk +=1
 
         if gk == 4:
-            print ("Entro")
-            newdata = ser.readline().decode('utf-8').strip()    
-             # Verifica si se recibe una sentencia GPRMC  
-            if newdata[0:6] == "$GPRMC":  
-                newmsg = pynmea2.parse(newdata)  
-                status = newmsg.status
-                # read your shapefile
-                poly_file='poligono_casona.shp'
-                r = shapefile.Reader(poly_file)  
-                # Maneja los estados A y V  
-                if status == "A":  
-                    lat = newmsg.latitude  
-                    lon = newmsg.longitude  
-                    gps = f"Lat = {lat} Lng = {lon}"  
-                    print(gps)  
-                    speed = newmsg.spd_over_grnd  # velocidad en nudos  
-                    speed_mps = speed * (0.514444)  # convertimos de nudos a m/s  
-                    print(f"Speed: {speed_mps:.2f} m/s")
-                    # get the shapes
-                    shapes = r.shapes()
-                    inside_zone = False  # Bandera para verificar si está dentro de alguna zona
-                    for k in range(len(shapes)):
-                        # build a shapely polygon from your shape
-                        polygon = shape(shapes[k])    
-                        zone_def = check(lon, lat)
-                        if zone_def:
-                            zone = k
-                            print('El punto corresponde a la zona ' + str(zone+1))
-                            zona = zone+1
-                            inside_zone = True
-                            if zona == 1:
-                                rate = 15
-                            elif zona == 2:
-                                rate = 8
-                            gk=0
-                            break  # Sal del bucle si se encuentra una zona
-
-                    while not inside_zone:
-                        print("Estas Fuera de Rango . . .")
-                        rk = 0.0
-                        control_motor(motor1_pwm_pin, motor1_dir_pin, 0, 'forward')
-                        print("rk: " + str(rk))
-                        print("Velocidad: " + str(W))
+            print("Entré")
+            newdata = ser.readline().decode('utf-8').strip()
+            print(newdata)
+            gk=0
 
         #Lectura de Flancos para medir velocidad
         flancos_totales_1 = numero_flancos_A + numero_flancos_B
