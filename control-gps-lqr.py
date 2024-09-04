@@ -210,9 +210,9 @@ with open(output_file_path, 'w') as output_file:
         k += 1
         gk +=1
 
-        if gk==4:
-            print(gk)
-        
+        if gk == 4:
+            print("Entro")
+            gk = 0
 
         #Lectura de Flancos para medir velocidad
         flancos_totales_1 = numero_flancos_A + numero_flancos_B
