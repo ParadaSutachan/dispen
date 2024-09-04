@@ -237,8 +237,12 @@ with open(output_file_path, 'w') as output_file:
                         print(zone_def)
                         if not zone_def:
                             zone = j
+                            zona = zone+1
                             inside_zone = True
-                            print("No es la zona, solo prueba ")
+                            if zona == 1:
+                                rk = 15
+                                print("Sigo funcionando")
+
 
 
             gk=0
