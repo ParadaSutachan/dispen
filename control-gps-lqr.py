@@ -247,9 +247,10 @@ with open(output_file_path, 'w') as output_file:
                                 print(rk)
                             break
                     
-                    if not inside_zone:
+                    while not inside_zone:
                         print("Estas Fuera del Aerea a implementar . . .")
                         rk = 0.0
+                        control_motor(motor1_pwm_pin, motor1_dir_pin, 0, 'forward')
 
 
 
