@@ -251,7 +251,7 @@ with open(output_file_path, 'w') as output_file:
                         print("Estas Fuera de Rango . . .")
                         rk = 0.0
                         control_motor(motor1_pwm_pin, motor1_dir_pin, 0, 'forward')
-
+        print(g)
 
         #Lectura de Flancos para medir velocidad
         flancos_totales_1 = numero_flancos_A + numero_flancos_B
