@@ -250,30 +250,36 @@ with open(output_file_path, 'w') as output_file:
                         rk = 0.0
                         control_motor(motor1_pwm_pin, motor1_dir_pin, 0, 'forward')
                         newdata = ser.readline().decode('utf-8').strip()
-                        newmsg = pynmea2.parse(newdata)
-                        poly_file='poligono_casona.shp'
-                        r = shapefile.Reader(poly_file)
-                        if status == "A":
-                            lat = newmsg.latitude
-                            lon = newmsg.longitude
-                            gps = f"Lat = {lat} Lng = {lon}"
-                            print(gps)
-                            shapes = r.shapes()
-                            inside_zone = False # Bandera para verificar si está dentro de alguna zona
-                            for j in range(len(shapes)):
-                                polygon = shape(shapes[j])
-                                zone_def = check(lon,lat)
-                                if zone_def:
-                                    zone = j
-                                    zona = zone+1
-                                    inside_zone = True
-                                    if zona == 1:
-                                        rata = 8
-                                        print(rata)
-                                    if zona == 2:
-                                        rk = 10
-                                        print(rata)
-                                    break
+                        if newdata[0:6] == "$GPRMC":
+                            newmsg = pynmea2.parse(newdata)  
+                            status = newmsg.status
+                            # read your shapefile
+                            poly_file='poligono_casona.shp'
+                            r = shapefile.Reader(poly_file)
+                            # Maneja los estados A y V
+                            if status == "A":
+                                lat = newmsg.latitude
+                                lon = newmsg.longitude
+                                gps = f"Lat = {lat} Lng = {lon}"
+                                print(gps)
+                                # get the shapes
+                                shapes = r.shapes()
+                                inside_zone = False # Bandera para verificar si está dentro de alguna zona
+                                for j in range(len(shapes)):
+                                    polygon = shape(shapes[j])
+                                    zone_def = check(lon,lat)
+                                    if zone_def:
+                                        zone = j
+                                        zona = zone+1
+                                        inside_zone = True
+                                        if zona == 1:
+                                            rata = 8
+                                            print(rata)
+                                        if zona == 2:
+                                            rk = 10
+                                            print(rata)
+                                        break
+
                         time.sleep(0.2)
             gk=0
 
