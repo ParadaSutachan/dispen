@@ -188,7 +188,7 @@ while True:
             break
 
         elif status == "V":  
-            print("")
+            print("Buscando señal . . .")
 
 # Loop de Control
 
@@ -225,6 +225,13 @@ with open(output_file_path, 'w') as output_file:
                     lon = newmsg.longitude
                     gps = f"Lat = {lat} Lng = {lon}"
                     print(gps)
+                    speed = newmsg.spd_over_grnd  # velocidad en nudos
+                    speed_mps = speed * (0.514444)  # convertimos de nudos a m/s  
+                    print(f"Speed: {speed_mps:.2f} m/s")
+                    # get the shapes
+                    shapes = r.shapes()
+                    inside_zone = False  # Bandera para verificar si está dentro de alguna zona
+
 
             gk=0
 
