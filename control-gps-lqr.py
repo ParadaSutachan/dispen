@@ -239,8 +239,11 @@ with open(output_file_path, 'w') as output_file:
                             zone = j
                             zona = zone+1
                             inside_zone = True
-                            if zona == 1:
-                                rk = 15
+                            if not zona == 1:
+                                rk = 8
+                                print(rk)
+                            if zona ==1:
+                                rk = 10
                                 print(rk)
 
 
