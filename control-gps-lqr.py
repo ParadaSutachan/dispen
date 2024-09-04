@@ -238,11 +238,11 @@ with open(output_file_path, 'w') as output_file:
                             zona = zone+1
                             inside_zone = True
                             if zona == 1:
-                                rata = 8
-                                print(rata)
+                                rate = 8
+                                print(rate)
                             if zona == 2:
-                                rk = 10
-                                print(rata)
+                                rate = 10
+                                print(rate)
                             break
                     
                     while not inside_zone:
