@@ -241,7 +241,7 @@ with open(output_file_path, 'w') as output_file:
                             inside_zone = True
                             if zona == 1:
                                 rk = 15
-                                print("Sigo funcionando")
+                                print(rk)
 
 
 
