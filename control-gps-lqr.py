@@ -210,7 +210,7 @@ with open(output_file_path, 'w') as output_file:
         k += 1
         gk +=1
 
-        if gk == 2:
+        if gk == 3:
             print("Entré")
             newdata = ser.readline().decode('utf-8').strip()
             if newdata[0:6] == "$GPRMC":
@@ -231,9 +231,28 @@ with open(output_file_path, 'w') as output_file:
                     # get the shapes
                     shapes = r.shapes()
                     inside_zone = False  # Bandera para verificar si está dentro de alguna zona
-
-
-            gk=0
+                    for j in range(len(shapes)):
+                        # build a shapely polygon from your shape
+                        polygon = shape(shapes[j])
+                        zone_def = check(lon, lat)
+                        if zone_def:
+                            zone = j
+                            zona = zone+1
+                            inside_zone = True
+                            if zona == 1:
+                                rate = 8
+                                print('El punto corresponde a la zona ' + str(zone+1))
+                            elif zona == 2:
+                                rate = 15
+                                print('El punto corresponde a la zona ' + str(zone+1))
+                            gk=0
+                            break
+                    while not inside_zone:
+                        print("Estas Fuera de Rango . . .")
+                        rk = 0.0
+                        control_motor(motor1_pwm_pin, motor1_dir_pin, 0, 'forward')
+                        print("rk: " + str(rk))
+                        print("Velocidad: " + str(W))
 
         #Lectura de Flancos para medir velocidad
         flancos_totales_1 = numero_flancos_A + numero_flancos_B
