@@ -166,12 +166,7 @@ xk1 = np.array([[0],
                    [0],
                    [0]]) 
 
-#Inicializacion del arduino
-
-#variables galga
-wg = 0.0
-GPIO.setwarnings(False)
-time.sleep(10)  # Esperar a que la conexión serial se establezca
+#Inicializacion del GPS
 
 while True:
 
