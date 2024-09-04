@@ -166,7 +166,7 @@ xk1 = np.array([[0],
                    [0],
                    [0]]) 
 
-#Inicializacion del GPS
+#Inicializacion del arduino
 
 while True:
 
@@ -188,7 +188,7 @@ while True:
             break
 
         elif status == "V":  
-            print("Buscando señal . . .")
+            print("")
 
 # Loop de Control
 
@@ -198,7 +198,6 @@ pi.write(motor2_en_pin, 1)
 
 # Crear el archivo de salida para guardar los datos
 output_file_path = '/home/santiago/Documents/dispensador/dispen/beta-test.txt'
-
 
 with open(output_file_path, 'w') as output_file:
     output_file.write("Tiempo \t PWM \t W \t Referencia \t Flujo \n")
@@ -245,6 +244,15 @@ with open(output_file_path, 'w') as output_file:
                                 rate = 15
                             elif zona == 2:
                                 rate = 8
+                            g=0
+                            break  # Sal del bucle si se encuentra una zona
+
+                    while not inside_zone:
+                        print("Estas Fuera de Rango . . .")
+                        rk = 0.0
+                        control_motor(motor1_pwm_pin, motor1_dir_pin, 0, 'forward')
+
+
         #Lectura de Flancos para medir velocidad
         flancos_totales_1 = numero_flancos_A + numero_flancos_B
         FPS = flancos_totales_1 / (600.0)
@@ -265,8 +273,7 @@ with open(output_file_path, 'w') as output_file:
         float(speed_mps)
 
         if speed_mps <= 0.3:
-            speed_mps = 0.0
-
+            speed_mps =0.0
         rk = speed_mps*rate*faja
 
         ##Observador
@@ -304,7 +311,7 @@ with open(output_file_path, 'w') as output_file:
 
         # Registrar los datos en el archivo
         ts = time.time() - start_time
-        output_file.write(f"{ts:.2f}\t{uk:.2f}\t{W:.2f}\t{rk} \t{fk:.2f}\n")
+        output_file.write(f"{ts:.2f}\t{uk:.2f}\t{W:.2f}\t{rk} \t{fk:.2f}\n)
         output_file.flush()
 
         # Restablecer contadores
