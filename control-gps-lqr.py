@@ -235,7 +235,7 @@ with open(output_file_path, 'w') as output_file:
                         polygon = shape(shapes[j])
                         zone_def = check(lon,lat)
                         print(zone_def)
-                        if not zone_def:
+                        if zone_def:
                             zone = j
                             zona = zone+1
                             inside_zone = True
@@ -250,7 +250,7 @@ with open(output_file_path, 'w') as output_file:
                     if not inside_zone:
                         print("Estas Fuera del Aerea a implementar . . .")
                         rk = 0.0
-                        
+
 
 
 
