@@ -230,7 +230,11 @@ with open(output_file_path, 'w') as output_file:
                     print(f"Speed: {speed_mps:.2f} m/s")
                     # get the shapes
                     shapes = r.shapes()
-                    inside_zone = False  # Bandera para verificar si está dentro de alguna zona
+                    inside_zone = False # Bandera para verificar si está dentro de alguna zona
+                    for j in range(len(shapes)):
+                        polygon = shape(shapes[j])
+                        zone_def = check(lon,lat)
+                        print(zone_def)
 
 
             gk=0
