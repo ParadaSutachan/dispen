@@ -188,7 +188,7 @@ while True:
 
 speed_mps=0.0
 d=3.6
-
+gk=0.0
 
 
 # Loop de Control
