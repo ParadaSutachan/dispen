@@ -4,6 +4,10 @@ import time
 # Configuración de pines
 PIN_ESC = 21  # Cambia esto al pin GPIO que estés utilizando para la señal del ESC
 
+# Configuración de PWM
+PWM_FREQUENCY = 50  # Frecuencia típica de ESC para motores brushless (Hz)
+PWM_DUTY_CYCLE_MAX = 255  # Valor PWM máximo permitido por pigpio
+
 # Configura la instancia de pigpio
 pi = pigpio.pi()
 
@@ -11,16 +15,14 @@ pi = pigpio.pi()
 if not pi.connected:
     exit()
 
-# Configuración de la señal PWM
-PWM_FREQUENCY = 50  # Frecuencia típica de ESC para motores brushless (Hz)
-PWM_DUTY_CYCLE_MAX = 2000  # Valor PWM máximo para el ESC (esto puede variar)
-
 # Configura el pin GPIO como salida PWM
 pi.set_mode(PIN_ESC, pigpio.OUTPUT)
 
-# Mueve el motor brushless a su máxima velocidad
+# Configura el rango y frecuencia PWM
+pi.set_PWM_range(PIN_ESC, PWM_DUTY_CYCLE_MAX)
 pi.set_PWM_frequency(PIN_ESC, PWM_FREQUENCY)
-pi.set_PWM_range(PIN_ESC, 1000)  # Rango del PWM (ajusta si es necesario)
+
+# Mueve el motor brushless a su máxima velocidad
 pi.set_PWM_dutycycle(PIN_ESC, PWM_DUTY_CYCLE_MAX)
 
 # Espera un poco para permitir que el motor se estabilice
