@@ -15,7 +15,7 @@ pi_m = math.pi
 
 #Puerto arduino
 
-arduino_port = '/dev/ttyACM0'  # Puerto donde está conectada la placa Arduino
+arduino_port = '/dev/ttyACM1'  # Puerto donde está conectada la placa Arduino
 arduino_baud = 9600
 
 
