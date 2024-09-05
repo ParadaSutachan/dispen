@@ -87,7 +87,7 @@ def control_motor(pin_pwm, pin_dir, speed_percent, direction):
     elif direction == 'backward':
         pi.write(pin_dir, 0)  # Dirección hacia atrás
     else:
-        raise ValueError("Dirección no válida. Usa 'forward' o 'backward'.")ç
+        raise ValueError("Dirección no válida. Usa 'forward' o 'backward'.")
     
 def control_brushless(PWM_PIN,SPEED):
     FREQUENCY =int(SPEED * 255/100)
