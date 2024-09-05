@@ -269,7 +269,7 @@ with open(output_file_path, 'w') as output_file:
         print("Flujo = "+ str(fk))
 
         e_time = t1.tocvalue()
-        toc = T-e_time         #Toc
+        toc = abs(T-e_time)        #Toc
         time.sleep(toc)
     
 
