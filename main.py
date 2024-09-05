@@ -35,7 +35,7 @@ RPM2 = 0.0
 
 # Pines de los brushless
 
-PWM_PIN = 20  # Ajusta este valor según el pin que estés usando
+PWM_PIN = 21  # Ajusta este valor según el pin que estés usando
 FREQUENCY = 50  # Frecuencia típica para PWM de motores brushless es de 50 Hz
 
 # Inicialización de Pigpio
