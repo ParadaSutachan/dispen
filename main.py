@@ -102,6 +102,9 @@ def main():
     pi.write(motor1_en_pin, 1)
     pi.write(motor2_en_pin, 1)
 
+     # Configurar el motor brushless al 50% de PWM
+    pi.set_PWM_dutycycle(PWM_PIN, 128)  # 50% de 255 es 128
+
     # Ruta del archivo
     file_path = '/home/santiago/Documents/dispensador/dispensador/Pbrs1.txt'
 
@@ -173,6 +176,7 @@ def main():
         # Deshabilitar motores
         pi.set_PWM_dutycycle(motor1_pwm_pin, 0)
         pi.set_PWM_dutycycle(motor2_pwm_pin, 0)
+        pi.set_PWM_dutycycle(PWM_PIN, 0)
 
         pi.write(motor1_en_pin, 0)
         pi.write(motor2_en_pin, 0)
