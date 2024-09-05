@@ -2,7 +2,7 @@ import pigpio
 import time
 
 # Configuración de pines
-PIN_ESC = 21  # Cambia esto al pin GPIO que estés utilizando para la señal del ESC
+PIN_ESC = 12  # Cambia esto al pin GPIO que estés utilizando para la señal del ESC
 
 # Configuración de PWM
 PWM_FREQUENCY = 50  # Frecuencia típica de ESC para motores brushless (Hz)
