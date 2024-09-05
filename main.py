@@ -87,7 +87,8 @@ def control_motor(pin_pwm, pin_dir, speed_percent, direction):
     else:
         raise ValueError("Dirección no válida. Usa 'forward' o 'backward'.")
     
-pwm = GPIO.PWM(PWM_PIN, FREQUENCY)
+pi.set_PWM_frequency(PWM_PIN, FREQUENCY)
+
 
 # Función principal
 def main():
