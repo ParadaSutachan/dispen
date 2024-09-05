@@ -2,7 +2,7 @@ import pigpio
 import time
 
 # Configuración de pines
-PIN_ESC = 18  # Cambia esto al pin GPIO que estés utilizando para la señal del ESC
+PIN_ESC = 21  # Cambia esto al pin GPIO que estés utilizando para la señal del ESC
 
 # Configura la instancia de pigpio
 pi = pigpio.pi()
