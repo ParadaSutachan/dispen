@@ -15,8 +15,8 @@ pi_m = math.pi
 
 #Puerto arduino
 
-arduino_port = '/dev/ttyACM1'  # Puerto donde está conectada la placa Arduino
-arduino_baud = 9600
+#arduino_port = '/dev/ttyACM1'  # Puerto donde está conectada la placa Arduino
+#arduino_baud = 9600
 
 
 # Configuración de pines de motor y encoder
@@ -158,19 +158,19 @@ xk1 = np.array([[0],
 #Inicializacion del arduino
 
 #variables galga
-wg = 0.0
-GPIO.setwarnings(False)
-arduino = serial.Serial(arduino_port, arduino_baud)
-time.sleep(10)  # Esperar a que la conexión serial se establezca
+#wg = 0.0
+#GPIO.setwarnings(False)
+#arduino = serial.Serial(arduino_port, arduino_baud)
+#time.sleep(10)  # Esperar a que la conexión serial se establezca
 
-while True:
-    if arduino.in_waiting > 0:
-        mensaje = arduino.readline().decode('utf-8').strip()
-        if mensaje == "Listo para pesar":
-            print("Arduino ha completado la inicialización.")
-            break
-        else:
-            print(f"Mensaje de Arduino: {mensaje}")
+#while True:
+#    if arduino.in_waiting > 0:
+#        mensaje = arduino.readline().decode('utf-8').strip()
+#        if mensaje == "Listo para pesar":
+#            print("Arduino ha completado la inicialización.")
+#            break
+#        else:
+#            print(f"Mensaje de Arduino: {mensaje}")
 
 # Loop de Control
 
@@ -186,8 +186,8 @@ output_file_path = '/home/santiago/Documents/dispensador/dispen/test_control_ss.
 with open(output_file_path, 'w') as output_file:
     output_file.write("Tiempo \t PWM \t W \t Referencia \tFlujo \t Peso \n")
 
-    wg = arduino.readline().decode('utf-8')
-    print("Peso: " +str(wg))
+    #wg = arduino.readline().decode('utf-8')
+    #print("Peso: " +str(wg))
 
     start_time = time.time()
 
@@ -251,13 +251,13 @@ with open(output_file_path, 'w') as output_file:
         delta_w_1 = delta_w 
 
         # Medir peso
-        if arduino.in_waiting > 0:
-            wg = arduino.readline().decode('utf-8')
-            print("Peso: " +str(wg))
+        #if arduino.in_waiting > 0:
+        #   wg = arduino.readline().decode('utf-8')
+        #    print("Peso: " +str(wg))
 
         # Registrar los datos en el archivo
         ts = time.time() - start_time
-        output_file.write(f"{ts:.2f}\t{uk:.2f}\t{W:.2f}\t{rk} \t{fk:.2f}\t{wg}")
+        output_file.write(f"{ts:.2f}\t{uk:.2f}\t{W:.2f}\t{rk} \t{fk:.2f}\t\n")
         output_file.flush()
 
         # Restablecer contadores
