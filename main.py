@@ -1,29 +1,35 @@
-# -- coding: utf-8 --
+#!/usr/bin/env python
+
+# esc_start.py
+# 2015-04-14
+# Public Domain
+#
+# Sends the servo pulses needed to initialise some ESCs
+#
+# Requires the pigpio daemon to be running
+#
+# sudo pigpiod
+
 import time
+
 import pigpio
 
-# Pines de los brushless
-PWM_PIN = 18  # Ajusta este valor según el pin que estés usando
-FREQUENCY = 50  # Frecuencia típica para PWM de motores brushless es de 50 Hz
+SERVO = 18
 
-# Inicialización de Pigpio
-pi = pigpio.pi()
+pi = pigpio.pi() # Connect to local Pi.
 
-# Configuración del PWM para el motor brushless
-pi.set_PWM_frequency(PWM_PIN, FREQUENCY)
+pi.set_servo_pulsewidth(SERVO, 1000) # Minimum throttle.
 
-# Iniciar el PWM con 100% del ciclo de trabajo
-# El ciclo de trabajo 255 es 100% en una escala de 0 a 255
-pi.set_PWM_dutycycle(PWM_PIN, 255)
+time.sleep(1)
 
-try:
-    # El motor funcionará al 100% hasta que detengas el script
-    print("Motor brushless funcionando al 100%")
-    while True:
-        time.sleep(1)  # Mantener el motor funcionando
+pi.set_servo_pulsewidth(SERVO, 2000) # Maximum throttle.
 
-except KeyboardInterrupt:
-    # Al presionar Ctrl+C se detendrá el motor y se limpiará
-    print("Interrupción detectada. Deteniendo el motor.")
-    pi.set_PWM_dutycycle(PWM_PIN, 0)  # Detener el motor
-    pi.stop()
+time.sleep(1)
+
+pi.set_servo_pulsewidth(SERVO, 1100) # Slightly open throttle.
+
+time.sleep(1)
+
+pi.set_servo_pulsewidth(SERVO, 0) # Stop servo pulses.
+
+pi.stop() # Disconnect from local Raspberry Pi.
