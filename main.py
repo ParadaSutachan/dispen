@@ -33,6 +33,11 @@ RPM = 0.0
 RPS2 = 0.0
 RPM2 = 0.0
 
+# Pines de los brushless
+
+PWM_PIN = 18  # Ajusta este valor según el pin que estés usando
+FREQUENCY = 50  # Frecuencia típica para PWM de motores brushless es de 50 Hz
+
 # Inicialización de Pigpio
 pi = pigpio.pi()
 
@@ -81,6 +86,8 @@ def control_motor(pin_pwm, pin_dir, speed_percent, direction):
         pi.write(pin_dir, 0)  # Dirección hacia atrás
     else:
         raise ValueError("Dirección no válida. Usa 'forward' o 'backward'.")
+    
+pwm = GPIO.PWM(PWM_PIN, FREQUENCY)
 
 # Función principal
 def main():
@@ -121,6 +128,7 @@ def main():
             # Controlar los motores con las velocidades especificadas
             control_motor(motor1_pwm_pin, motor1_dir_pin, 100, 'forward')
             control_motor(motor2_pwm_pin, motor2_dir_pin, 100, 'forward')
+            pwm.start(50)
             #
             # Avanzar en las líneas circularmente
             current_line1 = (current_line1 + 1) % total_lines
