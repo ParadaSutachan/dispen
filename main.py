@@ -35,8 +35,9 @@ RPM2 = 0.0
 
 # Pines de los brushless
 
-PWM_PIN = 21  # Ajusta este valor según el pin que estés usando
-FREQUENCY = 50  # Frecuencia típica para PWM de motores brushless es de 50 Hz
+PWM_PINN = 21  # Ajusta este valor según el pin que estés usando
+PIN_DIRR = 14
+PIN_ENN= 7  # Frecuencia típica para PWM de motores brushless es de 50 Hz
 
 # Inicialización de Pigpio
 pi = pigpio.pi()
@@ -69,6 +70,7 @@ def contador_flancos_encoder_b2(gpio, level, tick):
     global numero_flancos_B2
     numero_flancos_B2 += 1
 
+SPEED= 0.0
 # Configuración de callbacks
 cb1 = pi.callback(PIN_ENCODER_A, pigpio.EITHER_EDGE, contador_flancos_encoder)
 cb2 = pi.callback(PIN_ENCODER_B, pigpio.EITHER_EDGE, contador_flancos_encoder_b)
@@ -85,9 +87,11 @@ def control_motor(pin_pwm, pin_dir, speed_percent, direction):
     elif direction == 'backward':
         pi.write(pin_dir, 0)  # Dirección hacia atrás
     else:
-        raise ValueError("Dirección no válida. Usa 'forward' o 'backward'.")
+        raise ValueError("Dirección no válida. Usa 'forward' o 'backward'.")ç
     
-pi.set_PWM_frequency(PWM_PIN, FREQUENCY)
+def control_brushless(PWM_PIN,SPEED):
+    FREQUENCY =int(SPEED * 255/100)
+    pi.set_PWM_frequency(PWM_PINN, FREQUENCY)
 
 
 # Función principal
@@ -101,9 +105,9 @@ def main():
     # Habilitar motores
     pi.write(motor1_en_pin, 1)
     pi.write(motor2_en_pin, 1)
+    pi.write(PIN_ENN,1)
 
      # Configurar el motor brushless al 50% de PWM
-    pi.set_PWM_dutycycle(PWM_PIN, 128)  # 50% de 255 es 128
 
     # Ruta del archivo
     file_path = '/home/santiago/Documents/dispensador/dispensador/Pbrs1.txt'
@@ -132,6 +136,7 @@ def main():
             # Controlar los motores con las velocidades especificadas
             control_motor(motor1_pwm_pin, motor1_dir_pin, 100, 'forward')
             control_motor(motor2_pwm_pin, motor2_dir_pin, 100, 'forward')
+            control_brushless(PWM_PINN,50)
             
             #
             # Avanzar en las líneas circularmente
@@ -176,7 +181,7 @@ def main():
         # Deshabilitar motores
         pi.set_PWM_dutycycle(motor1_pwm_pin, 0)
         pi.set_PWM_dutycycle(motor2_pwm_pin, 0)
-        pi.set_PWM_dutycycle(PWM_PIN, 0)
+        pi.set_PWM_dutycycle(PWM_PINN, 0)
 
         pi.write(motor1_en_pin, 0)
         pi.write(motor2_en_pin, 0)
