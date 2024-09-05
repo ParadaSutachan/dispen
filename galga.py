@@ -28,10 +28,10 @@ motor2_pwm_pin = 13
 motor2_dir_pin = 25
 motor2_en_pin = 23
 
-PIN_ENCODER_A = 18
-PIN_ENCODER_B = 17
-PIN_ENCODER2_A = 16
-PIN_ENCODER2_B = 19
+PIN_ENCODER_A = 16
+PIN_ENCODER_B = 19
+PIN_ENCODER2_A = 18
+PIN_ENCODER2_B = 17
 
 T = 0.2
 
