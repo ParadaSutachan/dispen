@@ -6,7 +6,7 @@ import time
 GPIO.setmode(GPIO.BCM)
 
 GPIO.setup(21, GPIO.OUT)
-rojo = GPIO.PWM(24, 50)
+rojo = GPIO.PWM(21, 50)
 rojo.start(0)    
 
 while True:
