@@ -1,60 +1,42 @@
-# -- coding: utf-8 --
-#!/usr/bin/env python3
-
-import serial  #type: ignore
+#!/usr/bin/env python
+import RPi.GPIO as GPIO  
 import time  
-import pynmea2 #type: ignore
-import shapefile #type: ignore
-from shapely.geometry import shape, Point   #type: ignore
 
-# Configura el puerto serie  
-port = "/dev/ttyAMA0"  
-ser = serial.Serial(port, baudrate=9600, timeout=0.1) 
+# Configuración del pin GPIO  
+ESC_PIN = 21  
+GPIO.setmode(GPIO.BCM)  
+GPIO.setup(ESC_PIN, GPIO.OUT)  
 
-def check(lon, lat):
-    # build a shapely point from your geopoint
-    point = Point(lon, lat)
+# Configuración de PWM  
+pwm = GPIO.PWM(ESC_PIN, 50)  # 50 Hz para controlar el ESC
+pwm.start(0)  # Inicializa el PWM con un ciclo de trabajo de 0%  
 
-    # the contains function does exactly what you want
-    return polygon.contains(point)
+# Función para convertir de microsegundos a ciclo de trabajo PWM
+def set_pwm_from_microseconds(pulse_width):
+    # Calcular el duty cycle correspondiente al ancho de pulso en microsegundos
+    # 1000 us corresponde a 5% de duty cycle, 2000 us corresponde a 10%
+    duty_cycle = (pulse_width / 20000) * 100  # Convertir microsegundos a porcentaje de duty cycle
+    pwm.ChangeDutyCycle(duty_cycle)
 
+# Volver a la configuración original: de 1000 a 2000 microsegundos
+try:
+    print("Volviendo a la configuración original...")
 
-while True:  
-    newdata = ser.readline().decode('utf-8').strip()  
-    # read your shapefile
-    poly_file='poligono_casona.shp'
-    r = shapefile.Reader(poly_file)
+    # Inicialización del ESC al valor mínimo (1000 us)
+    set_pwm_from_microseconds(1000)
+    time.sleep(3)
 
-    # Verifica si se recibe una sentencia GPRMC  
-    if newdata[0:6] == "$GPRMC":  
-        newmsg = pynmea2.parse(newdata)  
-        status = newmsg.status   
-        # Maneja los estados A y V  
-        if status == "A":  
-            lat = newmsg.latitude  
-            lon = newmsg.longitude  
-            gps = f"Lat = {lat} Lng = {lon}"  
-            print(gps)  
-            speed = newmsg.spd_over_grnd  # velocidad en nudos  
-            speed_mps = speed * (0.514444)  # convertimos de nudos a m/s  
-            print(f"Speed: {speed:.2f} knots / {speed_mps:.2f} m/s")  
+    # Subir a un valor de punto neutro (1500 us)
+    set_pwm_from_microseconds(1500)
+    time.sleep(2)
 
-            # get the shapes
-            shapes = r.shapes()
-            inside_zone = False  # Bandera para verificar si está dentro de alguna zona
-            for k in range(len(shapes)):
-                # build a shapely polygon from your shape
-                polygon = shape(shapes[k])    
-                zone_def = check(lon, lat)
-                if zone_def:
-                    zone = k
-                    print('El punto corresponde a la zona ' + str(zone+1))
-                    inside_zone = True
-                    break  # Sal del bucle si se encuentra una zona
+    # Aumentar gradualmente hasta el valor máximo (2000 us)
+    print("Aumentando al máximo...")
+    set_pwm_from_microseconds(2000)
+    time.sleep(2)
 
-            if not inside_zone:
-                print("Estas Fuera de Rango")
-
-        elif status == "V":  
-            print("Estoy Agarrando Señal, Krnal ...")  
-            print("Estoy Cansado, Jefe")
+    print("Configuración completa.")
+    
+finally:
+    pwm.stop()  # Detener el PWM
+    GPIO.cleanup()  # Limpiar los pines GPIO al finalizar
