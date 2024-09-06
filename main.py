@@ -14,7 +14,7 @@ import time
 
 import pigpio
 
-SERVO = 20
+SERVO = 21
 
 pi = pigpio.pi() # Connect to local Pi.
 
