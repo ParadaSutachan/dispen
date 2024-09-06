@@ -21,7 +21,7 @@ pi = pigpio.pi() # Connect to local Pi.
 pi.set_servo_pulsewidth(SERVO, 2000) # Minimum throttle.
 
 input("Press enter")
+
 pi.set_servo_pulsewidth(SERVO, 1000) # Maximum throttle.
-input("Press enter")
 
 pi.stop() # Disconnect from local Raspberry Pi.
