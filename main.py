@@ -39,8 +39,9 @@ def run_motor_neutral():
     set_pwm(1500)
     time.sleep(5)  # Mantener durante 5 segundos
 
-try:
+
     # Recalibrar el ESC para volver al rango estándar
-    calibrate_esc()
+calibrate_esc()
+run_motor_neutral()
 
     # Probar el moto
