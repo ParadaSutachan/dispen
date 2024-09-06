@@ -15,5 +15,6 @@ def calibrate_min():
     time.sleep(2)  # Esperar 2 segundos para que el ESC registre el mínimo
 
 calibrate_min()
-
+# Detener Pigpio
+pi.stop()
 # Nota: Después de esto, el ESC debería estar calibrado para aceptar señales de 1000 a 2000 microsegundos.
