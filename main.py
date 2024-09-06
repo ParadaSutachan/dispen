@@ -1,21 +1,22 @@
 #!/usr/bin/env python
-import pigpio
+# esc_start.py
+# 2015-04-14
+# Public Domain
+#
+# Sends the servo pulses needed to initialise some ESCs
+#
+# Requires the pigpio daemon to be running
+#
+# sudo pigpiod
 import time
+import pigpio
+SERVO = 21
+pi = pigpio.pi() # Connect to local Pi.
+pi.set_servo_pulsewidth(SERVO, 2500) # Minimum throttle.
 
-# Conectarse al daemon pigpio
-pi = pigpio.pi()
+input("Press enter")
 
-# Definir el pin del ESC
-ESC_PIN = 21  # Cambia al pin GPIO que estés utilizando
+pi.set_servo_pulsewidth(SERVO, 500) # Maximum throttle.
+input("Press enter")
 
-# Enviar señal mínima de 1000 microsegundos para el límite inferior
-
-print("Enviando señal mínima para calibración...")
-pi.set_servo_pulsewidth(ESC_PIN, 2500)  # 1000us = señal mínima
-input("presente")
-pi.set_servo_pulsewidth(ESC_PIN, 500)  # 1000us = señal mínima
-time.sleep(5)  # Esperar 2 segundos para que el ESC registre el mínimo
-
-# Detener Pigpio
-pi.stop()
-# Nota: Después de esto, el ESC debería estar calibrado para aceptar señales de 1000 a 2000 microsegundos.
+pi.stop() # Disconnect from local Raspberry Pi.
