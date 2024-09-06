@@ -17,12 +17,12 @@ def test_esc():
     time.sleep(10)
 
     # Enviar señal máxima (2000 us)
-    pi.set_servo_pulsewidth(ESC_PIN, 1200)
+    pi.set_servo_pulsewidth(ESC_PIN, 1050)
     print("Señal máxima (2000 us)...")
     time.sleep(10)
 
     # Detener motor con señal mínima (1000 us)
-    pi.set_servo_pulsewidth(ESC_PIN, 1000)
+    pi.set_servo_pulsewidth(ESC_PIN, 1100)
     print("Señal mínima (1000 us)...")
     time.sleep(10)
 
