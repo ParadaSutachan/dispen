@@ -20,19 +20,7 @@ def set_pwm_from_microseconds(pulse_width):
 
 # Volver a la configuración original: de 1000 a 2000 microsegundos
 try:
-    print("Volviendo a la configuración original...")
-
-    # Inicialización del ESC al valor mínimo (1000 us)
-    set_pwm_from_microseconds(1000)
-    time.sleep(3)
-
-    # Subir a un valor de punto neutro (1500 us)
-    set_pwm_from_microseconds(1500)
-    time.sleep(2)
-
-    # Aumentar gradualmente hasta el valor máximo (2000 us)
-    print("Aumentando al máximo...")
-    set_pwm_from_microseconds(2000)
+    set_pwm_from_microseconds(1600)
     time.sleep(2)
 
     print("Configuración completa.")
