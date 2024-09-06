@@ -8,12 +8,18 @@ pi = pigpio.pi()
 # Definir el pin del ESC
 ESC_PIN = 21  # Cambia al pin GPIO que estés utilizando
 
-# Enviar señal mínima de 1000 microsegundos para el límite inferior
-def calibrate_min():
-    print("Enviando señal mínima para calibración...")
-    pi.set_servo_pulsewidth(ESC_PIN, 1100)  # 1000us = señal mínima
-    time.sleep(2)  # Esperar 2 segundos para que el ESC registre el mínimo
+def test_esc():
+    print("Probando el ESC...")
 
-calibrate_min()
+    # Enviar señal intermedia (1500 us, punto neutro)
+    pi.set_servo_pulsewidth(ESC_PIN, 1120)
+    print("Señal neutra (1500 us)...")
+    time.sleep(3)
 
-# Nota: Después de esto, el ESC debería estar calibrado para aceptar señales de 1000 a 2000 microsegundos.
+
+
+test_esc()
+
+# Apagar el servo PWM y limpiar
+pi.set_servo_pulsewidth(ESC_PIN, 0)  # Apagar el PWM
+pi.stop()  # Detener pigpio
