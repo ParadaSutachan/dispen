@@ -1,22 +1,19 @@
 #!/usr/bin/env python
-import RPi.GPIO as GPIO  
-import time  
+import pigpio
+import time
 
-# Configuración del pin GPIO  
-ESC_PIN = 21  
-GPIO.setmode(GPIO.BCM)  
-GPIO.setup(ESC_PIN, GPIO.OUT)  
+# Conectarse al daemon pigpio
+pi = pigpio.pi()
 
-# Configuración de PWM  
-pwm = GPIO.PWM(ESC_PIN, 50)  # 50 Hz  
-pwm.start(0)  # Inicializa el PWM con un ciclo de trabajo de 0%  
+# Definir el pin del ESC
+ESC_PIN = 21  # Cambia al pin GPIO que estés utilizando
 
-# Calibración del ESC  
-print("Calibrando ESC...")  
-pwm.ChangeDutyCycle(6.005)  # Máxima señal  
-time.sleep(20)  # Espera 2 segundos  
-pwm.ChangeDutyCycle(0)  # Mínima señal  
-print("Calibración completa.")   
-# Limpieza  
-pwm.stop()  
-GPIO.cleanup()  
+# Enviar señal máxima de 2000 microsegundos para el límite superior
+def calibrate_max():
+    print("Enviando señal máxima para calibración...")
+    pi.set_servo_pulsewidth(ESC_PIN, 2000)  # 2000us = señal máxima
+    time.sleep(2)  # Esperar 2 segundos para que el ESC registre el máximo
+
+calibrate_max()
+
+# Nota: Mantén encendido durante este tiempo y desconecta la batería del ESC después de 2 segundos.
