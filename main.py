@@ -19,12 +19,7 @@ SERVO = 20
 pi = pigpio.pi() # Connect to local Pi.
 
 pi.set_servo_pulsewidth(SERVO, 2500) # Minimum throttle.
-input("uwue")
-pi.set_servo_pulsewidth(SERVO, 1000) # Minimum throttle.
-input("uwue")
 
-
-pi.set_servo_pulsewidth(SERVO, 1200) # Minimum throttle.
 time.sleep(10)
 
 ###
