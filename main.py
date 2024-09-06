@@ -20,15 +20,15 @@ pi = pigpio.pi() # Connect to local Pi.
 
 pi.set_servo_pulsewidth(SERVO, 2000) # Minimum throttle.
 
-time.sleep(1)
+time.sleep(3)
 
 pi.set_servo_pulsewidth(SERVO, 1000) # Maximum throttle.
 
-time.sleep(1)
+time.sleep(3)
 
 pi.set_servo_pulsewidth(SERVO, 1200) # Slightly open throttle.
 
-time.sleep(1)
+time.sleep(3)
 
 pi.set_servo_pulsewidth(SERVO, 0) # Stop servo pulses.
 
