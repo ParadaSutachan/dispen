@@ -13,10 +13,10 @@ def test_esc():
 
     pi.set_servo_pulsewidth(ESC_PIN, 2000)
     print("Señal neutra (2000 us)...")
-    time.sleep(1)
+    time.sleep(0.5)
 
     # Enviar señal intermedia (1500 us, punto neutro)
-    pi.set_servo_pulsewidth(ESC_PIN, 1045)
+    pi.set_servo_pulsewidth(ESC_PIN, 1035)
     print("Señal neutra (1050 us)...")
     time.sleep(15)
 
