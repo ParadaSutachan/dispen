@@ -1,47 +1,26 @@
 #!/usr/bin/env python
-import pigpio
+
+# esc_start.py
+# 2015-04-14
+# Public Domain
+#
+# Sends the servo pulses needed to initialise some ESCs
+#
+# Requires the pigpio daemon to be running
+#
+# sudo pigpiod
+
 import time
 
-# Conectar al daemon pigpio
-pi = pigpio.pi()
+import pigpio
 
-# Definir el pin GPIO donde está conectado el ESC
-ESC_PIN = 21  # Cambia al pin GPIO que estés utilizando
+SERVO = 21
 
-# Función para enviar el pulso PWM
-def set_pwm(pulse_width):
-    pi.set_servo_pulsewidth(ESC_PIN, pulse_width)
+pi = pigpio.pi() # Connect to local Pi.
 
-# Inicializar el ESC en el valor máximo (2000 us)
-def calibrate_esc():
-    print("Iniciando recalibración del ESC...")
+pi.set_servo_pulsewidth(SERVO, 5) # Minimum throttle.
 
-    # Enviar el valor máximo (2000 us) durante unos segundos
-    set_pwm(2000)
-    print("Manteniendo señal máxima (2000 us)...")
-    time.sleep(2)
+time.sleep(10)
 
-    # Desconectar la batería del ESC durante unos segundos, luego reconectar
-    input("Desconecta la batería del ESC ahora y presiona Enter para continuar...")
-
-    # Enviar el valor mínimo (1000 us) una vez reconectada la batería
-    set_pwm(1000)
-    print("Manteniendo señal mínima (1000 us)...")
-    time.sleep(2)
-
-    print("Recalibración completa. El ESC está listo para operar.")
-
-# Configurar el ESC a un valor intermedio (1500 us)
-def run_motor_neutral():
-    print("Probando el motor a velocidad neutral (1500 us)...")
-
-    # Enviar el valor de 1500 microsegundos para probar la velocidad neutra
-    set_pwm(1500)
-    time.sleep(5)  # Mantener durante 5 segundos
-
-
-    # Recalibrar el ESC para volver al rango estándar
-calibrate_esc()
-run_motor_neutral()
-
-    # Probar el moto
+###
+pi.stop() # Disconnect from local Raspberry Pi.
