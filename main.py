@@ -12,7 +12,7 @@ import time
 import pigpio
 SERVO = 21
 pi = pigpio.pi() # Connect to local Pi.
-pi.set_servo_pulsewidth(SERVO, 2500) # Minimum throttle.
+pi.set_servo_pulsewidth(SERVO, 2000) # Minimum throttle.
 
 input("Press enter")
 
