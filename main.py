@@ -13,7 +13,7 @@ pwm.start(0)  # Inicializa el PWM con un ciclo de trabajo de 0%
 
 # Calibración del ESC  
 print("Calibrando ESC...")  
-pwm.ChangeDutyCycle(6)  # Máxima señal  
+pwm.ChangeDutyCycle(6.5)  # Máxima señal  
 time.sleep(5)  # Espera 2 segundos  
 pwm.ChangeDutyCycle(0)  # Mínima señal  
 time.sleep(2)  # Espera 2 segundos  
