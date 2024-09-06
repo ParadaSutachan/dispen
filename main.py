@@ -1,24 +1,36 @@
 #!/usr/bin/env python
+import RPi.GPIO as GPIO  
+import time  
 
-# esc_start.py
-# 2015-04-14
-# Public Domain
-#
-# Sends the servo pulses needed to initialise some ESCs
-#
-# Requires the pigpio daemon to be running
-#
-# sudo pigpiod
+# Configuración del pin GPIO  
+ESC_PIN = 18  
+GPIO.setmode(GPIO.BCM)  
+GPIO.setup(ESC_PIN, GPIO.OUT)  
 
-import time
+# Configuración de PWM  
+pwm = GPIO.PWM(ESC_PIN, 50)  # 50 Hz  
+pwm.start(0)  # Inicializa el PWM con un ciclo de trabajo de 0%  
 
-import pigpio
+# Calibración del ESC  
+print("Calibrando ESC...")  
+pwm.ChangeDutyCycle(100)  # Máxima señal  
+time.sleep(2)  # Espera 2 segundos  
+pwm.ChangeDutyCycle(0)  # Mínima señal  
+time.sleep(2)  # Espera 2 segundos  
+print("Calibración completa.")  
 
-SERVO = 21
+# Control del motor  
+try:  
+    while True:  
+        for duty_cycle in range(0, 101, 5):  # Aumenta el ciclo de trabajo  
+            pwm.ChangeDutyCycle(duty_cycle)  
+            time.sleep(0.5)  
+        for duty_cycle in range(100, -1, -5):  # Disminuye el ciclo de trabajo  
+            pwm.ChangeDutyCycle(duty_cycle)  
+            time.sleep(0.5)  
+except KeyboardInterrupt:  
+    pass  
 
-pi = pigpio.pi() # Connect to local Pi.
-input("Press enter")
-pi.set_servo_pulsewidth(SERVO, 1500) # Minimum throttle.
-time.sleep(10)
-pi.set_servo_pulsewidth(SERVO, 0) # Minimum throttle.
-pi.stop() # Disconnect from local Raspberry Pi.
+# Limpieza  
+pwm.stop()  
+GPIO.cleanup()  
