@@ -1,30 +1,20 @@
-#!/usr/bin/env python
-#!/usr/bin/env python
+# -- coding: utf-8 --
+#!/usr/bin/env python3
 
-# esc_start.py
-# 2015-04-14
-# Public Domain
-#
-# Sends the servo pulses needed to initialise some ESCs
-#
-# Requires the pigpio daemon to be running
-#
-# sudo pigpiod
-
+import RPi.GPIO as GPIO
 import time
+GPIO.setmode(GPIO.BCM)
 
-import pigpio
+GPIO.setup(21, GPIO.OUT)
+rojo = GPIO.PWM(24, 50)
+rojo.start(0)    
 
-SERVO = 21
+while True:
+    for i in range(0, 101, 5):
+        rojo.ChangeDutyCycle(i)
+        print(i)
+        time.sleep(3)           
 
-pi = pigpio.pi() # Connect to local Pi.
-pi.set_mode(SERVO, pigpio.OUTPUT)
-
-pi.set_PWM_frequency(SERVO, 50)
-
-pi.set_servo_pulsewidth(SERVO, 1200) # Minimum throttle.
-
-time.sleep(10)
-
-###
-pi.stop() # Disconnect from local Raspberry Pi.
+    print("Ciclo completo")
+    pwm.stop()  
+    GPIO.cleanup()
