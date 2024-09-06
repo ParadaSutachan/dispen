@@ -21,15 +21,10 @@ print("Calibración completa.")
 
 # Control del motor  
 try:  
-    while True:  
-        for duty_cycle in range(0, 101, 5):  # Aumenta el ciclo de trabajo  
-            pwm.ChangeDutyCycle(duty_cycle)
-            print(duty_cycle) 
-            time.sleep(3)  
-        for duty_cycle in range(100, -1, -5):  # Disminuye el ciclo de trabajo  
-            pwm.ChangeDutyCycle(duty_cycle)
-            print(duty_cycle)  
-            time.sleep(3)  
+    while True: 
+             # Aumenta el ciclo de trabajo  
+            pwm.ChangeDutyCycle(20)
+             
 except KeyboardInterrupt:  
     pass  
 
