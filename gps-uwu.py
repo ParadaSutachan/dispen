@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#!/usr/bin/env python
 
 # esc_start.py
 # 2015-04-14
@@ -14,9 +15,12 @@ import time
 
 import pigpio
 
-SERVO = 16
+SERVO = 21
 
 pi = pigpio.pi() # Connect to local Pi.
+pi.set_mode(SERVO, pigpio.OUTPUT)
+
+pi.set_PWM_frequency(SERVO, 50)
 
 pi.set_servo_pulsewidth(SERVO, 1200) # Minimum throttle.
 
