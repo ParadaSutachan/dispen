@@ -2,24 +2,42 @@
 import pigpio
 import time
 
-# Conectarse al daemon pigpio
+# Conectar al demonio pigpio
 pi = pigpio.pi()
 
-# Definir el pin del ESC
-ESC_PIN = 21  # Cambia al pin GPIO que estés utilizando
+# Definir el pin GPIO donde está conectado el ESC
+ESC_PIN = 21  # Cambia al pin que estés utilizando
 
-def test_esc():
-    print("Probando el ESC...")
+# Función para enviar el pulso PWM
+def set_pwm(pulse_width):
+    pi.set_servo_pulsewidth(ESC_PIN, pulse_width)
 
-    # Enviar señal intermedia (1500 us, punto neutro)
-    pi.set_servo_pulsewidth(ESC_PIN, 1040)
-    print("Señal neutra (1500 us)...")
-    time.sleep(10)
+# Inicializar el ESC
+def initialize_esc():
+    print("Inicializando ESC...")
+    set_pwm(1100)  # Establece el valor mínimo
+    time.sleep(3)
 
+# Ajustar el rango para que 1200 sea más manejable
+def run_motor_at_custom_speed():
+    print("Probando con PWM ajustado...")
+    
+    # Prueba con un valor ajustado de 1150 (entre 1100 y 1200) para disminuir la velocidad
+    set_pwm(1150)
+    time.sleep(3)
+    
+    # O prueba diferentes valores para reducir la velocidad a niveles más bajos
+    set_pwm(1180)
+    time.sleep(3)
+    
+    # Finalmente, prueba en 1200
+    set_pwm(1200)
+    time.sleep(3)
 
+try:
+    initialize_esc()
+    run_motor_at_custom_speed()
 
-test_esc()
-
-# Apagar el servo PWM y limpiar
-pi.set_servo_pulsewidth(ESC_PIN, 0)  # Apagar el PWM
-pi.stop()  # Detener pigpio
+finally:
+    pi.set_servo_pulsewidth(ESC_PIN, 0)  # Apagar el PWM
+    pi.stop()  # Finalizar pigpio
