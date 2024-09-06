@@ -20,9 +20,8 @@ pi = pigpio.pi() # Connect to local Pi.
 pi.set_mode(SERVO, pigpio.OUTPUT)
 
 pi.set_PWM_frequency(SERVO, 50)
-pi.set_PWM_range(SERVO, 20000) # 1,000,000 / 50 = 20,000us for 100% duty cycle
-dutty_cycle = 25*255/100
-pi.set_PWM_dutycycle(SERVO, dutty_cycle) # Minimum throttle.
+pi.set_PWM_range(SERVO, 2000) # 1,000,000 / 50 = 20,000us for 100% duty cycle
+pi.set_servo_pulsewidth(SERVO, 1000) # Minimum throttle.
 
 time.sleep(10)
 
