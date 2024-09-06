@@ -29,11 +29,11 @@ pi.set_servo_pulsewidth(SERVO, 500) # Maximum throttle.
 
 time.sleep(5)
 
-pi.set_servo_pulsewidth(SERVO, 1200) # Slightly open throttle.
+pi.set_servo_pulsewidth(SERVO, 1250) # Slightly open throttle.
 
 time.sleep(5)
 
-pi.set_servo_pulsewidth(SERVO, 1250) # Stop servo pulses.
+pi.set_servo_pulsewidth(SERVO, 0) # Stop servo pulses.
 
 time.sleep(3)
 
