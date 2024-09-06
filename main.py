@@ -8,18 +8,12 @@ pi = pigpio.pi()
 # Definir el pin del ESC
 ESC_PIN = 21  # Cambia al pin GPIO que estés utilizando
 
-def test_esc():
-    print("Probando el ESC...")
+# Enviar señal máxima de 2000 microsegundos para el límite superior
+def calibrate_max():
+    print("Enviando señal máxima para calibración...")
+    pi.set_servo_pulsewidth(ESC_PIN, 1200)  # 2000us = señal máxima
+    time.sleep(2)  # Esperar 2 segundos para que el ESC registre el máximo
 
-    # Enviar señal intermedia (1500 us, punto neutro)
-    pi.set_servo_pulsewidth(ESC_PIN, 1120)
-    print("Señal neutra (1500 us)...")
-    time.sleep(3)
+calibrate_max()
 
-
-
-test_esc()
-
-# Apagar el servo PWM y limpiar
-pi.set_servo_pulsewidth(ESC_PIN, 0)  # Apagar el PWM
-pi.stop()  # Detener pigpio
+# Nota: Mantén encendido durante este tiempo y desconecta la batería del ESC después de 2 segundos.
