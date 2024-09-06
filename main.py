@@ -23,7 +23,7 @@ print("Calibración completa.")
 try:  
     while True: 
              # Aumenta el ciclo de trabajo  
-            pwm.ChangeDutyCycle(50)
+        pwm.ChangeDutyCycle(100)
 
 except KeyboardInterrupt:  
     pass  
