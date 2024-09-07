@@ -10,7 +10,7 @@ pi = pigpio.pi()
 ESC_PIN = 16  # Cambia este valor por el pin GPIO que estés utilizando
 
 print("Estableciendo el valor máximo de 2000 us...")
-pi.set_servo_pulsewidth(ESC_PIN, 1000)  # Configura el PWM a 2000 us (máximo)
+pi.set_servo_pulsewidth(ESC_PIN, 1500)  # Configura el PWM a 2000 us (máximo)
 time.sleep(10)  # Mantener durante 5 segundos para probar el valor máximo
 
 
