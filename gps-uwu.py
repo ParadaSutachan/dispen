@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 import time
 
 # Configurar los pines GPIO
-ESC_PIN = 16  # El pin GPIO donde está conectado el ESC
+ESC_PIN = 21  # El pin GPIO donde está conectado el ESC
 pwmMin = 1000  # Valor mínimo del PWM en microsegundos
 pwmMax = 2000  # Valor máximo del PWM en microsegundos
 
