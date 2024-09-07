@@ -1,46 +1,19 @@
 #!/usr/bin/env python
-import RPi.GPIO as GPIO  
-import time  
+import pigpio
+import time
 
-# Configuración del pin GPIO  
-ESC_PIN = 21  
-GPIO.setmode(GPIO.BCM)  
-GPIO.setup(ESC_PIN, GPIO.OUT)  
+# Conectarse al daemon pigpio
+pi = pigpio.pi()
 
-# Configuración de PWM  
-pwm = GPIO.PWM(ESC_PIN, 50)  # 50 Hz para el ESC
-pwm.start(0)  # Inicializa el PWM con un ciclo de trabajo de 0%  
+# Definir el pin del ESC
+ESC_PIN = 21  # Cambia al pin GPIO que estés utilizando
 
-# Función para convertir de microsegundos a ciclo de trabajo PWM
-def set_pwm_from_microseconds(pulse_width):
-    # Calcular el duty cycle correspondiente al ancho de pulso en microsegundos
-    # 1000 us corresponde a 5% de duty cycle, 2000 us corresponde a 10%
-    duty_cycle = (pulse_width / 20000) * 100  # Convertir microsegundos a porcentaje de duty cycle
-    pwm.ChangeDutyCycle(duty_cycle)
+# Enviar señal máxima de 2000 microsegundos para el límite superior
+def calibrate_max():
+    print("Enviando señal máxima para calibración...")
+    pi.set_servo_pulsewidth(ESC_PIN, 2000)  # 2000us = señal máxima
+    time.sleep(2)  # Esperar 2 segundos para que el ESC registre el máximo
 
-try:
-    print("Calibrando el ESC...")
+calibrate_max()
 
-    # Enviar señal máxima primero (2000 us) durante unos segundos
-    set_pwm_from_microseconds(2000)
-    print("Manteniendo máximo...")
-    time.sleep(3)
-
-    # Luego enviar la señal mínima (1000 us) para que el ESC calibre el rango
-    set_pwm_from_microseconds(1000)
-    print("Manteniendo mínimo...")
-    time.sleep(3)
-
-    print("Calibración completa. Probando valores intermedios...")
-
-    # Probar el valor intermedio (1500 us)
-    set_pwm_from_microseconds(1500)
-    time.sleep(3)
-
-    # Probar el valor máximo nuevamente
-    set_pwm_from_microseconds(2000)
-    time.sleep(3)
-
-finally:
-    pwm.stop()  # Detener el PWM
-    GPIO.cleanup()  # Limpiar los pines GPIO al finalizar
+# Nota: Mantén encendido durante este tiempo y desconecta la batería del ESC después de 2 segundos.
