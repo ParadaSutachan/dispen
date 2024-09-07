@@ -28,7 +28,7 @@ try:
     print("Moviendo los motores a velocidad de 1200 microsegundos...")
     set_speed(pwm1, 1090)  # Señal de 1200 microsegundos para el primer motor
     set_speed(pwm2, 1090)  # Señal de 1200 microsegundos para el segundo motor
-    time.sleep(5)  # Mantener la velocidad por 5 segundos
+    time.sleep(10)  # Mantener la velocidad por 5 segundos
 
     # Detener los motores
     print("Deteniendo motores...")
