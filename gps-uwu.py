@@ -19,6 +19,8 @@ print("Enviando señal 1200 para calibración...")
 pi.set_servo_pulsewidth(ESC_PIN2, 1200)  # 2000us = señal máxima
 time.sleep(5)  # Esperar 2 segundos para que el ESC registre el máximo
 
-pi.stop()
 
+pi.set_servo_pulsewidth(ESC_PIN, 0)  # 2000us = señal máxima
+pi.set_servo_pulsewidth(ESC_PIN2, 0)  # 2000us = señal máxima
+pi.stop()
 # Nota: Mantén encendido durante este tiempo y desconecta la batería del ESC después de 2 segundos.
