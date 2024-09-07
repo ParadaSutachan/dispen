@@ -10,7 +10,7 @@ if not pi.connected:
     exit()
 
 # Definir el pin GPIO donde está conectado el ESC
-ESC_PIN = 21  # Cambia este valor por el pin GPIO que estés utilizando
+ESC_PIN = 20  # Cambia este valor por el pin GPIO que estés utilizando
 
 # Función para enviar una señal mínima de 1000 us para desbloquear el ESC
 def unlock_esc():
