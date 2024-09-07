@@ -10,7 +10,7 @@ if not pi.connected:
     exit()
 
 # Definir el pin GPIO donde está conectado el ESC
-ESC_PIN = 21  # Cambia este valor por el pin GPIO que estés utilizando
+ESC_PIN = 20  # Cambia este valor por el pin GPIO que estés utilizando
 
 # Función para mover el motor a un valor neutro de 1500 us
 def test_motor_neutral():
