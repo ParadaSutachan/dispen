@@ -1,33 +1,46 @@
-import pigpio  
+#!/usr/bin/env python
+import RPi.GPIO as GPIO  
 import time  
 
 # Configuración del pin GPIO  
 ESC_PIN = 21  
-pi = pigpio.pi()  # Conectar al daemon pigpio  
+GPIO.setmode(GPIO.BCM)  
+GPIO.setup(ESC_PIN, GPIO.OUT)  
 
-if not pi.connected:  
-    exit()  
+# Configuración de PWM  
+pwm = GPIO.PWM(ESC_PIN, 50)  # 50 Hz para el ESC
+pwm.start(0)  # Inicializa el PWM con un ciclo de trabajo de 0%  
 
-# Calibración del ESC  
-print("Calibrando ESC...")  
-pi.set_servo_pulsewidth(ESC_PIN, 2000)  # Máxima señal  
-time.sleep(2)  # Espera 2 segundos  
-pi.set_servo_pulsewidth(ESC_PIN, 1000)  # Mínima señal  
-time.sleep(2)  # Espera 2 segundos  
-print("Calibración completa.")  
+# Función para convertir de microsegundos a ciclo de trabajo PWM
+def set_pwm_from_microseconds(pulse_width):
+    # Calcular el duty cycle correspondiente al ancho de pulso en microsegundos
+    # 1000 us corresponde a 5% de duty cycle, 2000 us corresponde a 10%
+    duty_cycle = (pulse_width / 20000) * 100  # Convertir microsegundos a porcentaje de duty cycle
+    pwm.ChangeDutyCycle(duty_cycle)
 
-# Control del motor  
-try:  
-    while True:  
-        for pulsewidth in range(1000, 2001, 50):  # Aumenta el pulso  
-            pi.set_servo_pulsewidth(ESC_PIN, pulsewidth)  
-            time.sleep(0.5)  
-        for pulsewidth in range(2000, 999, -50):  # Disminuye el pulso  
-            pi.set_servo_pulsewidth(ESC_PIN, pulsewidth)  
-            time.sleep(0.5)  
-except KeyboardInterrupt:  
-    pass  
+try:
+    print("Calibrando el ESC...")
 
-# Limpieza  
-pi.set_servo_pulsewidth(ESC_PIN, 0)  # Detener el motor  
-pi.stop()
+    # Enviar señal máxima primero (2000 us) durante unos segundos
+    set_pwm_from_microseconds(2000)
+    print("Manteniendo máximo...")
+    time.sleep(3)
+
+    # Luego enviar la señal mínima (1000 us) para que el ESC calibre el rango
+    set_pwm_from_microseconds(1000)
+    print("Manteniendo mínimo...")
+    time.sleep(3)
+
+    print("Calibración completa. Probando valores intermedios...")
+
+    # Probar el valor intermedio (1500 us)
+    set_pwm_from_microseconds(1500)
+    time.sleep(3)
+
+    # Probar el valor máximo nuevamente
+    set_pwm_from_microseconds(2000)
+    time.sleep(3)
+
+finally:
+    pwm.stop()  # Detener el PWM
+    GPIO.cleanup()  # Limpiar los pines GPIO al finalizar
