@@ -1,42 +1,34 @@
-import pigpio
+import RPi.GPIO as GPIO
 import time
 
-# Configuración
-ESC_PIN = 19  # El pin GPIO donde está conectado el ESC
-pi = pigpio.pi()
+# Configuración de pines
+ESC_PIN = 19  # Pin GPIO donde está conectado el ESC
 
-if not pi.connected:
-    exit()
+# Configurar GPIO
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(ESC_PIN, GPIO.OUT)
 
-# Inicialización del ESC
-ESC_MIN = 1000  # Microsegundos para velocidad mínima (parado)
-ESC_MAX = 2000  # Microsegundos para máxima velocidad
+# Configurar la señal PWM para el ESC (50 Hz, típico de servos y ESC)
+pwm = GPIO.PWM(ESC_PIN, 50)  # Frecuencia de 50 Hz (20ms ciclo completo)
 
-# Calibrar ESC
-print("Calibrando ESC...")
-pi.set_servo_pulsewidth(ESC_PIN, 0)  # Detener motor
-time.sleep(2)
+# Inicializar ESC
+pwm.start(0)  # Inicialmente con un duty cycle de 0%
 
-pi.set_servo_pulsewidth(ESC_PIN, ESC_MAX)  # Señal máxima
-print("Enviando señal máxima para calibración.")
-time.sleep(2)
+# Calcular el ciclo de trabajo en función del pulso (1000-2000 microsegundos)
+def set_speed(pulse_width):
+    duty_cycle = pulse_width / 20000 * 100  # Convertir microsegundos a ciclo de trabajo
+    pwm.ChangeDutyCycle(duty_cycle)
 
-pi.set_servo_pulsewidth(ESC_PIN, ESC_MIN)  # Señal mínima
-print("Enviando señal mínima para calibración.")
-time.sleep(2)
-
-# Aumentar a máxima velocidad
-print("Subiendo a máxima velocidad.")
-pi.set_servo_pulsewidth(ESC_PIN, ESC_MAX)
-time.sleep(5)  # Mantener a máxima velocidad por 5 segundos
-
-# Detener motor
-print("Deteniendo motor.")
-pi.set_servo_pulsewidth(ESC_PIN, ESC_MIN)
-time.sleep(2)
-
-# Limpiar y desconectar
-pi.set_servo_pulsewidth(ESC_PIN, 0)
-pi.stop()
-print("Proceso finalizado.")
+try:
+    # Configurar ESC a velocidad máxima (2000 microsegundos)
+    print("Acelerando a velocidad máxima...")
+    set_speed(2000)
+    
+    time.sleep(5)  # Mantener la velocidad por 5 segundos
+    
+finally:
+    # Detener el motor y limpiar la configuración
+    set_speed(0)
+    pwm.stop()
+    GPIO.cleanup()
 
