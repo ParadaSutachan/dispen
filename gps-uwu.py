@@ -9,7 +9,7 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(ESC_PIN, GPIO.OUT)
 
 # Configurar la señal PWM para el ESC (50 Hz)
-pwm = GPIO.PWM(ESC_PIN, 50)  # Frecuencia de 50 Hz (20 ms ciclo completo)
+pwm = GPIO.PWM(ESC_PIN, 50)  # Frecuencia de 50 Hz (20ms ciclo completo)
 
 # Inicializar PWM
 pwm.start(0)  # Iniciar con un duty cycle de 0%
@@ -20,25 +20,19 @@ def set_speed(pulse_width):
     pwm.ChangeDutyCycle(duty_cycle)
 
 try:
-    print("Iniciando calibración ESC...")
-    
-    # Enviar señal de máxima potencia para calibración
-    print("Enviando señal máxima...")
+    # Mover el motor a máxima velocidad por 3 segundos
+    print("Moviendo a máxima velocidad...")
     set_speed(2000)  # Señal máxima (2000 microsegundos)
-    time.sleep(2)
-    
-    # Enviar señal mínima para restablecer configuración
-    print("Enviando señal mínima para calibración...")
-    set_speed(1000)  # Señal mínima (1000 microsegundos)
-    time.sleep(2)
-    
-    # Esperar y detener el motor
-    print("Calibración completada, deteniendo motor...")
-    set_speed(0)
+    time.sleep(3)  # Mantener la velocidad por 3 segundos
+
+    # Detener el motor
+    print("Deteniendo motor...")
+    set_speed(1000)  # Señal mínima (1000 microsegundos para detener)
     time.sleep(1)
     
 finally:
+    # Limpiar y detener PWM
     pwm.stop()
     GPIO.cleanup()
-    print("Proceso de calibración terminado.")
+    print("Proceso finalizado.")
 
