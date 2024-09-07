@@ -2,25 +2,26 @@
 import pigpio
 import time
 
-# Conectarse al daemon pigpio
+# Conectar al daemon pigpio
 pi = pigpio.pi()
 
-# Definir el pin del ESC
-ESC_PIN = 21  # Cambia al pin GPIO que estés utilizando
-ESC_PIN2 = 20  # Cambia al pin GPIO que estés utilizando
+# Verificar que la conexión con el daemon pigpio esté activa
+if not pi.connected:
+    exit()
 
-# Enviar señal máxima de 2000 microsegundos para el límite superior
+# Definir el pin GPIO donde está conectado el ESC
+ESC_PIN = 21  # Cambia este valor por el pin GPIO que estés utilizando
 
-print("Enviando señal máxima para calibración...")
-pi.set_servo_pulsewidth(ESC_PIN, 6)  # 2000us = señal máxima
-time.sleep(5)  # Esperar 2 segundos para que el ESC registre el máximo
+# Función para mover el motor a un valor neutro de 1500 us
+def test_motor_neutral():
+    print("Enviando señal neutra de 1500 us...")
+    pi.set_servo_pulsewidth(ESC_PIN, 1500)  # Enviar señal neutra (generalmente punto de arranque)
+    time.sleep(5)  # Mantener durante 5 segundos
 
-print("Enviando señal 1200 para calibración...")
-pi.set_servo_pulsewidth(ESC_PIN2, 10)  # 2000us = señal máxima
-time.sleep(5)  # Esperar 2 segundos para que el ESC registre el máximo
+try:
+    test_motor_neutral()
 
-
-pi.set_servo_pulsewidth(ESC_PIN, 0)  # 2000us = señal máxima
-pi.set_servo_pulsewidth(ESC_PIN2, 0)  # 2000us = señal máxima
-pi.stop()
-# Nota: Mantén encendido durante este tiempo y desconecta la batería del ESC después de 2 segundos.
+finally:
+    pi.set_servo_pulsewidth(ESC_PIN, 0)  # Apagar el PWM
+    pi.stop()  # Finalizar pigpio
+    print("Proceso completado y conexión con pigpio cerrada.")
