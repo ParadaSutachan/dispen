@@ -2,7 +2,7 @@ import pigpio
 import time
 
 # Configuración
-ESC_PIN = 21  # El pin GPIO donde está conectado el ESC
+ESC_PIN = 19  # El pin GPIO donde está conectado el ESC
 pi = pigpio.pi()
 
 if not pi.connected:
