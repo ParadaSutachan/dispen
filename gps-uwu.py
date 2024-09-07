@@ -20,7 +20,7 @@ def unlock_esc():
 
 # Función para probar valores de PWM desde 1000 us a 1200 us lentamente
 def test_motor_slowly():
-    for pwm_value in range(1000, 1201):  # Probar con valores 1000, 1050, 1100, 1150, 1200
+    for pwm_value in range(1000, 1201,100):  # Probar con valores 1000, 1050, 1100, 1150, 1200
         print(f"Probando con PWM de {pwm_value} us...")
         pi.set_servo_pulsewidth(ESC_PIN, pwm_value)
         time.sleep(5)  # Mantener durante 3 segundos
