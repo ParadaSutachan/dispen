@@ -1,55 +1,42 @@
-import RPi.GPIO as GPIO
+import pigpio
 import time
 
-# Configurar los pines GPIO
+# Configuración
 ESC_PIN = 21  # El pin GPIO donde está conectado el ESC
-pwmMin = 1000  # Valor mínimo del PWM en microsegundos
-pwmMax = 2000  # Valor máximo del PWM en microsegundos
+pi = pigpio.pi()
 
-# Configurar GPIO en modo BCM y el pin de salida PWM
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(ESC_PIN, GPIO.OUT)
+if not pi.connected:
+    exit()
 
-# Configurar PWM en 50Hz (frecuencia estándar para un ESC)
-pwm = GPIO.PWM(ESC_PIN, 50)
-pwm.start(0)
+# Inicialización del ESC
+ESC_MIN = 1000  # Microsegundos para velocidad mínima (parado)
+ESC_MAX = 2000  # Microsegundos para máxima velocidad
 
-# Función para convertir microsegundos a duty cycle para PWM en 50Hz
-def set_pwm_duty_cycle(pulse_width_microseconds):
-    duty_cycle = pulse_width_microseconds / 20000 * 100  # Convertir microsegundos a porcentaje de duty cycle
-    pwm.ChangeDutyCycle(duty_cycle)
+# Calibrar ESC
+print("Calibrando ESC...")
+pi.set_servo_pulsewidth(ESC_PIN, 0)  # Detener motor
+time.sleep(2)
 
-try:
-    # Inicializar el ESC en el valor mínimo durante unos segundos
-    print("Inicializando ESC...")
-    set_pwm_duty_cycle(pwmMin)
-    time.sleep(3)
+pi.set_servo_pulsewidth(ESC_PIN, ESC_MAX)  # Señal máxima
+print("Enviando señal máxima para calibración.")
+time.sleep(2)
 
-    # Subir a un valor neutro (1500 microsegundos)
-    print("Subiendo al valor neutro (1500 us)...")
-    set_pwm_duty_cycle(1500)
-    time.sleep(2)
+pi.set_servo_pulsewidth(ESC_PIN, ESC_MIN)  # Señal mínima
+print("Enviando señal mínima para calibración.")
+time.sleep(2)
 
-    while True:
-        # Aumentar la señal PWM desde el mínimo hasta el máximo
-        print("Acelerando...")
-        for pulse_width in range(pwmMin, pwmMax + 1, 10):
-            set_pwm_duty_cycle(pulse_width)
-            time.sleep(0.02)  # Pequeña pausa entre incrementos
+# Aumentar a máxima velocidad
+print("Subiendo a máxima velocidad.")
+pi.set_servo_pulsewidth(ESC_PIN, ESC_MAX)
+time.sleep(5)  # Mantener a máxima velocidad por 5 segundos
 
-        time.sleep(2)  # Mantener la velocidad máxima por 2 segundos
+# Detener motor
+print("Deteniendo motor.")
+pi.set_servo_pulsewidth(ESC_PIN, ESC_MIN)
+time.sleep(2)
 
-        # Reducir la señal PWM desde el máximo hasta el mínimo
-        print("Desacelerando...")
-        for pulse_width in range(pwmMax, pwmMin - 1, -10):
-            set_pwm_duty_cycle(pulse_width)
-            time.sleep(0.02)  # Pequeña pausa entre decrementos
+# Limpiar y desconectar
+pi.set_servo_pulsewidth(ESC_PIN, 0)
+pi.stop()
+print("Proceso finalizado.")
 
-        time.sleep(2)  # Mantener la velocidad mínima por 2 segundos
-
-except KeyboardInterrupt:
-    print("Parando...")
-
-finally:
-    pwm.stop()  # Detener el PWM
-    GPIO.cleanup()  # Limpiar los pines GPIO al finalizar
