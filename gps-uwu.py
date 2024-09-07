@@ -1,28 +1,33 @@
-#!/usr/bin/env python
-import pigpio
-import time
+import pigpio  
+import time  
 
-# Conectar al daemon pigpio
-pi = pigpio.pi()
+# Configuración del pin GPIO  
+ESC_PIN = 21  
+pi = pigpio.pi()  # Conectar al daemon pigpio  
 
-# Verificar que la conexión con el daemon pigpio esté activa
-if not pi.connected:
-    exit()
+if not pi.connected:  
+    exit()  
 
-# Definir el pin GPIO donde está conectado el ESC
-ESC_PIN = 20  # Cambia este valor por el pin GPIO que estés utilizando
+# Calibración del ESC  
+print("Calibrando ESC...")  
+pi.set_servo_pulsewidth(ESC_PIN, 2000)  # Máxima señal  
+time.sleep(2)  # Espera 2 segundos  
+pi.set_servo_pulsewidth(ESC_PIN, 1000)  # Mínima señal  
+time.sleep(2)  # Espera 2 segundos  
+print("Calibración completa.")  
 
-# Mover el motor a 1200 microsegundos (velocidad baja)
-def move_to_1200():
-    print("Moviendo el motor a 1200 us...")
-    pi.set_servo_pulsewidth(ESC_PIN, 1200)  # Configurar el PWM a 1200 microsegundos
-    time.sleep(5)  # Mantener durante 5 segundos
+# Control del motor  
+try:  
+    while True:  
+        for pulsewidth in range(1000, 2001, 50):  # Aumenta el pulso  
+            pi.set_servo_pulsewidth(ESC_PIN, pulsewidth)  
+            time.sleep(0.5)  
+        for pulsewidth in range(2000, 999, -50):  # Disminuye el pulso  
+            pi.set_servo_pulsewidth(ESC_PIN, pulsewidth)  
+            time.sleep(0.5)  
+except KeyboardInterrupt:  
+    pass  
 
-try:
-    move_to_1200()
-
-finally:
-    # Detener el PWM
-    pi.set_servo_pulsewidth(ESC_PIN, 0)  # Apagar el PWM
-    pi.stop()  # Finalizar pigpio
-    print("Proceso completado y conexión con pigpio cerrada.")
+# Limpieza  
+pi.set_servo_pulsewidth(ESC_PIN, 0)  # Detener el motor  
+pi.stop()
