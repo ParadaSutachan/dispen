@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 import time
 
 # Configuración de pines
-ESC_PIN = 19  # Pin GPIO donde está conectado el ESC
+ESC_PIN = 20  # Pin GPIO donde está conectado el ESC
 
 # Configurar GPIO
 GPIO.setmode(GPIO.BCM)
