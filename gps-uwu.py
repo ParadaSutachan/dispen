@@ -10,29 +10,18 @@ if not pi.connected:
     exit()
 
 # Definir el pin GPIO donde está conectado el ESC
-ESC_PIN = 20  # Cambia este valor por el pin GPIO que estés utilizando
+ESC_PIN = 21  # Cambia este valor por el pin GPIO que estés utilizando
 
-# Función para enviar una señal mínima de 1000 us para desbloquear el ESC
-def unlock_esc():
-    print("Enviando señal mínima de 1000 us para desbloquear el ESC...")
-    pi.set_servo_pulsewidth(ESC_PIN, 1000)  # Enviar señal mínima
-    time.sleep(3)  # Esperar 3 segundos para que el ESC acepte la señal mínima
-
-# Función para probar valores de PWM desde 1000 us a 1200 us lentamente
-def test_motor_slowly():
-    for pwm_value in range(1000, 1201,100):  # Probar con valores 1000, 1050, 1100, 1150, 1200
-        print(f"Probando con PWM de {pwm_value} us...")
-        pi.set_servo_pulsewidth(ESC_PIN, pwm_value)
-        time.sleep(5)  # Mantener durante 3 segundos
+# Función para establecer el valor máximo (2000 us)
+def set_max_pwm():
+    print("Estableciendo el valor máximo de 2000 us...")
+    pi.set_servo_pulsewidth(ESC_PIN, 2000)  # Configura el PWM a 2000 us (máximo)
+    time.sleep(5)  # Mantener durante 5 segundos para probar el valor máximo
 
 try:
-    # Enviar señal mínima para desbloquear el ESC
-    unlock_esc()
-
-    # Probar incrementos lentos desde 1000 us hasta 1200 us
-    test_motor_slowly()
+    set_max_pwm()
 
 finally:
-    pi.set_servo_pulsewidth(ESC_PIN, 0)  # Apagar el PWM
+    pi.set_servo_pulsewidth(ESC_PIN, 0)  # Apagar el PWM al finalizar
     pi.stop()  # Finalizar pigpio
     print("Proceso completado y conexión con pigpio cerrada.")
