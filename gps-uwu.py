@@ -22,7 +22,7 @@ def set_speed(pulse_width):
 try:
     # Mover el motor a máxima velocidad por 3 segundos
     print("Moviendo a máxima velocidad...")
-    set_speed(2000)  # Señal máxima (2000 microsegundos)
+    set_speed(1200)  # Señal máxima (2000 microsegundos)
     time.sleep(3)  # Mantener la velocidad por 3 segundos
 
     # Detener el motor
