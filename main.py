@@ -150,6 +150,8 @@ def main():
                 RPM2 = RPS2 * 120.0
                 
                 print("Revoluciones por segundo M2: {:.4f} | Revoluciones por minuto M2: {:.4f}".format(RPS2, RPM2))
+                print("flancos a",numero_flancos_A)
+                print("flancos a",numero_flancos_B)
 
                 # Restablecer contadores
                 numero_flancos_B = 0
