@@ -10,6 +10,9 @@ import pynmea2 #type: ignore
 import shapefile #type: ignore
 from shapely.geometry import shape, Point   #type: ignore
 
+
+
+
 # Inicialización de Pigpio
 pi = pigpio.pi()
 pi_m = math.pi
@@ -17,6 +20,8 @@ pi_m = math.pi
 # Configura el puerto serie  
 port = "/dev/ttyAMA0"  
 ser = serial.Serial(port, baudrate=9600, timeout=0.1) 
+
+
 
 # Configuración de pines de motor y encoder
 motor1_pwm_pin = 12
@@ -30,6 +35,9 @@ PIN_ENCODER_A = 18
 PIN_ENCODER_B = 17
 PIN_ENCODER2_A = 16
 PIN_ENCODER2_B = 19
+
+ESC_PIN_1 = 19  # Pin GPIO donde está conectado el primer ESC
+ESC_PIN_2 = 20  # Pin GPIO donde está conectado el segundo ESC
 
 INTERVALO = 0.2  # Intervalo de tiempo en segundos para cálculo de RPM
 
@@ -144,6 +152,26 @@ def contador_flancos_encoder_b2(gpio, level, tick):
 cb1 = pi.callback(PIN_ENCODER_A, pigpio.EITHER_EDGE, contador_flancos_encoder)
 cb3 = pi.callback(PIN_ENCODER2_A, pigpio.EITHER_EDGE, contador_flancos_encoder2)
 
+# Configurar GPIO
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(ESC_PIN_1, GPIO.OUT)
+GPIO.setup(ESC_PIN_2, GPIO.OUT)
+
+# Configurar la señal PWM para los ESC (50 Hz)
+pwm1 = GPIO.PWM(ESC_PIN_1, 50)  # Frecuencia de 50 Hz (20ms ciclo completo)
+pwm2 = GPIO.PWM(ESC_PIN_2, 50)  # Frecuencia de 50 Hz (20ms ciclo completo)
+
+# Inicializar PWM
+pwm1.start(0)  # Iniciar con un duty cycle de 0%
+pwm2.start(0)  # Iniciar con un duty cycle de 0%
+
+
+# Función para convertir microsegundos a ciclo de trabajo
+def set_speed(pwm, pulse_width):
+    duty_cycle = pulse_width / 20000 * 100  # Convertir microsegundos a ciclo de trabajo
+    pwm.ChangeDutyCycle(duty_cycle)
+
+
 # Función para controlar el motor
 def control_motor(pin_pwm, pin_dir, speed_percent, direction):
     duty_cycle = int(speed_percent * 255 / 100)
@@ -185,6 +213,7 @@ while True:
 
         elif status == "V":  
             print("Buscando señal . . .")
+            
 
 speed_mps=0.0
 d=3.6
@@ -292,6 +321,11 @@ with open(output_file_path, 'w') as output_file:
 
                         time.sleep(0.2)
             gk=0
+
+            # Mover los motores a velocidad de 1200 microsegundos por 5 segundos
+        print("Moviendo los brushless a velocidad de 1200 microsegundos...")
+        set_speed(pwm1, 1090)  # Señal de 1200 microsegundos para el primer motor
+        set_speed(pwm2, 1090)  # Señal de 1200 microsegundos para el segundo motor
 
 
         flancos_totales_1 = numero_flancos_A + numero_flancos_B
