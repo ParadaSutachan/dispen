@@ -311,8 +311,8 @@ with open(output_file_path, 'w') as output_file:
                         time.sleep(0.2)
             gk=0
 
-        set_speed(pwm1, 1090)  # Señal de 1200 microsegundos para el primer motor
-        set_speed(pwm2, 1090)  # Señal de 1200 microsegundos para el segundo motor
+        set_speed(pwm1, 1200)  # Señal de 1200 microsegundos para el primer motor
+        set_speed(pwm2, 1200)  # Señal de 1200 microsegundos para el segundo motor
 
         #Lectura de Flancos para medir velocidad
         flancos_totales_1 = numero_flancos_A + numero_flancos_B
