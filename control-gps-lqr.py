@@ -176,8 +176,10 @@ delta_f_1 = 0.0
 delta_f_2 = 0.0
 k=0
 gk=0
-rate = 0.0
-faja = 3.0
+rate = 12.82
+dosis_m1=0.0
+dosis_m2=0.0
+faja = 3.6
 
 xk = np.array([[0],
                [0],
@@ -261,10 +263,12 @@ with open(output_file_path, 'w') as output_file:
                             zona = zone+1
                             inside_zone = True
                             if zona == 1:
-                                rate = 8
-                                print(rate)
+                                dosis_m1 = 0.7*rate
+                                dosis_m2 = 0.3*rate
+                                
                             if zona == 2:
-                                rate = 10
+                                dosis_m1 = 0.4*rate
+                                dosis_m2 = 0.6*rate
                                 print(rate)
                             break
                     
@@ -296,11 +300,12 @@ with open(output_file_path, 'w') as output_file:
                                         zona = zone+1
                                         inside_zone = True
                                         if zona == 1:
-                                            rate = 8
-                                            print(rate)
+                                            dosis_m1 = 0.7*rate
+                                            dosis_m2 = 0.3*rate
                                         if zona == 2:
-                                            rate = 10
-                                            print(rate)
+                                            dosis_m1 = 0.4*rate
+                                            dosis_m2 = 0.6*rate
+
                                         break
 
                         time.sleep(0.2)
@@ -328,10 +333,11 @@ with open(output_file_path, 'w') as output_file:
 
         float(speed_mps)
 
-        if speed_mps <= 0.3:
+        if speed_mps <= 0.2:
             speed_mps =0.0
 
-        rk = speed_mps*rate*faja
+        rk = speed_mps*dosis_m1*faja
+
         print("rk: " + str(rk))
 
         ##Observador
