@@ -36,7 +36,7 @@ PIN_ENCODER_B = 17
 PIN_ENCODER2_A = 16
 PIN_ENCODER2_B = 19
 
-ESC_PIN_1 = 19  # Pin GPIO donde está conectado el primer ESC
+ESC_PIN_1 = 21  # Pin GPIO donde está conectado el primer ESC
 ESC_PIN_2 = 20  # Pin GPIO donde está conectado el segundo ESC
 
 INTERVALO = 0.2  # Intervalo de tiempo en segundos para cálculo de RPM
@@ -119,7 +119,6 @@ delta_fn_2= 0.0
 v1 = 0.0
 v2 = 0.0
 
-rate= 0.0
 # Configuración de pines de entrada para los encoders
 pi.set_mode(PIN_ENCODER_A, pigpio.INPUT)
 pi.set_pull_up_down(PIN_ENCODER_A, pigpio.PUD_UP)
@@ -217,6 +216,9 @@ while True:
 
 speed_mps=0.0
 d=3.6
+rate= 12.82
+dosis_m1=0.0
+dosis_m2= 0.0
 gk=0.0
 
 
@@ -277,11 +279,15 @@ with open(output_file_path, 'w') as output_file:
                             zona = zone+1
                             inside_zone = True
                             if zona == 1:
-                                rate = 8
-                                print(rate)
+                                dosis_m1 = 0.7*rate
+                                dosis_m2= 0.3*rate
+                                print(dosis_m1)
+                                print(dosis_m2)
                             if zona == 2:
-                                rate = 10
-                                print(rate)
+                                dosis_m1 = 0.4*rate
+                                dosis_m2 = 0.6 *rate
+                                print(dosis_m1)
+                                print(dosis_m2)
                             break
                     
                     while not inside_zone:
@@ -312,17 +318,23 @@ with open(output_file_path, 'w') as output_file:
                                         zona = zone+1
                                         inside_zone = True
                                         if zona == 1:
-                                            rate = 8
-                                            print(rate)
+                                            dosis_m1 = 0.7*rate
+                                            dosis_m2 = 0.3 *rate
+                                            print(dosis_m1)
+                                            print(dosis_m2)
                                         if zona == 2:
-                                            rate = 10
-                                            print(rate)
+                                            dosis_m1 = 0.4*rate
+                                            dosis_m2 = 0.6 *rate
+                                            print(dosis_m1)
+                                            print(dosis_m2)
+                                           
                                         break
 
                         time.sleep(0.2)
             gk=0
 
             # Mover los motores a velocidad de 1200 microsegundos por 5 segundos
+
         print("Moviendo los brushless a velocidad de 1200 microsegundos...")
         set_speed(pwm1, 1090)  # Señal de 1200 microsegundos para el primer motor
         set_speed(pwm2, 1090)  # Señal de 1200 microsegundos para el segundo motor
