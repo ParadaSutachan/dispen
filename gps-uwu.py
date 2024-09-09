@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 import time
 
 # Configuración de pines
-ESC_PIN_1 = 19  # Pin GPIO donde está conectado el primer ESC
+ESC_PIN_1 = 21  # Pin GPIO donde está conectado el primer ESC
 ESC_PIN_2 = 20  # Pin GPIO donde está conectado el segundo ESC
 
 # Configurar GPIO
