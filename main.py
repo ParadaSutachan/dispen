@@ -145,13 +145,13 @@ def main():
 
                 # Calcular RPS y RPM para el motor 2
                 print("flancos a",numero_flancos_A)
-                print("flancos a",numero_flancos_B)
+                print("flancos b",numero_flancos_B)
                 RPS2 = (numero_flancos_A2 + numero_flancos_B2) / 1200.0
                 RPM2 = RPS2 * 120.0
                 
                 print("Revoluciones por segundo M2: {:.4f} | Revoluciones por minuto M2: {:.4f}".format(RPS2, RPM2))
-                print("flancos a",numero_flancos_A2)
-                print("flancos a",numero_flancos_B2)
+                print("flancos a2",numero_flancos_A2)
+                print("flancos a2",numero_flancos_B2)
 
                 # Restablecer contadores
                 numero_flancos_B = 0
