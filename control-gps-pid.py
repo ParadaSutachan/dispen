@@ -281,13 +281,11 @@ with open(output_file_path, 'w') as output_file:
                             if zona == 1:
                                 dosis_m1 = 0.7*rate
                                 dosis_m2= 0.3*rate
-                                print(dosis_m1)
-                                print(dosis_m2)
+                                print("Estamos es zona " + str(zona))
                             if zona == 2:
                                 dosis_m1 = 0.4*rate
                                 dosis_m2 = 0.6 *rate
-                                print(dosis_m1)
-                                print(dosis_m2)
+                                print("Estamos es zona " + str(zona))
                             break
                     
                     while not inside_zone:
@@ -320,13 +318,9 @@ with open(output_file_path, 'w') as output_file:
                                         if zona == 1:
                                             dosis_m1 = 0.7*rate
                                             dosis_m2 = 0.3 *rate
-                                            print(dosis_m1)
-                                            print(dosis_m2)
                                         if zona == 2:
                                             dosis_m1 = 0.4*rate
                                             dosis_m2 = 0.6 *rate
-                                            print(dosis_m1)
-                                            print(dosis_m2)
                                            
                                         break
 
@@ -346,7 +340,7 @@ with open(output_file_path, 'w') as output_file:
         print("Velocidad: " + str(W))
 
         flancos_totales_2 = numero_flancos_A2 + numero_flancos_B2
-        RPS2 = flancos_totales_1 / (600.0)
+        RPS2 = flancos_totales_2 / (600.0)
         W2 = RPS2 * ((2 * pi_m) / INTERVALO)
         print("Velocidad: " + str(W2))
 

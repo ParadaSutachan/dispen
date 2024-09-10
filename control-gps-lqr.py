@@ -302,9 +302,11 @@ with open(output_file_path, 'w') as output_file:
                                         if zona == 1:
                                             dosis_m1 = 0.7*rate
                                             dosis_m2 = 0.3*rate
+                                            print("Estamos es zona " + str(zona))
                                         if zona == 2:
                                             dosis_m1 = 0.4*rate
                                             dosis_m2 = 0.6*rate
+                                            print("Estamos es zona " + str(zona))
 
                                         break
 
@@ -319,6 +321,11 @@ with open(output_file_path, 'w') as output_file:
         FPS = flancos_totales_1 / (600.0)
         W = FPS * ((2 * pi_m) / T)      #Velocidad del motor
         print("Velocidad: " + str(W))
+
+        flancos_totales_2 = numero_flancos_A2 + numero_flancos_B2
+        RPS2 = flancos_totales_2 / (600.0)
+        W2 = RPS2 * ((2 * pi_m) / T)
+        print("Velocidad: " + str(W2))
 
 
         # Soft Sensor
