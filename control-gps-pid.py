@@ -342,7 +342,7 @@ with open(output_file_path, 'w') as output_file:
 
                         control_motor(motor1_pwm_pin, motor1_dir_pin, 0, 'forward')
                         control_motor(motor2_pwm_pin, motor2_dir_pin, 0, 'forward')
-                        
+
                         newdata = ser.readline().decode('utf-8').strip()
                         if newdata[0:6] == "$GPRMC":
                             newmsg = pynmea2.parse(newdata)  
@@ -420,9 +420,19 @@ with open(output_file_path, 'w') as output_file:
             fm_n2 = delta_fn2 + setpoint_f
 #----------------------------------------------------------------------------------------------------
         if speed_mps <= 0.4:
-            speed_mps =0.0
-            motor_speed=0.0
-            motor2_speed=0.0
+            # Reiniciar el control cuando estamos quietos
+            iek_m = 0.0
+            iek_m2 = 0.0
+            iek_s = 0.0
+            iek_s2 = 0.0
+            fm_n = 0.0
+            fm_n2 = 0.0
+            motor_speed = 0.0
+            motor2_speed = 0.0
+            control_motor(motor1_pwm_pin, motor1_dir_pin, motor_speed, 'forward')
+            control_motor(motor2_pwm_pin, motor2_dir_pin, motor2_speed, 'forward')
+            continue  # Salir del bucle si no hay movimiento
+
 
         rk_m= float(speed_mps*d*dosis_m1)
         rk_m2= float(speed_mps*d*dosis_m2)    
