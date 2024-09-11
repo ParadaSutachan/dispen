@@ -65,7 +65,9 @@ def contador_flancos_encoder_b2(gpio, level, tick):
 
 # Configuración de callbacks
 cb1 = pi.callback(PIN_ENCODER_A, pigpio.EITHER_EDGE, contador_flancos_encoder)
+cb2 = pi.callback(PIN_ENCODER_B, pigpio.EITHER_EDGE, contador_flancos_encoder_b)
 cb3 = pi.callback(PIN_ENCODER2_A, pigpio.EITHER_EDGE, contador_flancos_encoder2)
+cb4 = pi.callback(PIN_ENCODER2_B, pigpio.EITHER_EDGE, contador_flancos_encoder_b2)
 
 # Función para controlar el motor
 def control_motor(pin_pwm, pin_dir, speed_percent, direction):
@@ -80,6 +82,9 @@ def control_motor(pin_pwm, pin_dir, speed_percent, direction):
         raise ValueError("Dirección no válida. Usa 'forward' o 'backward'.")
     
 # Contadores de flancos
+
+global numero_flancos_A, numero_flancos_B, numero_flancos_A2, numero_flancos_B2
+
 numero_flancos_A = 0
 numero_flancos_B = 0
 numero_flancos_A2 = 0
@@ -195,6 +200,7 @@ with open(output_file_path, 'w') as output_file:
     start_time = time.time()
 
     while(time.time()-start_time <= 60):
+        
         
         t1 = TicToc()       # Tic
         t1.tic()
