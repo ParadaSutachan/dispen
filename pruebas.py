@@ -230,7 +230,11 @@ async def main():
             #rk_m2 = float(speed_mps * ancho_faja * dosis_m2)
             if zona:
                 rk_m = float(25)
+
+                print("rk_m" + str(rk_m))
                 rk_m2 = float(35)
+
+                print("rk_m2" + str(rk_m2))
 
             
 
