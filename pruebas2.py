@@ -60,7 +60,7 @@ try:
 
         print("Count: {}".format(count))
 
-        FPS = count/600.0
+        FPS = count/300.0
         W = ((2*pi_m)/0.2)
         print("W: {}".format(W))
         count = 0    
