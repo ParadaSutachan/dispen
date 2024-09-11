@@ -28,10 +28,10 @@ motor1_en_pin = 22
 motor2_pwm_pin = 13
 motor2_dir_pin = 25
 motor2_en_pin = 23
-PIN_ENCODER_A = 18
-PIN_ENCODER_B = 17
-PIN_ENCODER2_A = 16
-PIN_ENCODER2_B = 19
+pin_a = 17  # Pin A del encoder  M1
+pin_b = 18  # Pin B del encoder  M1
+pin_a2 = 16 # Pin A del enconder M2
+pin_b2 = 19 # Pin B del enconder M2
 INTERVALO = 0.2  # Intervalo de tiempo en segundos para cálculo de RPM
 # Contadores de flancos
 numero_flancos_A = 0
@@ -111,40 +111,61 @@ FLANCOS_M1_A2=0.0
 FLANCOS_M1_B2=0.0
 FPS=0.0
 FPS2=0.0
+
+count = 0
+count2 = 0  
+last_state = 0
+last_state2 = 0
+
+# Configuración de pines
+ESC_PIN_1 = 21  # Pin GPIO donde está conectado el primer ESC
+ESC_PIN_2 = 20  # Pin GPIO donde está conectado el segundo ESC
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(ESC_PIN_1, GPIO.OUT)
+GPIO.setup(ESC_PIN_2, GPIO.OUT)
+
+# Configurar la señal PWM para los ESC (50 Hz)
+pwm1 = GPIO.PWM(ESC_PIN_1, 50)  # Frecuencia de 50 Hz (20ms ciclo completo)
+pwm2 = GPIO.PWM(ESC_PIN_2, 50)  # Frecuencia de 50 Hz (20ms ciclo completo)
+
+
+def rotary_interrupt(channel):  
+    global count  
+    global last_state  
+
+    if GPIO.input(pin_a) != last_state:  
+        if GPIO.input(pin_b) != last_state:  
+            count += 1  
+        else:  
+            count += 1  
+    last_state = GPIO.input(pin_a)
+
+def rotary_interrupt2(channel):  
+    global count2  
+    global last_state2  
+
+    if GPIO.input(pin_a2) != last_state2:  
+        if GPIO.input(pin_b2) != last_state2:  
+            count2 += 1  
+        else:  
+            count2 += 1  
+    last_state2 = GPIO.input(pin_a)  
 # Configuración de pines de entrada para los encoders
 # Configuración de los pines A y B con pull-up y detección de ambos flancos
-def rotary_interrupt(channel):
 
-    global FLANCOS_M1_A, FLANCOS_M1_B, FLANCOS_M1,FLANCOS_M1_A2,FLANCOS_M1_B2, FLANCOS_M2
-    
-    if channel == PIN_ENCODER_A:
-        FLANCOS_M1_A += 1  # Incrementa el contador de flancos en pin A
-    elif channel == PIN_ENCODER_B:
-        FLANCOS_M1_B += 1  # Incrementa el contador de flancos en pin B
+def set_speed(pwm, pulse_width):
+    duty_cycle = pulse_width / 20000 * 100  # Convertir microsegundos a ciclo de trabajo
+    pwm.ChangeDutyCycle(duty_cycle)
 
-    if channel == PIN_ENCODER2_A:
-        FLANCOS_M1_A2 += 1  # Incrementa el contador de flancos en pin A
-    elif channel == PIN_ENCODER2_B:
-        FLANCOS_M1_B2 += 1  # Incrementa el contador de flancos en pin B
-
-    
-    # Sumar los flancos detectados en A y B
-    FLANCOS_M1 = FLANCOS_M1_A + FLANCOS_M1_B
-    FLANCOS_M2= FLANCOS_M1_A2 + FLANCOS_M1_B2
-
-# Configuración GPIO
-GPIO.setmode(GPIO.BCM)
-
-GPIO.setup(PIN_ENCODER_A, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(PIN_ENCODER_B, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(PIN_ENCODER2_A, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(PIN_ENCODER2_B, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-
-# Añadir detección de eventos en ambos pines para detectar flancos ascendentes y descendentes
-GPIO.add_event_detect(PIN_ENCODER_A, GPIO.BOTH, callback=rotary_interrupt)
-GPIO.add_event_detect(PIN_ENCODER_B, GPIO.BOTH, callback=rotary_interrupt)
-GPIO.add_event_detect(PIN_ENCODER2_A, GPIO.BOTH, callback=rotary_interrupt)
-GPIO.add_event_detect(PIN_ENCODER2_B, GPIO.BOTH, callback=rotary_interrupt)
+# Configuración GPIO  
+GPIO.setmode(GPIO.BCM)  
+GPIO.setup(pin_a, GPIO.IN, pull_up_down=GPIO.PUD_UP)  
+GPIO.setup(pin_b, GPIO.IN, pull_up_down=GPIO.PUD_UP)  
+GPIO.add_event_detect(pin_a, GPIO.BOTH, callback=rotary_interrupt)  
+GPIO.setup(pin_a2, GPIO.IN, pull_up_down=GPIO.PUD_UP)  
+GPIO.setup(pin_b2, GPIO.IN, pull_up_down=GPIO.PUD_UP)  
+GPIO.add_event_detect(pin_a2, GPIO.BOTH, callback=rotary_interrupt2)  
 
 
 
@@ -165,6 +186,24 @@ def check(lon, lat):
     # the contains function does exactly what you want
     return polygon.contains(point)
 
+
+speed_mps=0.0
+d=3.6
+zona=0
+gk=0.0
+dosis_m1= 0.0
+dosis_m2 = 0.0
+
+
+
+delta_W_1= 0.0
+delta_fn_1 =0.0
+delta_fn_2 = 0.0
+contador=0
+delta_W_12= 0.0
+delta_fn_12 =0.0
+delta_fn_22 = 0.0
+
 while True:
     newdata = ser.readline().decode('utf-8').strip()  
     
@@ -184,100 +223,100 @@ while True:
             break
         elif status == "V":  
             print("Buscando señal . . .")
-
-speed_mps=0.0
-d=3.6
-zona=0
-gk=0.0
-dosis_m1= 0.0
-dosis_m2 = 0.0
-
-
 # Loop de Control
-start_time = time.time()
-#rk_m= float(speed_mps*d*rate)
-#rk_m2= float(speed_mps*d*rate) #  M2
 # Habilitar motores
+
 pi.write(motor1_en_pin, 1)
 pi.write(motor2_en_pin, 1)
-delta_W_1= 0.0
-delta_fn_1 =0.0
-delta_fn_2 = 0.0
-contador=0
-delta_W_12= 0.0
-delta_fn_12 =0.0
-delta_fn_22 = 0.0
-# Crear el archivo de salida para guardar los datos
-output_file_path = '/home/santiago/Documents/dispensador/dispen/uwurrr.txt'
-with open(output_file_path, 'w') as output_file:
-    output_file.write("Tiempo \t PWM_1 \t PWM_M2 \t W1 \t W2 \tFlujo \t Flujo2\n")
-    start_time = time.time()
-    inside_zone = False  # Bandera inicial
-    time.sleep(10)
 
- # Bucle principal de control
-    while True:
+# Inicializar PWM
+pwm1.start(0)  # Iniciar con un duty cycle de 0%
+pwm2.start(0)  # Iniciar con un duty cycle de 0%
+
+# Crear el archivo de salida para guardar los datos
+output_file_path = '/home/santiago/Documents/dispensador/dispen/beta-test.txt'
+with open(output_file_path, 'w') as output_file:
+    output_file.write("Tiempo \t PWM \t W \t Referencia \t Flujo \n")
+    start_time = time.time()
+    while(True):
         
-        t1 = TicToc()
+        t1 = TicToc()       # Tic
         t1.tic()
         k += 1
-        gk += 1
+        gk +=1
 
-        if gk == 5:  # Solo leer los datos del GPS cada 5 iteraciones
-            newdata = ser.readline().decode('utf-8').strip()
-            if newdata[0:6] == "$GPRMC":
-                newmsg = pynmea2.parse(newdata)
+        if gk == 5:
+            # Verifica si se recibe una sentencia GPRMC
+            newdata = ser.readline().decode('utf-8').strip() 
+             
+            if newdata[0:6] == "$GPRMC":  
+                newmsg = pynmea2.parse(newdata)  
                 status = newmsg.status
-                if status == "A":
-                    lat = newmsg.latitude
-                    lon = newmsg.longitude
-                    gps = f"Lat = {lat} Lng = {lon}"
-                    print(gps)
-                    speed = newmsg.spd_over_grnd  # velocidad en nudos
-                    speed_mps = speed * 0.514444  # convertir nudos a m/s
-                    print(f"velocidad : {speed_mps:.2f} m/s")
+                # read your shapefile
+                poly_file='poligono_casona.shp'
+                r = shapefile.Reader(poly_file)
+                # Maneja los estados A y V  
+                if status == "A":  
+                    lat = newmsg.latitude  
+                    lon = newmsg.longitude  
+                    gps = f"Lat = {lat} Lng = {lon}"  
+                    print(gps)  
+                    speed = newmsg.spd_over_grnd  # velocidad en nudos  
+                    speed_mps = speed * (0.514444)  # convertimos de nudos a m/s  
+                    print(f"Speed: {speed_mps:.2f} m/s")
 
-                    # Verifica si estamos dentro de una zona
-                    poly_file = 'poligono_casona.shp'
-                    r = shapefile.Reader(poly_file)
                     shapes = r.shapes()
-                    inside_zone = False  # Reinicia la bandera para cada lectura
+                    inside_zone = False  # Bandera para verificar si está dentro de alguna zona
                     for j in range(len(shapes)):
-                        polygon = shape(shapes[j])
-                        if check(lon, lat):  # Verifica si está dentro de la zona
-                            inside_zone = True
-                            zona = j + 1
+                        # build a shapely polygon from your shape
+                        polygon = shape(shapes[j])    
+                        zone_def = check(lon, lat)
+                        if zone_def: 
+                            zona = j+1
                             if zona == 1:
-                                rk_m = 8
-                                rk_m2 = 12
-                                print("Estamos en zona 1")
+                                rk_s = 20
+                                rk_s2 = 20
                             elif zona == 2:
-                                rk_m = 6
-                                rk_m2 = 11
-                                print("Estamos en zona 2")
-                            break  # Sal del bucle una vez que encontremos la zona
+                                rk_s = 35
+                                rk_s2 = 35
+                            print('Estas en zona ' + str(zona))
+                            inside_zone = True
+                            break  # Sal del bucle si se encuentra una zona
+
                     if not inside_zone:
-                        print("Fuera de zona")
-                        rk_m = 0.0
-                        rk_m2 = 0.0
+                        rk_m = 0
+                        rk_m2 =0
+                        ek_m = 0
+                        ek_m2 =0
+                        fm_n = 0
+                        fm_n2 = 0
+                        upi_s = 0
+                        upi_s2 = 0
+                        print("Estas Fuera de Rango . . .")
                         control_motor(motor1_pwm_pin, motor1_dir_pin, 0, 'forward')
                         control_motor(motor2_pwm_pin, motor2_dir_pin, 0, 'forward')
-            gk = 0  # Reinicia el contador de `gk`
+
+                elif status == "V":  
+                    print("Buscando señal . . .")
+            gk = 0
+        
+        set_speed(pwm1, 1200)  # Señal de 1200 microsegundos para el primer motor
+        set_speed(pwm2, 1200)  # Señal de 1200 microsegundos para el segundo motor
+        
 
         
         #rk_m = float(d*speed_mps*dosis_m1)
         #rk_m2 = float(d*speed_mps*dosis_m2)
 
         # Calcular FPS y W
-        FPS = FLANCOS_M1 / 1200.0
-        W = FPS*((2 * pi_m) / 0.2)
-        print("W: " + str(W))
+        FPS = count / (600.0)
+        W = FPS * ((2 * pi_m) / INTERVALO)      #Velocidad del motor
+        print("Velocidad m1: " + str(W))
 
+        FPS2 = count2 / (600.0)
+        W2 = FPS2 * ((2 * pi_m) / INTERVALO)      #Velocidad del motor
+        print("Velocidad m2: " + str(W2))
 
-        # Calcular FPS y W
-        FPS2 = FLANCOS_M2 / 1200.0
-        W = FPS2*((2 * pi_m) / 0.2)
-        print("W2: " + str(W))
 
 
         #Msoft sensor 
@@ -287,6 +326,11 @@ with open(output_file_path, 'w') as output_file:
             fm_n= 0
         else :
             fm_n = delta_fn + setpoint_f            # PARA M1
+
+        float(speed_mps)
+        if speed_mps <= 0.3:
+            speed_mps =0.0
+
 #-------------------------------------------------------------------------------------------------
         delta_W2 = W2 - setpoint_W
         delta_fn2= 0.1969*delta_W_12 + 1.359 * delta_fn_12 - 0.581*delta_fn_22 
@@ -294,6 +338,11 @@ with open(output_file_path, 'w') as output_file:
             fm_n2= 0
         else :                                                          # Softsensor PARA M2
             fm_n2 = delta_fn2 + setpoint_f
+        
+        float(speed_mps)
+        if speed_mps <= 0.3:
+            speed_mps =0.0
+            
 #----------------------------------------------------------------------------------------------------
         #Control maestro para M1
         yk_m = fm_n
@@ -379,14 +428,8 @@ with open(output_file_path, 'w') as output_file:
         # Registrar los datos en el archivo
         ts = time.time() - start_time
         output_file.write(f"{ts:.2f}\t{upi_s:.2f}\t{upi_s2:.2f}\t{W:.2f}\t{W2:.2f}\t{fm_n}\t{fm_n2:.2f}")
-        # Restablecer contadores
-        FLANCOS_M1_A=0.0
-        FLANCOS_M1_B=0.0  
-        FLANCOS_M1=0.0
-
-        FLANCOS_M1_A2=0.0
-        FLANCOS_M1_B2=0.0  
-        FLANCOS_M2=0.0
+        # Restablecer 
+        count = 0
 
 
         e_time= t1.tocvalue()
