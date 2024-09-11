@@ -197,8 +197,7 @@ with open(output_file_path, 'w') as output_file:
                     print(gps)  
                     speed = newmsg.spd_over_grnd  # velocidad en nudos  
                     speed_mps = speed * (0.514444)  # convertimos de nudos a m/s  
-                    print(f"Speed: {speed:.2f} knots / {speed_mps:.2f} m/s")
-                    break
+                    print(f"Speed: {speed_mps:.2f} m/s")
                 elif status == "V":  
                     print("Buscando señal . . .")
 
