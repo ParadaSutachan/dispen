@@ -231,10 +231,10 @@ with open(output_file_path, 'w') as output_file:
                                         zona = zone+1
                                         inside_zone = True
                                         if zona == 1:
-                                            rk = 8
+                                            rk = 25
                                             print("Estamos es zona " + str(zona))
                                         if zona == 2:
-                                            rk = 10
+                                            rk = 40
                                             print("Estamos es zona " + str(zona))
                                         break
 
