@@ -330,8 +330,8 @@ with open(output_file_path, 'w') as output_file:
             # Mover los motores a velocidad de 1200 microsegundos por 5 segundos
 
         print("Moviendo los brushless a velocidad de 1200 microsegundos...")
-        set_speed(pwm1, 1090)  # Señal de 1200 microsegundos para el primer motor
-        set_speed(pwm2, 1090)  # Señal de 1200 microsegundos para el segundo motor
+        set_speed(pwm1, 1200)  # Señal de 1200 microsegundos para el primer motor
+        set_speed(pwm2, 1200)  # Señal de 1200 microsegundos para el segundo motor
 
 
         flancos_totales_1 = numero_flancos_A + numero_flancos_B
