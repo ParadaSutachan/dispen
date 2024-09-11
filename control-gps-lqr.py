@@ -287,11 +287,16 @@ with open(output_file_path, 'w') as output_file:
                             break  # Sal del bucle si se encuentra una zona
 
                     if not inside_zone:
+                        rk2 = 0
+                        ek2 = 0
+                        fk2 = 0
+                        uk2 = 0
                         rk = 0
                         ek = 0
                         fk = 0
                         uk = 0
-                        control_motor(motor1_pwm_pin, motor1_dir_pin, motor1_speed, 'forward')
+                        control_motor(motor2_pwm_pin, motor2_dir_pin, 0, 'forward')
+                        control_motor(motor1_pwm_pin, motor1_dir_pin, 0, 'forward')
                         print("Estas Fuera de Rango . . .")
 
                 elif status == "V":  
