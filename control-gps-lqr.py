@@ -206,13 +206,13 @@ with open(output_file_path, 'w') as output_file:
 
                     shapes = r.shapes()
                     inside_zone = False  # Bandera para verificar si está dentro de alguna zona
-                    for k in range(len(shapes)):
+                    for j in range(len(shapes)):
                         # build a shapely polygon from your shape
-                        polygon = shape(shapes[k])    
+                        polygon = shape(shapes[j])    
                         zone_def = check(lon, lat)
                         if zone_def:
                             rk = 25 
-                            zona = k+1
+                            zona = j+1
                             print('El punto corresponde a la zona ' + str(zona))
                             inside_zone = True
                             break  # Sal del bucle si se encuentra una zona
