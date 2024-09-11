@@ -183,6 +183,8 @@ k=0
 gk=0
 rate = 12.82
 faja = 3.6
+dosis_m1=0.0
+dosis_m2=0.0
 
 ## Inicializacion variables para el calculo del observador ------------------------------------------------
 xk = np.array([[0],
@@ -350,7 +352,7 @@ with open(output_file_path, 'w') as output_file:
 
         rk = speed_mps*dosis_m1*faja
         rk2 = speed_mps*dosis_m2*faja
-        
+
         print("rk: " + str(rk))
         print("rk2: " + str(rk2))
 
