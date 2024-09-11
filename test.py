@@ -89,8 +89,8 @@ try:
         print("Flancos en A: {}, Flancos en B: {}, Flancos Totales (M1): {}".format(FLANCOS_M1_A, FLANCOS_M1_B, FLANCOS_M1))
 
         # Calcular FPS y W
-        FPS = count / 300.0
-        W = ((2 * pi_m) / 0.2)
+        FPS = count / 1200.0
+        W = FPS*((2 * pi_m) / 0.2)
         print("W: {}".format(W))
 
         # Reiniciar el contador
