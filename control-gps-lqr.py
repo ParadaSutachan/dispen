@@ -185,48 +185,22 @@ with open(output_file_path, 'w') as output_file:
         gk +=1
 
         if gk == 5:
-            newdata = ser.readline().decode('utf-8').strip
-
-            #leer poligono
-            poly_file='poligono_casona.shp'
-            r = shapefile.Reader(poly_file)
-            str(newdata)
-            # Verificas si se recibe una sentencia GPRMC
-            if newdata[0:6] == "$GPRMC":
-                newmsg = pynmea2.parse(newdata)
-                status = newmsg.status
-                # Verifica si son validos o no los datos
-                if status == "A":
-                    lat = newmsg.latitude
-                    lon = newmsg.longitude
+            # Verifica si se recibe una sentencia GPRMC  
+            if newdata[0:6] == "$GPRMC":  
+                newmsg = pynmea2.parse(newdata)  
+                status = newmsg.status   
+                # Maneja los estados A y V  
+                if status == "A":  
+                    lat = newmsg.latitude  
+                    lon = newmsg.longitude  
                     gps = f"Lat = {lat} Lng = {lon}"  
-                    print(gps) 
-                    speed = newmsg.spd_over_grnd
-                    speed_mps = speed * (0.514444)
-                    print(f"Speed: {speed_mps:.2f} m/s")
-
-                    #obtiene la forma
-                    shapes = r.shapes()
-                    inside_zone = False
-                    for k in range(len(shapes)):
-                        polygon = shape(shapes[k])
-                        zone_def = check(lon,lat)
-                        if zone_def:
-                            inside_zone = True
-                            zona = k + 1
-                            if zona == 1:
-                                rk = 20
-                            if zona == 2:
-                                rk = 40
-                            print('El punto corresponde a la zona ' + str(zona))
-                            break
-                    if not inside_zone:
-                        rk = 0.0
-                        fk = 0.0
-                        control_motor(motor1_pwm_pin, motor1_dir_pin, 0, 'forward')
-                        print("Estas Fuera de Rango . . .")
-                elif status == "V":
-                    print("Buscando señal")
+                    print(gps)  
+                    speed = newmsg.spd_over_grnd  # velocidad en nudos  
+                    speed_mps = speed * (0.514444)  # convertimos de nudos a m/s  
+                    print(f"Speed: {speed:.2f} knots / {speed_mps:.2f} m/s")
+                    break
+                elif status == "V":  
+                    print("Buscando señal . . .")
 
         #Lectura de Flancos para medir velocidad
         FPS = count / (600.0)
