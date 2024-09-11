@@ -94,7 +94,9 @@ try:
         print("W: {}".format(W))
 
         # Reiniciar el contador
-        count = 0    
+        count = 0  
+        FLANCOS_M1_A=0.0
+        FLANCOS_M1_B=0.0  
         FLANCOS_M1=0.0
         time.sleep(0.2)
 
