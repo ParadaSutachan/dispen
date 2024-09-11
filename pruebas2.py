@@ -54,6 +54,8 @@ try:
         pi.write(motor1_en_pin, 1)
         pi.write(motor2_en_pin, 1)
 
+        control_motor(motor1_pwm_pin, motor1_dir_pin, 100, 'forward')
+
         print("Count: {}".format(count))
         count = 0    
         time.sleep(0.2)  
