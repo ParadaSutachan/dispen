@@ -277,15 +277,15 @@ with open(output_file_path, 'w') as output_file:
                         if zone_def: 
                             zona = j+1
                             if zona == 1:
-                                #dosis_m1 = 0.7*rate
-                                #dosis_m2 = 0.3*rate
-                                rk = 20
-                                rk2 = 35
+                                dosis_m1 = 0.7*rate
+                                dosis_m2 = 0.3*rate
+                                #rk = 20
+                                #rk2 = 35
                             elif zona == 2:
-                                #dosis_m1 = 0.4*rate
-                                #dosis_m2 = 0.6*rate
-                                rk = 35
-                                rk2 = 20
+                                dosis_m1 = 0.4*rate
+                                dosis_m2 = 0.6*rate
+                                #rk = 35
+                                #rk2 = 20
                             print('Estas en zona ' + str(zona))
                             inside_zone = True
                             break  # Sal del bucle si se encuentra una zona
@@ -348,7 +348,9 @@ with open(output_file_path, 'w') as output_file:
         if speed_mps <= 0.3:
             speed_mps =0.0
 
-        #rk = speed_mps*rate*faja
+        rk = speed_mps*dosis_m1*faja
+        rk2 = speed_mps*dosis_m2*faja
+        
         print("rk: " + str(rk))
         print("rk2: " + str(rk2))
 
