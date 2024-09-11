@@ -261,6 +261,7 @@ with open(output_file_path, 'w') as output_file:
                         rk_m = 0.0
                         rk_m2 = 0.0
                         control_motor(motor1_pwm_pin, motor1_dir_pin, 0, 'forward')
+                        control_motor(motor2_pwm_pin, motor2_dir_pin, 0, 'forward')
             gk = 0  # Reinicia el contador de `gk`
 
         
