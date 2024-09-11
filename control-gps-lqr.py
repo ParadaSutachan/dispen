@@ -160,20 +160,33 @@ Bo = np.array([[-0.000419785220888, -0.001633156413536],
 #Definición de ek, rk, flujo y X
 
 ek = 0.0
+ek2 = 0.0
 ek_1 = 0.0
+ek2_1 = 0.0
 ek_int = 0.0
+ek2_int = 0.0
 ek_int_1 = 0.0
+ek2_int_1 =0.0
 rk = 0.0
+rk2 = 0.0
 fk = 0.0
+fk2 = 0.0
 W = 0.0
+W2 = 0.0
 uk = 0.0
+uk2 = 0.0
 F_b = 21.3465
 W_b = 28
 delta_w = 0.0
+delta_w2 = 0.0
 delta_w_1 = 0.0
+delta_w2_1 = 0.0
 delta_f = 0.0
-delta_f_1 = 0.0 
+delta_f2 = 0.0
+delta_f_1 = 0.0
+delta_f2_1 = 0.0 
 delta_f_2 = 0.0
+delta_f2_2 = 0.0
 k=0
 gk=0
 rate = 12.82
@@ -186,7 +199,17 @@ xk = np.array([[0],
                [0],
                [0]])
 
+x2k = np.array([[0],
+               [0],
+               [0],
+               [0]])
+
 xk1 = np.array([[0], 
+                   [0],
+                   [0],
+                   [0]])
+
+x2k1 = np.array([[0], 
                    [0],
                    [0],
                    [0]]) 
@@ -230,12 +253,10 @@ with open(output_file_path, 'w') as output_file:
 
     while(True):
         
-        t1 = TicToc()       # Tic
-        t1.tic()
         k += 1
         gk +=1
 
-        if gk == 3:
+        if gk == 6:
             newdata = ser.readline().decode('utf-8').strip()
             if newdata[0:6] == "$GPRMC":
                 newmsg = pynmea2.parse(newdata)  
@@ -265,17 +286,49 @@ with open(output_file_path, 'w') as output_file:
                             if zona == 1:
                                 dosis_m1 = 0.7*rate
                                 dosis_m2 = 0.3*rate
+                                print("Estamos es zona " + str(zona))
+                                break
                                 
                             if zona == 2:
                                 dosis_m1 = 0.4*rate
                                 dosis_m2 = 0.6*rate
-                                print(rate)
-                            break
+                                print("Estamos es zona " + str(zona))
+                                break
+                            
                     
                     while not inside_zone:
                         print("Estas Fuera del Aerea a implementar . . .")
-                        rk = 0.0
                         control_motor(motor1_pwm_pin, motor1_dir_pin, 0, 'forward')
+                        ek = 0.0
+                        ek2 = 0.0
+                        ek_1 = 0.0
+                        ek2_1 = 0.0
+                        ek_int = 0.0
+                        ek2_int = 0.0
+                        ek_int_1 = 0.0
+                        ek2_int_1 =0.0
+                        rk = 0.0
+                        rk2 = 0.0
+                        fk = 0.0
+                        fk2 = 0.0
+                        W = 0.0
+                        W2 = 0.0
+                        uk = 0.0
+                        uk2 = 0.0
+                        F_b = 21.3465
+                        W_b = 28
+                        delta_w = 0.0
+                        delta_w2 = 0.0
+                        delta_w_1 = 0.0
+                        delta_w2_1 = 0.0
+                        delta_f = 0.0
+                        delta_f2 = 0.0
+                        delta_f_1 = 0.0
+                        delta_f2_1 = 0.0 
+                        delta_f_2 = 0.0
+                        delta_f2_2 = 0.0
+                        k=0
+
                         newdata = ser.readline().decode('utf-8').strip()
                         if newdata[0:6] == "$GPRMC":
                             newmsg = pynmea2.parse(newdata)  
@@ -303,16 +356,21 @@ with open(output_file_path, 'w') as output_file:
                                             dosis_m1 = 0.7*rate
                                             dosis_m2 = 0.3*rate
                                             print("Estamos es zona " + str(zona))
+                                            break
+
                                         if zona == 2:
                                             dosis_m1 = 0.4*rate
                                             dosis_m2 = 0.6*rate
                                             print("Estamos es zona " + str(zona))
-
-                                        break
+                                            break      
+                                break
 
                         time.sleep(0.2)
             gk=0
 
+        t1 = TicToc()       # Tic
+        t1.tic()
+        
         set_speed(pwm1, 1200)  # Señal de 1200 microsegundos para el primer motor
         set_speed(pwm2, 1200)  # Señal de 1200 microsegundos para el segundo motor
 
@@ -320,47 +378,70 @@ with open(output_file_path, 'w') as output_file:
         flancos_totales_1 = numero_flancos_A + numero_flancos_B
         FPS = flancos_totales_1 / (600.0)
         W = FPS * ((2 * pi_m) / T)      #Velocidad del motor
-        print("Velocidad: " + str(W))
+        print("Velocidad M1: " + str(W))
 
         flancos_totales_2 = numero_flancos_A2 + numero_flancos_B2
         RPS2 = flancos_totales_2 / (600.0)
         W2 = RPS2 * ((2 * pi_m) / T)
-        print("Velocidad: " + str(W2))
+        print("Velocidad M2: " + str(W2))
 
 
-        # Soft Sensor
-        delta_w = W-W_b
+        # Soft Sensor Fk1 
+        delta_w = W - W_b
         delta_f = 0.1969*delta_w_1 + 1.359*delta_f_1 -0.581*delta_f_2
 
+        # Soft Sensor Fk2
+        delta_w2 = W2 - W_b
+        delta_f2 = 0.1969*delta_w2_1 + 1.359*delta_f2_1 -0.581*delta_f2_2
+        
+
         if k <= 3:
-             fk= 0
+             fk = 0
+             fk2 = 0
         else :
-             fk=delta_f+F_b
+             fk = delta_f + F_b
+             fk2 = delta_f2 + F_b
+
+        print("Flujo M1 = "+ str(fk))
+        print("Flujo M2 = "+ str(fk2))
+
         # Calulo de la referencia #
 
         float(speed_mps)
+        print("Velocidad persona: "+ str(speed_mps))
 
-        if speed_mps <= 0.2:
-            speed_mps =0.0
+        if speed_mps <= 0.4:
+            speed_mps = 0.0
 
-        rk = speed_mps*dosis_m1*faja
+        rk = speed_mps * dosis_m1 * faja
+        rk2 = speed_mps * dosis_m2 * faja
 
         print("rk: " + str(rk))
+        print("rk2: " + str(rk2))
+        
 
-        ##Observador
+        ## Observador -------------------------------------------------------------------------
+
         uo = np.array([[uk],
                        [fk]])
         
+        u2o = np.array([[uk2],
+                        [fk2]])
+        
         xk1 = Ao@xk + Bo@uo
-        ##
+        x2k1 = Ao@x2k + Bo@u2o
 
-        ## Controlador
+        ## -----------------------------------------------------------------------------------
+
+        ## Controlador M1 ---------------------------------------------------------------
+
         ek = rk - fk
         print("ek: "+str(ek))
         ek_int = ek_1 + ek_int_1
         uik = ek_int*Ki
         ux_k= K@xk
         uk = -uik-float(ux_k[0]) #Accion de Control
+
         if uk < 0 or uk > 100:
             if uk < 0 :
                 uik = 0 - float(ux_k[0])
@@ -370,8 +451,31 @@ with open(output_file_path, 'w') as output_file:
         uk = -uik-float(ux_k[0])        
         motor1_speed = uk  
         print("uk = " + str(uk))
+        ## FIN Control M1 --------------------------------------------------------------
+
+        ## Controlador M2 ---------------------------------------------------------------
+
+        ek2 = rk2 - fk2
+        print("ek2: "+str(ek2))
+        ek2_int = ek2_1 + ek2_int_1
+        uik2 = ek2_int*Ki
+        ux_k2= K@x2k
+        uk2 = -uik-float(ux_k2[0]) #Accion de Control
+
+        if uk2 < 0 or uk2 > 100:
+            if uk2 < 0 :
+                uik2 = 0 - float(ux_k2[0])
+            if uk2 >100:
+                uik2 = -100 - float(ux_k2[0])
+
+        uk2 = -uik2-float(ux_k2[0])        
+        motor2_speed = uk2  
+        print("uk2 = " + str(uk2))
+
+        ## FIN Control M2 ------------------------------------------------------------------
 
         control_motor(motor1_pwm_pin, motor1_dir_pin, motor1_speed, 'forward')
+        control_motor(motor1_pwm_pin, motor1_dir_pin, motor2_speed, 'forward')
         
         delta_f_2 = delta_f_1
         delta_f_1 = delta_f
@@ -379,6 +483,13 @@ with open(output_file_path, 'w') as output_file:
         ek_int_1=ek_int
         ek_1 = ek
         delta_w_1 = delta_w 
+
+        delta_f2_2 = delta_f2_1
+        delta_f2_1 = delta_f2
+        x2k = x2k1
+        ek2_int_1=ek2_int
+        ek2_1 = ek2
+        delta_w2_1 = delta_w2 
 
         # Registrar los datos en el archivo
         ts = time.time() - start_time
@@ -391,9 +502,8 @@ with open(output_file_path, 'w') as output_file:
         numero_flancos_A2 = 0
         numero_flancos_B2 = 0
 
-        print("Flujo = "+ str(fk))
-
         e_time = t1.tocvalue()
+        print("Tic toc: " + str(e_time))
         toc = abs(T-e_time)        #Toc
         time.sleep(toc)
     
