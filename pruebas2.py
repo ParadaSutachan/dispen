@@ -1,10 +1,11 @@
 import RPi.GPIO as GPIO  
 import time  
 import pigpio
+import math
 
 # Inicialización de Pigpio
 pi = pigpio.pi()
-
+pi_m = math.pi
 # Pines de motor y encoder
 motor1_pwm_pin = 12
 motor1_dir_pin = 24
@@ -30,7 +31,8 @@ pin_b = 18  # Pin B del encoder
 
 # Variables  
 count = 0  
-last_state = 0  
+last_state = 0 
+W = 0
 
 def rotary_interrupt(channel):  
     global count  
@@ -57,6 +59,9 @@ try:
         control_motor(motor1_pwm_pin, motor1_dir_pin, 100, 'forward')
 
         print("Count: {}".format(count))
+
+        FPS = count/600.0
+        W = ((2*pi_m)/0.2)
         count = 0    
         time.sleep(0.2)  
 except KeyboardInterrupt:  
