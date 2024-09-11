@@ -261,7 +261,8 @@ with open(output_file_path, 'w') as output_file:
                                 rk_m2 = 35
                             print('Estas en zona ' + str(zona))
                             inside_zone = True
-                            break  # Sal del bucle si se encuentra una zona
+                            break  # Sal del bucle si se encuentra una zona#
+
 
                     if not inside_zone:
                         rk_m = 0
