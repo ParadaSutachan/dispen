@@ -42,7 +42,7 @@ def rotary_interrupt(channel):
         if GPIO.input(pin_b) != last_state:  
             count += 1  
         else:  
-            count -= 1  
+            count += 1  
     last_state = GPIO.input(pin_a)  
 
 # Configuración GPIO  
@@ -66,4 +66,4 @@ try:
         count = 0    
         time.sleep(0.2)  
 except KeyboardInterrupt:  
-    GPIO.cleanup() # -- coding: utf-8 --
+    GPIO.cleanup()
