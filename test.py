@@ -15,6 +15,11 @@ motor2_pwm_pin = 13
 motor2_dir_pin = 25
 motor2_en_pin = 23
 
+# Variables para flancos
+FLANCOS_M1_A = 0
+FLANCOS_M1_B = 0
+FLANCOS_M1 = 0  # Suma total de los flancos en A y B
+
 # Función para controlar el motor
 def control_motor(pin_pwm, pin_dir, speed_percent, direction):
     duty_cycle = int(speed_percent * 255 / 100)
@@ -33,13 +38,21 @@ pin_b = 18  # Pin B del encoder
 
 # Variables
 count = 0  
-last_state_a = 0
-last_state_b = 0
 W = 0
 
 # Función de interrupción para manejar los cambios en los pines A y B
 def rotary_interrupt(channel):
     global count
+    global FLANCOS_M1_A, FLANCOS_M1_B, FLANCOS_M1
+    
+    if channel == pin_a:
+        FLANCOS_M1_A += 1  # Incrementa el contador de flancos en pin A
+    elif channel == pin_b:
+        FLANCOS_M1_B += 1  # Incrementa el contador de flancos en pin B
+    
+    # Sumar los flancos detectados en A y B
+    FLANCOS_M1 = FLANCOS_M1_A + FLANCOS_M1_B
+
     state_a = GPIO.input(pin_a)
     state_b = GPIO.input(pin_b)
 
@@ -71,6 +84,9 @@ try:
 
         # Imprimir el conteo del encoder
         print("Count: {}".format(count))
+
+        # Imprimir los flancos totales detectados en A y B
+        print("Flancos en A: {}, Flancos en B: {}, Flancos Totales (M1): {}".format(FLANCOS_M1_A, FLANCOS_M1_B, FLANCOS_M1))
 
         # Calcular FPS y W
         FPS = count / 300.0
