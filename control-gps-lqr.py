@@ -185,7 +185,8 @@ with open(output_file_path, 'w') as output_file:
         gk +=1
 
         if gk == 5:
-            # Verifica si se recibe una sentencia GPRMC  
+            # Verifica si se recibe una sentencia GPRMC
+            rk = 25  
             if newdata[0:6] == "$GPRMC":  
                 newmsg = pynmea2.parse(newdata)  
                 status = newmsg.status   
