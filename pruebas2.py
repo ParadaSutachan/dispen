@@ -1,8 +1,5 @@
-# -- coding: utf-8 --
-#!/usr/bin/env python3
-
+import RPi.GPIO as GPIO  
 import time  
-import Encoder  
 import pigpio
 
 # Inicialización de Pigpio
@@ -27,21 +24,38 @@ def control_motor(pin_pwm, pin_dir, speed_percent, direction):
         pi.write(pin_dir, 0)  # Dirección hacia atrás
     else:
         raise ValueError("Dirección no válida. Usa 'forward' o 'backward'.")
-    
-# Configura los pines GPIO para el encoder  
-encoder = Encoder(17, 18)  # Cambia los números de los pines según tu conexión  
+# Configuración de pines  
+pin_a = 17  # Pin A del encoder  
+pin_b = 18  # Pin B del encoder  
+
+# Variables  
+count = 0  
+last_state = 0  
+
+def rotary_interrupt(channel):  
+    global count  
+    global last_state  
+
+    if GPIO.input(pin_a) != last_state:  
+        if GPIO.input(pin_b) != last_state:  
+            count += 1  
+        else:  
+            count -= 1  
+    last_state = GPIO.input(pin_a)  
+
+# Configuración GPIO  
+GPIO.setmode(GPIO.BCM)  
+GPIO.setup(pin_a, GPIO.IN, pull_up_down=GPIO.PUD_UP)  
+GPIO.setup(pin_b, GPIO.IN, pull_up_down=GPIO.PUD_UP)  
+GPIO.add_event_detect(pin_a, GPIO.BOTH, callback=rotary_interrupt)  
 
 try:  
     while True:  
-        # Leer el valor del encoder  
         pi.write(motor1_en_pin, 1)
         pi.write(motor2_en_pin, 1)
 
-        control_motor(motor1_pwm_pin, motor1_dir_pin, 100, 'forward')
-
-        value = encoder.position  
-        print("Posición del encoder:", value)  
+        print("Count: {}".format(count))
+        count = 0    
         time.sleep(0.2)  
-
 except KeyboardInterrupt:  
-    print("Deteniendo...")
+    GPIO.cleanup() # -- coding: utf-8 --
