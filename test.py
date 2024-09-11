@@ -106,7 +106,7 @@ FPS2=0.0
 # Configuración de los pines A y B con pull-up y detección de ambos flancos
 def rotary_interrupt(channel):
 
-    global FLANCOS_M1_A, FLANCOS_M1_B, FLANCOS_M1,FLANCOS_M1_A2,FLANCOS_M1_B2
+    global FLANCOS_M1_A, FLANCOS_M1_B, FLANCOS_M1,FLANCOS_M1_A2,FLANCOS_M1_B2, FLANCOS_M2
     
     if channel == PIN_ENCODER_A:
         FLANCOS_M1_A += 1  # Incrementa el contador de flancos en pin A
@@ -137,22 +137,8 @@ GPIO.add_event_detect(PIN_ENCODER_B, GPIO.BOTH, callback=rotary_interrupt)
 GPIO.add_event_detect(PIN_ENCODER2_A, GPIO.BOTH, callback=rotary_interrupt)
 GPIO.add_event_detect(PIN_ENCODER2_B, GPIO.BOTH, callback=rotary_interrupt)
 
-# Funciones de callback para contar flancos
-def contador_flancos_encoder(gpio, level, tick):
-    global numero_flancos_A
-    numero_flancos_A += 1
-def contador_flancos_encoder_b(gpio, level, tick):
-    global numero_flancos_B
-    numero_flancos_B += 1
-def contador_flancos_encoder2(gpio, level, tick):
-    global numero_flancos_A2
-    numero_flancos_A2 += 1
-def contador_flancos_encoder_b2(gpio, level, tick):
-    global numero_flancos_B2
-    numero_flancos_B2 += 1
-# Configuración de callbacks
-cb1 = pi.callback(PIN_ENCODER_A, pigpio.EITHER_EDGE, contador_flancos_encoder)
-cb3 = pi.callback(PIN_ENCODER2_A, pigpio.EITHER_EDGE, contador_flancos_encoder2)
+
+
 # Función para controlar el motor
 def control_motor(pin_pwm, pin_dir, speed_percent, direction):
     duty_cycle = int(speed_percent * 255 / 100)
