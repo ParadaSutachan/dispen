@@ -394,7 +394,8 @@ with open(output_file_path, 'w') as output_file:
                 uik2 = 0 - float(ux2_k[0])
             if uk2 >100:
                 uik2 = -100 - float(ux2_k[0])
-        uk2 = -uik2-float(ux2_k[0])        
+        uk2 = -uik2-float(ux2_k[0])   
+        print("uix2: " + float(ux2_k[0]))     
         motor2_speed = uk2  
         print("uk2 = " + str(uk2))
 
