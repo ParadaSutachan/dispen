@@ -89,7 +89,7 @@ GPIO.setup(pin_b, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.add_event_detect(pin_a, GPIO.BOTH, callback=rotary_interrupt)  
 GPIO.setup(pin_a2, GPIO.IN, pull_up_down=GPIO.PUD_UP)  
 GPIO.setup(pin_b2, GPIO.IN, pull_up_down=GPIO.PUD_UP)  
-GPIO.add_event_detect(pin_a, GPIO.BOTH, callback=rotary_interrupt2)  
+GPIO.add_event_detect(pin_a2, GPIO.BOTH, callback=rotary_interrupt2)  
 
 # Matrices A,B,C,D del modelo
 A = np.array([[0.894130801660748, 0.145973156319373, 0.066225686842812, 0.067086287188154],
