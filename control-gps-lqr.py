@@ -48,31 +48,28 @@ pwm1.start(0)  # Iniciar con un duty cycle de 0%
 pwm2.start(0)  # Iniciar con un duty cycle de 0%
 
 T = 0.2
-# Configuración de pines de entrada para los encoders
-pi.set_mode(PIN_ENCODER_A, pigpio.INPUT)
-pi.set_pull_up_down(PIN_ENCODER_A, pigpio.PUD_UP)
-pi.set_mode(PIN_ENCODER_B, pigpio.INPUT)
-pi.set_pull_up_down(PIN_ENCODER_B, pigpio.PUD_UP)
-pi.set_mode(PIN_ENCODER2_A, pigpio.INPUT)
-pi.set_pull_up_down(PIN_ENCODER2_A, pigpio.PUD_UP)
-pi.set_mode(PIN_ENCODER2_B, pigpio.INPUT)
-pi.set_pull_up_down(PIN_ENCODER2_B, pigpio.PUD_UP)
-# Funciones de callback para contar flancos
 def contador_flancos_encoder(gpio, level, tick):
     global numero_flancos_A
+    # Asegúrate de que el incremento sea seguro y no cause desbordamiento
     numero_flancos_A += 1
+
 def contador_flancos_encoder_b(gpio, level, tick):
     global numero_flancos_B
     numero_flancos_B += 1
+
 def contador_flancos_encoder2(gpio, level, tick):
     global numero_flancos_A2
     numero_flancos_A2 += 1
+
 def contador_flancos_encoder_b2(gpio, level, tick):
     global numero_flancos_B2
     numero_flancos_B2 += 1
+
 # Configuración de callbacks
 cb1 = pi.callback(PIN_ENCODER_A, pigpio.EITHER_EDGE, contador_flancos_encoder)
+cb2 = pi.callback(PIN_ENCODER_B, pigpio.EITHER_EDGE, contador_flancos_encoder_b)
 cb3 = pi.callback(PIN_ENCODER2_A, pigpio.EITHER_EDGE, contador_flancos_encoder2)
+cb4 = pi.callback(PIN_ENCODER2_B, pigpio.EITHER_EDGE, contador_flancos_encoder_b2)
 # Función para controlar el motor
 def control_motor(pin_pwm, pin_dir, speed_percent, direction):
     duty_cycle = int(speed_percent * 255 / 100)
