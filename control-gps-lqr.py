@@ -399,8 +399,8 @@ with open(output_file_path, 'w') as output_file:
         motor2_speed = uk2  
         print("uk2 = " + str(uk2))
 
-        control_motor(motor1_pwm_pin, motor1_dir_pin, 100, 'forward')
-        control_motor(motor2_pwm_pin, motor2_dir_pin, 100, 'forward')
+        control_motor(motor1_pwm_pin, motor1_dir_pin, motor1_speed, 'forward')
+        control_motor(motor2_pwm_pin, motor2_dir_pin, motor2_speed, 'forward')
         
         ## Reasignacion de variables M1 -----------------------------------------------------------------------
 
