@@ -72,7 +72,7 @@ def rotary_interrupt2(channel):
             count2 += 1  
         else:  
             count2 += 1  
-    last_state2 = GPIO.input(pin_a)  
+    last_state2 = GPIO.input(pin_a2)  
 
 # Función para controlar el motor
 def control_motor(pin_pwm, pin_dir, speed_percent, direction):
@@ -314,6 +314,7 @@ with open(output_file_path, 'w') as output_file:
         FPS = count / (600.0)
         W = FPS * ((2 * pi_m) / T)      #Velocidad del motor
         print("Velocidad M1: " + str(count))
+
         FPS2 = count2/(600.0)
         W2 = FPS2 *((2*pi_m)/T)
         print("Velocidad M2: " + str(count2))
