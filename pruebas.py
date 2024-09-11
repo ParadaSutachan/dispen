@@ -322,7 +322,7 @@ async def main():
                     ui_s2 = 100 - up_s2
 
             upi_s2 = ui_s2 + up_s2
-            print("rk 2 =" + str(rk_m2))
+            print("rk 2 =" + str(rk_s2))
             print("pwm motor 2 = " + str(upi_s2))
 
             # Aplicar los valores de control a los motores
