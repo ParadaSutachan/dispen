@@ -299,6 +299,7 @@ with open(output_file_path, 'w') as output_file:
                     while not inside_zone:
                         print("Estas Fuera del Aerea a implementar . . .")
                         control_motor(motor1_pwm_pin, motor1_dir_pin, 0, 'forward')
+                        control_motor(motor1_pwm_pin, motor2_dir_pin, 0, 'forward')
                         ek = 0.0
                         ek2 = 0.0
                         ek_1 = 0.0
@@ -370,7 +371,7 @@ with open(output_file_path, 'w') as output_file:
 
         t1 = TicToc()       # Tic
         t1.tic()
-        
+
         set_speed(pwm1, 1200)  # Señal de 1200 microsegundos para el primer motor
         set_speed(pwm2, 1200)  # Señal de 1200 microsegundos para el segundo motor
 
