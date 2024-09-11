@@ -12,6 +12,12 @@ from shapely.geometry import shape, Point   #type: ignore
 # Inicialización de Pigpio
 pi = pigpio.pi()
 pi_m = math.pi
+
+pi = pigpio.pi()
+if not pi.connected:
+    print("No se pudo conectar a pigpio. Verifica que el demonio esté corriendo.")
+    exit()
+
 # Configura el puerto serie  
 port = "/dev/ttyAMA0"  
 ser = serial.Serial(port, baudrate=9600, timeout=0.1) 
