@@ -30,30 +30,43 @@ PIN_ENCODER2_A = 16
 PIN_ENCODER2_B = 19
 T = 0.2
 # Configuración de pines de entrada para los encoders
-pi.set_mode(PIN_ENCODER_A, pigpio.INPUT)
-pi.set_pull_up_down(PIN_ENCODER_A, pigpio.PUD_UP)
-pi.set_mode(PIN_ENCODER_B, pigpio.INPUT)
-pi.set_pull_up_down(PIN_ENCODER_B, pigpio.PUD_UP)
-pi.set_mode(PIN_ENCODER2_A, pigpio.INPUT)
-pi.set_pull_up_down(PIN_ENCODER2_A, pigpio.PUD_UP)
-pi.set_mode(PIN_ENCODER2_B, pigpio.INPUT)
-pi.set_pull_up_down(PIN_ENCODER2_B, pigpio.PUD_UP)
-# Funciones de callback para contar flancos
-def contador_flancos_encoder(gpio, level, tick):
-    global numero_flancos_A
-    numero_flancos_A += 1
-def contador_flancos_encoder_b(gpio, level, tick):
-    global numero_flancos_B
-    numero_flancos_B += 1
-def contador_flancos_encoder2(gpio, level, tick):
-    global numero_flancos_A2
-    numero_flancos_A2 += 1
-def contador_flancos_encoder_b2(gpio, level, tick):
-    global numero_flancos_B2
-    numero_flancos_B2 += 1
-# Configuración de callbacks
-cb1 = pi.callback(PIN_ENCODER_A, pigpio.EITHER_EDGE, contador_flancos_encoder)
-cb3 = pi.callback(PIN_ENCODER2_A, pigpio.EITHER_EDGE, contador_flancos_encoder2)
+# Configuración de pines  
+pin_a = 17  # Pin A del encoder  M1
+pin_b = 18  # Pin B del encoder  M1
+pin_a2 = 16 # Pin A del enconder M2
+pin_b2 = 19 # Pin B del enconder M2
+
+# Contadores de flancos
+
+count = 0
+count2 = 0  
+last_state = 0
+last_state2 = 0
+W = 0
+W2 = 0
+
+def rotary_interrupt(channel):  
+    global count  
+    global last_state  
+
+    if GPIO.input(pin_a) != last_state:  
+        if GPIO.input(pin_b) != last_state:  
+            count += 1  
+        else:  
+            count += 1  
+    last_state = GPIO.input(pin_a)
+
+def rotary_interrupt2(channel):  
+    global count2  
+    global last_state2  
+
+    if GPIO.input(pin_a2) != last_state2:  
+        if GPIO.input(pin_b2) != last_state2:  
+            count2 += 1  
+        else:  
+            count2 += 1  
+    last_state2 = GPIO.input(pin_a)  
+
 # Función para controlar el motor
 def control_motor(pin_pwm, pin_dir, speed_percent, direction):
     duty_cycle = int(speed_percent * 255 / 100)
@@ -69,11 +82,15 @@ def check(lon, lat):
     point = Point(lon, lat)
     # the contains function does exactly what you want
     return polygon.contains(point)
-# Contadores de flancos
-numero_flancos_A = 0
-numero_flancos_B = 0
-numero_flancos_A2 = 0
-numero_flancos_B2 = 0
+# Configuración GPIO  
+GPIO.setmode(GPIO.BCM)  
+GPIO.setup(pin_a, GPIO.IN, pull_up_down=GPIO.PUD_UP)  
+GPIO.setup(pin_b, GPIO.IN, pull_up_down=GPIO.PUD_UP)  
+GPIO.add_event_detect(pin_a, GPIO.BOTH, callback=rotary_interrupt)  
+GPIO.setup(pin_a2, GPIO.IN, pull_up_down=GPIO.PUD_UP)  
+GPIO.setup(pin_b2, GPIO.IN, pull_up_down=GPIO.PUD_UP)  
+GPIO.add_event_detect(pin_a, GPIO.BOTH, callback=rotary_interrupt2)  
+
 # Matrices A,B,C,D del modelo
 A = np.array([[0.894130801660748, 0.145973156319373, 0.066225686842812, 0.067086287188154],
             [-0.441836100194477, 0.748393868632439, 0.027872957540047, -0.026971019471969],
@@ -112,7 +129,6 @@ ek_int = 0.0
 ek_int_1 = 0.0
 rk = 0.0
 fk = 0.0
-W = 0.0
 uk = 0.0
 F_b = 21.3465
 W_b = 28
@@ -168,7 +184,7 @@ with open(output_file_path, 'w') as output_file:
         t1.tic()
         k += 1
         gk +=1
-        if gk == 3:
+        if gk == 5:
             newdata = ser.readline().decode('utf-8').strip()
             if newdata[0:6] == "$GPRMC":
                 newmsg = pynmea2.parse(newdata)  
@@ -243,8 +259,7 @@ with open(output_file_path, 'w') as output_file:
 
 
         #Lectura de Flancos para medir velocidad
-        flancos_totales_1 = numero_flancos_A + numero_flancos_B
-        FPS = flancos_totales_1 / (600.0)
+        FPS = count / (600.0)
         W = FPS * ((2 * pi_m) / T)      #Velocidad del motor
         print("Velocidad: " + str(W))
         # Soft Sensor
@@ -294,10 +309,7 @@ with open(output_file_path, 'w') as output_file:
         output_file.write(f"{ts:.2f}\t{uk:.2f}\t{W:.2f}\t{rk} \t{fk:.2f}\n")
         output_file.flush()
         # Restablecer contadores
-        numero_flancos_A = 0
-        numero_flancos_B = 0
-        numero_flancos_A2 = 0
-        numero_flancos_B2 = 0
+        count = 0
         print("Flujo = "+ str(fk))
         e_time = t1.tocvalue()
         toc = abs(T-e_time)        #Toc
