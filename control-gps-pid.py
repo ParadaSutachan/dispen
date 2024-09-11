@@ -287,8 +287,6 @@ with open(output_file_path, 'w') as output_file:
                         print("Estas Fuera del Aerea a implementar . . .")
                         dosis_m1= 0.0
                         dosis_m2= 0.0
-                        pwm1= 0.0
-                        pwm2=0.0
                         speed_mps=0.0
                         fm_n= 0.0
                         fm_n2= 0.0
@@ -422,8 +420,8 @@ with open(output_file_path, 'w') as output_file:
 #----------------------------------------------------------------------------------------------------
         if speed_mps <= 0.4:
             speed_mps =0.0
-            pwm2= 0.0
-            pwm1= 0.0
+            motor_speed=0.0
+            motor2_speed=0.0
 
         rk_m= float(speed_mps*d*dosis_m1)
         rk_m2= float(speed_mps*d*dosis_m2)    
