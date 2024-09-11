@@ -210,14 +210,20 @@ with open(output_file_path, 'w') as output_file:
                         # build a shapely polygon from your shape
                         polygon = shape(shapes[j])    
                         zone_def = check(lon, lat)
-                        if zone_def:
-                            rk = 25 
+                        if zone_def: 
                             zona = j+1
-                            print('El punto corresponde a la zona ' + str(zona))
+                            if zona == 1:
+                                rk = 20
+                            elif zona == 2:
+                                rk = 35
+                            print('Estas en zona ' + str(zona))
                             inside_zone = True
                             break  # Sal del bucle si se encuentra una zona
 
                     if not inside_zone:
+                        rk = 0
+                        ek = 0
+                        fk = 0
                         print("Estas Fuera de Rango . . .")
 
                 elif status == "V":  
