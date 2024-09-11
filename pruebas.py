@@ -236,7 +236,12 @@ async def main():
 
                 print("rk_m2" + str(rk_m2))
             else:
+                rk_m = 0.0  # Valor por defecto fuera de la zona
+                rk_m2 = 0.0  # Valor por defecto fuera de la zona
                 print("fuera de zona socio")
+                time.sleep(5)
+                rk_m = 25.0  # Valor por defecto fuera de la zona
+                rk_m2 = 40.0  # Valor por defecto fuera de la zona
 
             
 
