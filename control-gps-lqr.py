@@ -203,6 +203,22 @@ with open(output_file_path, 'w') as output_file:
                     speed = newmsg.spd_over_grnd  # velocidad en nudos  
                     speed_mps = speed * (0.514444)  # convertimos de nudos a m/s  
                     print(f"Speed: {speed_mps:.2f} m/s")
+
+                    shapes = r.shapes()
+                    inside_zone = False  # Bandera para verificar si está dentro de alguna zona
+                    for k in range(len(shapes)):
+                        # build a shapely polygon from your shape
+                        polygon = shape(shapes[k])    
+                        zone_def = check(lon, lat)
+                        if zone_def:
+                            zona = k+1
+                            print('El punto corresponde a la zona ' + str(zona))
+                            inside_zone = True
+                            break  # Sal del bucle si se encuentra una zona
+
+                    if not inside_zone:
+                        print("Estas Fuera de Rango . . .")
+
                 elif status == "V":  
                     print("Buscando señal . . .")
             gk = 0
