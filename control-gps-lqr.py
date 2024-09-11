@@ -186,10 +186,14 @@ with open(output_file_path, 'w') as output_file:
 
         if gk == 5:
             # Verifica si se recibe una sentencia GPRMC
+            newdata = ser.readline().decode('utf-8').strip() 
             rk = 25  
             if newdata[0:6] == "$GPRMC":  
                 newmsg = pynmea2.parse(newdata)  
-                status = newmsg.status   
+                status = newmsg.status
+                # read your shapefile
+                poly_file='poligono_casona.shp'
+                r = shapefile.Reader(poly_file)
                 # Maneja los estados A y V  
                 if status == "A":  
                     lat = newmsg.latitude  
