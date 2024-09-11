@@ -12,6 +12,12 @@ from shapely.geometry import shape, Point   #type: ignore
 # Inicialización de Pigpio
 pi = pigpio.pi()
 pi_m = math.pi
+
+pi = pigpio.pi()
+if not pi.connected:
+    print("No se pudo conectar a pigpio. Verifica que el demonio esté corriendo.")
+    exit()
+
 # Configura el puerto serie  
 port = "/dev/ttyAMA0"  
 ser = serial.Serial(port, baudrate=9600, timeout=0.1) 
@@ -106,7 +112,7 @@ FPS2=0.0
 # Configuración de los pines A y B con pull-up y detección de ambos flancos
 def rotary_interrupt(channel):
 
-    global FLANCOS_M1_A, FLANCOS_M1_B, FLANCOS_M1,FLANCOS_M1_A2,FLANCOS_M1_B2
+    global FLANCOS_M1_A, FLANCOS_M1_B, FLANCOS_M1,FLANCOS_M1_A2,FLANCOS_M1_B2, FLANCOS_M2
     
     if channel == PIN_ENCODER_A:
         FLANCOS_M1_A += 1  # Incrementa el contador de flancos en pin A
@@ -137,22 +143,8 @@ GPIO.add_event_detect(PIN_ENCODER_B, GPIO.BOTH, callback=rotary_interrupt)
 GPIO.add_event_detect(PIN_ENCODER2_A, GPIO.BOTH, callback=rotary_interrupt)
 GPIO.add_event_detect(PIN_ENCODER2_B, GPIO.BOTH, callback=rotary_interrupt)
 
-# Funciones de callback para contar flancos
-def contador_flancos_encoder(gpio, level, tick):
-    global numero_flancos_A
-    numero_flancos_A += 1
-def contador_flancos_encoder_b(gpio, level, tick):
-    global numero_flancos_B
-    numero_flancos_B += 1
-def contador_flancos_encoder2(gpio, level, tick):
-    global numero_flancos_A2
-    numero_flancos_A2 += 1
-def contador_flancos_encoder_b2(gpio, level, tick):
-    global numero_flancos_B2
-    numero_flancos_B2 += 1
-# Configuración de callbacks
-cb1 = pi.callback(PIN_ENCODER_A, pigpio.EITHER_EDGE, contador_flancos_encoder)
-cb3 = pi.callback(PIN_ENCODER2_A, pigpio.EITHER_EDGE, contador_flancos_encoder2)
+
+
 # Función para controlar el motor
 def control_motor(pin_pwm, pin_dir, speed_percent, direction):
     duty_cycle = int(speed_percent * 255 / 100)
@@ -215,95 +207,58 @@ output_file_path = '/home/santiago/Documents/dispensador/dispen/uwurrr.txt'
 with open(output_file_path, 'w') as output_file:
     output_file.write("Tiempo \t PWM_1 \t PWM_M2 \t W1 \t W2 \tFlujo \t Flujo2\n")
     start_time = time.time()
-    while(True):
-        
-        t1 = TicToc()       # Tic
+    inside_zone = False  # Bandera inicial
+
+ # Bucle principal de control
+    while True:
+        t1 = TicToc()
         t1.tic()
         k += 1
-        gk +=1
-        if gk == 3:
+        gk += 1
+
+        if gk == 5:  # Solo leer los datos del GPS cada 5 iteraciones
             newdata = ser.readline().decode('utf-8').strip()
             if newdata[0:6] == "$GPRMC":
-                newmsg = pynmea2.parse(newdata)  
+                newmsg = pynmea2.parse(newdata)
                 status = newmsg.status
-                # read your shapefile
-                poly_file='poligono_casona.shp'
-                r = shapefile.Reader(poly_file)
-                # Maneja los estados A y V
                 if status == "A":
                     lat = newmsg.latitude
                     lon = newmsg.longitude
                     gps = f"Lat = {lat} Lng = {lon}"
                     print(gps)
                     speed = newmsg.spd_over_grnd  # velocidad en nudos
-                    speed_mps = speed * (0.514444)  # convertimos de nudos a m/s  
+                    speed_mps = speed * 0.514444  # convertir nudos a m/s
                     print(f"Speed: {speed_mps:.2f} m/s")
-                    # get the shapes
+
+                    # Verifica si estamos dentro de una zona
+                    poly_file = 'poligono_casona.shp'
+                    r = shapefile.Reader(poly_file)
                     shapes = r.shapes()
-                    inside_zone = False # Bandera para verificar si está dentro de alguna zona
+                    inside_zone = False  # Reinicia la bandera para cada lectura
                     for j in range(len(shapes)):
                         polygon = shape(shapes[j])
-                        zone_def = check(lon,lat)
-                        if zone_def:
-                            zone = j
-                            zona = zone+1
+                        if check(lon, lat):  # Verifica si está dentro de la zona
                             inside_zone = True
+                            zona = j + 1
                             if zona == 1:
-                                dosis_m1 = float(0.7*rate)
-                                dosis_m2=  float(0.3*rate)
-                                print(("dosis m1= ") + str(dosis_m1))
-                                print(("dosis m2= ") + str(dosis_m2))
-                            if zona == 2:
-                                dosis_m1 = float(0.4*rate)
-                                dosis_m2=  float(0.6*rate)
-                                print(("dosis m1= ") + str(dosis_m1))
-                                print(("dosis m2= ") + str(dosis_m2))
-                            break
-                    
-                    while not inside_zone:
-                        print("Estas Fuera del Aerea a implementar . . .")
+                                rk_m = 8
+                                rk_m2 = 12
+                                print("Estamos en zona 1")
+                            elif zona == 2:
+                                rk_m = 6
+                                rk_m2 = 11
+                                print("Estamos en zona 2")
+                            break  # Sal del bucle una vez que encontremos la zona
+                    if not inside_zone:
+                        print("Fuera de zona")
                         rk_m = 0.0
                         rk_m2 = 0.0
                         control_motor(motor1_pwm_pin, motor1_dir_pin, 0, 'forward')
-                        newdata = ser.readline().decode('utf-8').strip()
-                        if newdata[0:6] == "$GPRMC":
-                            newmsg = pynmea2.parse(newdata)  
-                            status = newmsg.status
-                            # read your shapefile
-                            poly_file='poligono_casona.shp'
-                            r = shapefile.Reader(poly_file)
-                            # Maneja los estados A y V
-                            if status == "A":
-                                lat = newmsg.latitude
-                                lon = newmsg.longitude
-                                gps = f"Lat = {lat} Lng = {lon}"
-                                print(gps)
-                                # get the shapes
-                                shapes = r.shapes()
-                                inside_zone = False # Bandera para verificar si está dentro de alguna zona
-                                for j in range(len(shapes)):
-                                    polygon = shape(shapes[j])
-                                    zone_def = check(lon,lat)
-                                    if zone_def:
-                                        zone = j
-                                        zona = zone+1
-                                        inside_zone = True
-                                    if zona == 1:
-                                        dosis_m1 = float(0.7*rate)
-                                        dosis_m2=  float(0.3*rate)
-                                        print(("dosis m1= ") + str(dosis_m1))
-                                        print(("dosis m2= ") + str(dosis_m2))
-                                    if zona == 2:
-                                        dosis_m1 = float(0.4*rate)
-                                        dosis_m2=  float(0.6*rate)
-                                        print(("dosis m1= ") + str(dosis_m1))
-                                        print(("dosis m2= ") + str(dosis_m2))
-                                        break
-                        time.sleep(0.2)
-            gk=0
+            gk = 0  # Reinicia el contador de `gk`
+
         
-        rk_m = float(d*speed_mps*dosis_m1)
-        rk_m2 = float(d*speed_mps*dosis_m2)
+        #rk_m = float(d*speed_mps*dosis_m1)
+        #rk_m2 = float(d*speed_mps*dosis_m2)
 
         # Calcular FPS y W
         FPS = FLANCOS_M1 / 1200.0
@@ -396,9 +351,9 @@ with open(output_file_path, 'w') as output_file:
         print("flujo2 = "+ str(fm_n2))
         
         motor_speed = upi_s  # Asegurar que motor1_speed esté en el rango 0-100
-        control_motor(motor1_pwm_pin, motor1_dir_pin, 100, 'forward')
+        control_motor(motor1_pwm_pin, motor1_dir_pin, motor_speed, 'forward')
         motor2_speed = upi_s2  # Asegurar que motor1_speed esté en el rango 0-100
-        control_motor(motor2_pwm_pin, motor2_dir_pin, 50, 'forward')
+        control_motor(motor2_pwm_pin, motor2_dir_pin, motor2_speed, 'forward')
 #       Reemplazo Variables m1
         delta_fn_2 = delta_fn_1
         delta_fn_1 = delta_fn
