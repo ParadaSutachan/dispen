@@ -246,7 +246,7 @@ with open(output_file_path, 'w') as output_file:
         k += 1
         gk +=1
 
-        if gk == 3:
+        if gk == 6:
             newdata = ser.readline().decode('ISO-8859-1').strip()
             if newdata[0:6] == "$GPRMC":
                 newmsg = pynmea2.parse(newdata)  
@@ -387,8 +387,7 @@ with open(output_file_path, 'w') as output_file:
         t1.tic()
         print("Moviendo los brushless a velocidad de 1200 microsegundos...")
         set_speed(pwm1, 1200)  # Señal de 1200 microsegundos para el primer motor
-        set_speed(pwm2, 1200)  # Señal de 1200 microsegundos para el segundo motor
-        print("Estamos es zona " + str(zona))
+        set_speed(pwm2, 1200)  # Señal de 1200 microsegundos para el segundo moto
 
 
         flancos_totales_1 = numero_flancos_A + numero_flancos_B
@@ -445,7 +444,6 @@ with open(output_file_path, 'w') as output_file:
 
         upi_m = ui_m  + up_m
         print("upi_m = "+ str(upi_m))
-        print("Estamos es zona " + str(zona))
 
 
         #Control maestro para M2
@@ -486,7 +484,6 @@ with open(output_file_path, 'w') as output_file:
         print("rks = "+ str(rk_s))
         print("pwm = "+ str(upi_s))
         print("flujo = "+ str(fm_n))
-        print("Estamos es zona " + str(zona))
 
 
         #Control esclavo para M2
@@ -553,7 +550,6 @@ with open(output_file_path, 'w') as output_file:
         e_time= t1.tocvalue()
         toc= abs(INTERVALO- e_time)
         time.sleep(toc)
-        print("Estamos es zona " + str(zona))
         
         
     
