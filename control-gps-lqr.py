@@ -388,8 +388,8 @@ with open(output_file_path, 'w') as output_file:
         ek2_int = ek2_1 + ek2_int_1
         uik2 = ek2_int*Ki
         ux2_k= K@x2k
-        u2k = -uik2-float(ux2_k[0])
-        print("u2k: " + str(u2k)) #Accion de Control
+        uk2 = -uik2-float(ux2_k[0])
+        print("u2k: " + str(uk2)) #Accion de Control
         if uk2 < 0 or uk2 > 100:
             if uk2 < 0 :
                 uik2 = 0 - float(ux2_k[0])
