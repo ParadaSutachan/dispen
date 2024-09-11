@@ -2,7 +2,7 @@
 #!/usr/bin/env python3
 
 import time  
-from encoder import Encoder  
+import Encoder  
 import pigpio
 
 # Inicialización de Pigpio
