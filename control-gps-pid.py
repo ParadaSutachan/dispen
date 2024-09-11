@@ -342,6 +342,7 @@ with open(output_file_path, 'w') as output_file:
 
                         control_motor(motor1_pwm_pin, motor1_dir_pin, 0, 'forward')
                         control_motor(motor2_pwm_pin, motor2_dir_pin, 0, 'forward')
+                        
                         newdata = ser.readline().decode('utf-8').strip()
                         if newdata[0:6] == "$GPRMC":
                             newmsg = pynmea2.parse(newdata)  
