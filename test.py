@@ -304,7 +304,7 @@ with open(output_file_path, 'w') as output_file:
             fm_n= 0
         else :
             fm_n = delta_fn + setpoint_f            # PARA M1
-            print("FLUJO= "+str(fm_n))
+            print("FLUJO = "+str(fm_n))
 
         float(speed_mps)
         if speed_mps <= 0.3:
@@ -409,6 +409,7 @@ with open(output_file_path, 'w') as output_file:
         output_file.write(f"{ts:.2f}\t{upi_s:.2f}\t{upi_s2:.2f}\t{W:.2f}\t{W2:.2f}\t{fm_n}\t{fm_n2:.2f}")
         # Restablecer 
         count = 0
+        count2 = 0
 
 
         e_time= t1.tocvalue()
