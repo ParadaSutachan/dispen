@@ -72,7 +72,7 @@ def rotary_interrupt2(channel):
             count2 += 1  
         else:  
             count2 += 1  
-    last_state2 = GPIO.input(pin_a)  
+    last_state2 = GPIO.input(pin_a2)  
 
 # Función para controlar el motor
 def control_motor(pin_pwm, pin_dir, speed_percent, direction):
@@ -277,15 +277,15 @@ with open(output_file_path, 'w') as output_file:
                         if zone_def: 
                             zona = j+1
                             if zona == 1:
-                                #dosis_m1 = 0.7*rate
-                                #dosis_m2 = 0.3*rate
-                                rk = 20
-                                rk2 = 35
+                                dosis_m1 = 0.7*rate
+                                dosis_m2 = 0.3*rate
+                                #rk = 20
+                                #rk2 = 35
                             elif zona == 2:
-                                #dosis_m1 = 0.4*rate
-                                #dosis_m2 = 0.6*rate
-                                rk = 35
-                                rk2 = 20
+                                dosis_m1 = 0.4*rate
+                                dosis_m2 = 0.6*rate
+                                #rk = 35
+                                #rk2 = 20
                             print('Estas en zona ' + str(zona))
                             inside_zone = True
                             break  # Sal del bucle si se encuentra una zona
@@ -314,6 +314,7 @@ with open(output_file_path, 'w') as output_file:
         FPS = count / (600.0)
         W = FPS * ((2 * pi_m) / T)      #Velocidad del motor
         print("Velocidad M1: " + str(count))
+
         FPS2 = count2/(600.0)
         W2 = FPS2 *((2*pi_m)/T)
         print("Velocidad M2: " + str(count2))
@@ -347,7 +348,9 @@ with open(output_file_path, 'w') as output_file:
         if speed_mps <= 0.3:
             speed_mps =0.0
 
-        #rk = speed_mps*rate*faja
+        rk = speed_mps*dosis_m1*faja
+        rk2 = speed_mps*dosis_m2*faja
+        
         print("rk: " + str(rk))
         print("rk2: " + str(rk2))
 
@@ -398,8 +401,8 @@ with open(output_file_path, 'w') as output_file:
         motor2_speed = uk2  
         print("uk2 = " + str(uk2))
 
-        control_motor(motor1_pwm_pin, motor1_dir_pin, 100, 'forward')
-        control_motor(motor2_pwm_pin, motor2_dir_pin, 100, 'forward')
+        control_motor(motor1_pwm_pin, motor1_dir_pin, motor1_speed, 'forward')
+        control_motor(motor2_pwm_pin, motor2_dir_pin, motor2_speed, 'forward')
         
         ## Reasignacion de variables M1 -----------------------------------------------------------------------
 
