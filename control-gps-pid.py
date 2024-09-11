@@ -151,6 +151,7 @@ cb1 = pi.callback(PIN_ENCODER_A, pigpio.EITHER_EDGE, contador_flancos_encoder)
 cb3 = pi.callback(PIN_ENCODER2_A, pigpio.EITHER_EDGE, contador_flancos_encoder2)
 
 # Configurar GPIO
+GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(ESC_PIN_1, GPIO.OUT)
 GPIO.setup(ESC_PIN_2, GPIO.OUT)
@@ -246,7 +247,7 @@ with open(output_file_path, 'w') as output_file:
         gk +=1
 
         if gk == 3:
-            newdata = ser.readline().decode('utf-8').strip()
+            newdata = ser.readline().decode('utf-8', errors='ignore').strip()
             if newdata[0:6] == "$GPRMC":
                 newmsg = pynmea2.parse(newdata)  
                 status = newmsg.status
