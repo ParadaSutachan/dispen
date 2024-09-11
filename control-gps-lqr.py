@@ -190,6 +190,7 @@ with open(output_file_path, 'w') as output_file:
             #leer poligono
             poly_file='poligono_casona.shp'
             r = shapefile.Reader(poly_file)
+            str(newdata)
             # Verificas si se recibe una sentencia GPRMC
             if newdata[0:6] == "$GPRMC":
                 newmsg = pynmea2.parse(newdata)
