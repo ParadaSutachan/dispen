@@ -156,7 +156,7 @@ while True:
 
 speed_mps=0.0
 d=3.6
-
+zona=0
 gk=0.0
 dosis_m1= 0.0
 dosis_m2 = 0.0
