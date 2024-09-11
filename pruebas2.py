@@ -56,12 +56,12 @@ try:
         pi.write(motor1_en_pin, 1)
         pi.write(motor2_en_pin, 1)
 
-        control_motor(motor1_pwm_pin, motor1_dir_pin, 100, 'forward')
+        control_motor(motor1_pwm_pin, motor1_dir_pin, 50, 'forward')
 
         print("Count: {}".format(count))
 
-        FPS = count/300.0
-        W = ((2*pi_m)/0.2)
+        FPS = count/600.0
+        W = FPS*((2*pi_m)/0.2)
         print("W: {}".format(W))
         count = 0    
         time.sleep(0.2)  
