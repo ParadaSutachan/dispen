@@ -51,8 +51,6 @@ count = 0
 count2 = 0  
 last_state = 0
 last_state2 = 0
-W = 0
-W2 = 0
 
 def rotary_interrupt(channel):  
     global count  
@@ -95,7 +93,7 @@ def check(lon, lat):
 def set_speed(pwm, pulse_width):
     duty_cycle = pulse_width / 20000 * 100  # Convertir microsegundos a ciclo de trabajo
     pwm.ChangeDutyCycle(duty_cycle)
-    
+
 # Configuración GPIO  
 GPIO.setmode(GPIO.BCM)  
 GPIO.setup(pin_a, GPIO.IN, pull_up_down=GPIO.PUD_UP)  
@@ -137,33 +135,78 @@ Bo = np.array([[-0.000419785220888, -0.001633156413536],
               [-0.003587244670196, 0.002212041259930],
               [0.020003639959133, -0.000008608682074]])
 #Definición de ek, rk, flujo y X
+
+## variables error M1 ----------------------------------------------------------------------
 ek = 0.0
 ek_1 = 0.0
 ek_int = 0.0
 ek_int_1 = 0.0
+
+## Variables error M2 ----------------------------------------------------------------------
+ek2 = 0.0
+ek2_1 = 0.0
+ek2_int = 0.0
+ek2_int_1 = 0.0
+
+## Variables rk,fk,uk para M1 ---------------------------------------------------------------
 rk = 0.0
 fk = 0.0
 uk = 0.0
+
+##  Variables rk,fk,uk para M2 -----------------------------------------------------------------
+rk2 = 0.0
+fk2 = 0.0
+uk2 = 0.0
+
+## Variables set-point
 F_b = 21.3465
 W_b = 28
+
+W = 0
+W2 = 0
+
+## Variables calculo de Soft sensor M1 -------------------------------------------------------------------
 delta_w = 0.0
 delta_w_1 = 0.0
 delta_f = 0.0
 delta_f_1 = 0.0 
 delta_f_2 = 0.0
+
+## Variables calculo de Soft Sensor M2 ---------------------------------------------------------------------
+delta_w2 = 0.0
+delta_w2_1 = 0.0
+delta_f2 = 0.0
+delta_f2_1 = 0.0 
+delta_f2_2 = 0.0
+
 k=0
 gk=0
-rate = 0.0
-faja = 3.0
+rate = 12.82
+faja = 3.6
+
+## Inicializacion variables para el calculo del observador ------------------------------------------------
 xk = np.array([[0],
                [0],
                [0],
-               [0]])
-xk1 = np.array([[0], 
-                   [0],
-                   [0],
-                   [0]]) 
-#Inicializacion del arduino
+               [0]]) ## xk para M1
+
+x2k = np.array([[0],
+                [0],
+                [0],
+                [0]]) ## xk para M2
+
+
+xk1 = np.array([[0],
+                [0],
+                [0],
+                [0]]) ## xk1 para M1
+
+x2k1 = np.array([[0],
+                 [0],
+                 [0],
+                 [0]]) ## xk1 para M2
+
+#Inicializacion del GPS
 while True:
     newdata = ser.readline().decode('utf-8').strip()  
     
@@ -234,9 +277,11 @@ with open(output_file_path, 'w') as output_file:
                         if zone_def: 
                             zona = j+1
                             if zona == 1:
-                                rk = 20
+                                dosis_m1 = 0.7*rate
+                                dosis_m2 = 0.3*rate
                             elif zona == 2:
-                                rk = 35
+                                dosis_m1 = 0.4*rate
+                                dosis_m2 = 0.6*rate
                             print('Estas en zona ' + str(zona))
                             inside_zone = True
                             break  # Sal del bucle si se encuentra una zona
@@ -259,29 +304,60 @@ with open(output_file_path, 'w') as output_file:
         #Lectura de Flancos para medir velocidad
         FPS = count / (600.0)
         W = FPS * ((2 * pi_m) / T)      #Velocidad del motor
-        print("Velocidad: " + str(W))
-        # Soft Sensor
+        print("Velocidad M1: " + str(W))
+        FPS2 = count2/(600.0)
+        W2 = FPS2 *((2*pi_m)/T)
+        print("Velocidad M2: " + str(W2))
+
+        # Soft Sensor M1 --------------------------------------------------------------------------
         delta_w = W-W_b
         delta_f = 0.1969*delta_w_1 + 1.359*delta_f_1 -0.581*delta_f_2
+
         if k <= 3:
              fk= 0
         else :
              fk=delta_f+F_b
+
+        print("Flujo 1: " + str(fk))
+
+        # Soft Sensor M2 ---------------------------------------------------------------------------
+
+        delta_w2 = W2-W_b
+        delta_f2 = 0.1969*delta_w2_1 + 1.359*delta_f2_1 -0.581*delta_f2_2
+
+        if k <= 3:
+             fk2= 0
+        else :
+             fk2=delta_f2+F_b
+
+        print("Flujo 2: " + str(fk2))
+
+
         # Calulo de la referencia #
-        float(speed_mps)
+        print(float(speed_mps))
         if speed_mps <= 0.3:
             speed_mps =0.0
         #rk = speed_mps*rate*faja
         print("rk: " + str(rk))
-        ##Observador
+        print("rk2: " + str(rk2))
+
+        ##Observador ------------------------------------------------------------------------------------
+
         uo = np.array([[uk],
                        [fk]])
         
+        u2o = np.array([[uk2],
+                        [fk2]])
+        
         xk1 = Ao@xk + Bo@uo
-        ##
-        ## Controlador
+
+        x2k1 = Ao@x2k + Bo@u2o
+        ## ------------------------------------------------------------------------------------------------
+
+        ## Controlador M1 ---------------------------------------------------------------------------------
         ek = rk - fk
         print("ek: "+str(ek))
+
         ek_int = ek_1 + ek_int_1
         uik = ek_int*Ki
         ux_k= K@xk
@@ -294,21 +370,50 @@ with open(output_file_path, 'w') as output_file:
         uk = -uik-float(ux_k[0])        
         motor1_speed = uk  
         print("uk = " + str(uk))
+
+        ## COntrolador M2 --------------------------------------------------------------------------------------
+        ek2 = rk2 - fk2
+        print("ek2: "+str(ek2))
+
+        ek2_int = ek2_1 + ek2_int_1
+        uik2 = ek2_int*Ki
+        ux2_k= K@x2k
+        u2k = -uik2-float(ux2_k[0]) #Accion de Control
+        if uk2 < 0 or uk2 > 100:
+            if uk2 < 0 :
+                uik2 = 0 - float(ux2_k[0])
+            if uk2 >100:
+                uik2 = -100 - float(ux2_k[0])
+        uk2 = -uik2-float(ux2_k[0])        
+        motor2_speed = uk2  
+        print("uk2 = " + str(uk2))
+
         control_motor(motor1_pwm_pin, motor1_dir_pin, motor1_speed, 'forward')
+        control_motor(motor2_pwm_pin, motor2_dir_pin, motor2_speed, 'forward')
         
+        ## Reasignacion de variables M1 -----------------------------------------------------------------------
+
         delta_f_2 = delta_f_1
         delta_f_1 = delta_f
         xk = xk1
         ek_int_1=ek_int
         ek_1 = ek
-        delta_w_1 = delta_w 
+        delta_w_1 = delta_w
+
+        delta_f2_2 = delta_f2_1
+        delta_f2_1 = delta_f2
+        x2k = x2k1
+        ek2_int_1=ek2_int
+        ek2_1 = ek2
+        delta_w2_1 = delta_w2 
+
         # Registrar los datos en el archivo
         ts = time.time() - start_time
         output_file.write(f"{ts:.2f}\t{uk:.2f}\t{W:.2f}\t{rk} \t{fk:.2f}\n")
         output_file.flush()
         # Restablecer contadores
         count = 0
-        print("Flujo = "+ str(fk))
+        count2 = 0
         e_time = t1.tocvalue()
         toc = abs(T-e_time)        #Toc
         time.sleep(toc)
