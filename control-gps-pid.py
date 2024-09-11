@@ -97,7 +97,6 @@ iek_s_1= 0.0    #PARA M1
 upi_s= 0.0
 up_s = 0.0
 ui_s = 0.0
-k= 0.0
 
 rk_s2= 0.0
 yk_s2= 0.0
@@ -225,8 +224,6 @@ gk=0.0
 # Loop de Control
 start_time = time.time()
 
-rk_m= float(speed_mps*d*rate)
-rk_m2= float(speed_mps*d*rate) #  M2
 # Habilitar motores
 pi.write(motor1_en_pin, 1)
 pi.write(motor2_en_pin, 1)
@@ -234,7 +231,6 @@ pi.write(motor2_en_pin, 1)
 delta_W_1= 0.0
 delta_fn_1 =0.0
 delta_fn_2 = 0.0
-contador=0
 delta_W_12= 0.0
 delta_fn_12 =0.0
 delta_fn_22 = 0.0
@@ -290,8 +286,61 @@ with open(output_file_path, 'w') as output_file:
                     
                     while not inside_zone:
                         print("Estas Fuera del Aerea a implementar . . .")
+                        speed_mps=0.0
+                        fm_n= 0.0
+                        fm_n2= 0.0
+                        W=0.0
+                        W2= 0.0
+
                         rk = 0.0
+                        rk_m= 0.0
+                        yk_m= 0.0
+                        ek_m= 0.0
+                        iek_m= 0.0
+                        iek_m_1= 0.0    #PARA M1
+                        upi_m= 0.0
+                        up_m = 0.0
+                        ui_m = 0.0
+
+                        rk_m2= 0.0
+                        yk_m2= 0.0
+                        ek_m2= 0.0
+                        iek_m2= 0.0     #PARA M2
+                        iek_m_12= 0.0
+                        upi_m2= 0.0
+                        up_m2 = 0.0
+                        ui_m2 = 0.0
+
+                        rk_s= 0.0
+                        yk_s= 0.0
+                        ek_s= 0.0
+                        iek_s= 0.0
+                        iek_s_1= 0.0    #PARA M1
+                        upi_s= 0.0
+                        up_s = 0.0
+                        ui_s = 0.0
+
+                        rk_s2= 0.0
+                        yk_s2= 0.0
+                        ek_s2= 0.0
+                        iek_s2= 0.0        #PARA M2
+                        iek_s_12= 0.0   
+                        upi_s2= 0.0
+                        up_s2 = 0.0
+                        ui_s2 = 0.0
+                        delta_fn= 0.0
+                        delta_fn_2= 0.0
+                        k=  0.0
+                        k2= 0.0
+                        delta_W_1= 0.0
+                        delta_fn_1 =0.0
+                        delta_fn_2 = 0.0
+                        delta_W_12= 0.0
+                        delta_fn_12 =0.0
+                        delta_fn_22 = 0.0
+
                         control_motor(motor1_pwm_pin, motor1_dir_pin, 0, 'forward')
+                        control_motor(motor2_pwm_pin, motor2_dir_pin, 0, 'forward')
                         newdata = ser.readline().decode('utf-8').strip()
                         if newdata[0:6] == "$GPRMC":
                             newmsg = pynmea2.parse(newdata)  
@@ -318,9 +367,11 @@ with open(output_file_path, 'w') as output_file:
                                         if zona == 1:
                                             dosis_m1 = 0.7*rate
                                             dosis_m2 = 0.3 *rate
+                                            print("Estamos es zona " + str(zona))
                                         if zona == 2:
                                             dosis_m1 = 0.4*rate
                                             dosis_m2 = 0.6 *rate
+                                            print("Estamos es zona " + str(zona))
                                            
                                         break
 
@@ -364,7 +415,11 @@ with open(output_file_path, 'w') as output_file:
         else :                                                          # Softsensor PARA M2
             fm_n2 = delta_fn2 + setpoint_f
 #----------------------------------------------------------------------------------------------------
+        if speed_mps <= 0.2:
+            speed_mps =0.0
 
+        rk_m= float(speed_mps*d*rate)
+        rk_m2= float(speed_mps*d*rate)    
 
         #Control maestro para M1
         yk_m = fm_n
