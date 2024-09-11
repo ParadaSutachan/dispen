@@ -247,7 +247,7 @@ with open(output_file_path, 'w') as output_file:
         gk +=1
 
         if gk == 3:
-            newdata = ser.readline().decode('utf-8', errors='ignore').strip()
+            newdata = ser.readline().decode('ISO-8859-1').strip()
             if newdata[0:6] == "$GPRMC":
                 newmsg = pynmea2.parse(newdata)  
                 status = newmsg.status
