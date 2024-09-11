@@ -185,10 +185,15 @@ with open(output_file_path, 'w') as output_file:
         gk +=1
 
         if gk == 5:
-            # Verifica si se recibe una sentencia GPRMC  
+            # Verifica si se recibe una sentencia GPRMC
+            newdata = ser.readline().decode('utf-8').strip() 
+             
             if newdata[0:6] == "$GPRMC":  
                 newmsg = pynmea2.parse(newdata)  
-                status = newmsg.status   
+                status = newmsg.status
+                # read your shapefile
+                poly_file='poligono_casona.shp'
+                r = shapefile.Reader(poly_file)
                 # Maneja los estados A y V  
                 if status == "A":  
                     lat = newmsg.latitude  
@@ -198,8 +203,26 @@ with open(output_file_path, 'w') as output_file:
                     speed = newmsg.spd_over_grnd  # velocidad en nudos  
                     speed_mps = speed * (0.514444)  # convertimos de nudos a m/s  
                     print(f"Speed: {speed_mps:.2f} m/s")
+
+                    shapes = r.shapes()
+                    inside_zone = False  # Bandera para verificar si está dentro de alguna zona
+                    for k in range(len(shapes)):
+                        # build a shapely polygon from your shape
+                        polygon = shape(shapes[k])    
+                        zone_def = check(lon, lat)
+                        if zone_def:
+                            rk = 25 
+                            zona = k+1
+                            print('El punto corresponde a la zona ' + str(zona))
+                            inside_zone = True
+                            break  # Sal del bucle si se encuentra una zona
+
+                    if not inside_zone:
+                        print("Estas Fuera de Rango . . .")
+
                 elif status == "V":  
                     print("Buscando señal . . .")
+            gk = 0
 
         #Lectura de Flancos para medir velocidad
         FPS = count / (600.0)
