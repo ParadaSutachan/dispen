@@ -28,48 +28,32 @@ PIN_ENCODER_A = 18
 PIN_ENCODER_B = 17
 PIN_ENCODER2_A = 16
 PIN_ENCODER2_B = 19
-
-# Configuración de pines brushless
-
-ESC_PIN_1 = 21  # Pin GPIO donde está conectado el primer ESC
-ESC_PIN_2 = 20  # Pin GPIO donde está conectado el segundo ESC
-
-# Configurar GPIO
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(ESC_PIN_1, GPIO.OUT)
-GPIO.setup(ESC_PIN_2, GPIO.OUT)
-
-# Configurar la señal PWM para los ESC (50 Hz)
-pwm1 = GPIO.PWM(ESC_PIN_1, 50)  # Frecuencia de 50 Hz (20ms ciclo completo)
-pwm2 = GPIO.PWM(ESC_PIN_2, 50)  # Frecuencia de 50 Hz (20ms ciclo completo)
-
-# Inicializar PWM
-pwm1.start(0)  # Iniciar con un duty cycle de 0%
-pwm2.start(0)  # Iniciar con un duty cycle de 0%
-
 T = 0.2
+# Configuración de pines de entrada para los encoders
+pi.set_mode(PIN_ENCODER_A, pigpio.INPUT)
+pi.set_pull_up_down(PIN_ENCODER_A, pigpio.PUD_UP)
+pi.set_mode(PIN_ENCODER_B, pigpio.INPUT)
+pi.set_pull_up_down(PIN_ENCODER_B, pigpio.PUD_UP)
+pi.set_mode(PIN_ENCODER2_A, pigpio.INPUT)
+pi.set_pull_up_down(PIN_ENCODER2_A, pigpio.PUD_UP)
+pi.set_mode(PIN_ENCODER2_B, pigpio.INPUT)
+pi.set_pull_up_down(PIN_ENCODER2_B, pigpio.PUD_UP)
+# Funciones de callback para contar flancos
 def contador_flancos_encoder(gpio, level, tick):
     global numero_flancos_A
-    # Asegúrate de que el incremento sea seguro y no cause desbordamiento
     numero_flancos_A += 1
-
 def contador_flancos_encoder_b(gpio, level, tick):
     global numero_flancos_B
     numero_flancos_B += 1
-
 def contador_flancos_encoder2(gpio, level, tick):
     global numero_flancos_A2
     numero_flancos_A2 += 1
-
 def contador_flancos_encoder_b2(gpio, level, tick):
     global numero_flancos_B2
     numero_flancos_B2 += 1
-
 # Configuración de callbacks
 cb1 = pi.callback(PIN_ENCODER_A, pigpio.EITHER_EDGE, contador_flancos_encoder)
-cb2 = pi.callback(PIN_ENCODER_B, pigpio.EITHER_EDGE, contador_flancos_encoder_b)
 cb3 = pi.callback(PIN_ENCODER2_A, pigpio.EITHER_EDGE, contador_flancos_encoder2)
-cb4 = pi.callback(PIN_ENCODER2_B, pigpio.EITHER_EDGE, contador_flancos_encoder_b2)
 # Función para controlar el motor
 def control_motor(pin_pwm, pin_dir, speed_percent, direction):
     duty_cycle = int(speed_percent * 255 / 100)
@@ -85,12 +69,6 @@ def check(lon, lat):
     point = Point(lon, lat)
     # the contains function does exactly what you want
     return polygon.contains(point)
-
-# Función para convertir microsegundos a ciclo de trabajo
-def set_speed(pwm, pulse_width):
-    duty_cycle = pulse_width / 20000 * 100  # Convertir microsegundos a ciclo de trabajo
-    pwm.ChangeDutyCycle(duty_cycle)
-
 # Contadores de flancos
 numero_flancos_A = 0
 numero_flancos_B = 0
@@ -146,7 +124,7 @@ delta_f_2 = 0.0
 k=0
 gk=0
 rate = 0.0
-faja = 3.6
+faja = 3.0
 xk = np.array([[0],
                [0],
                [0],
@@ -190,7 +168,7 @@ with open(output_file_path, 'w') as output_file:
         t1.tic()
         k += 1
         gk +=1
-        if gk == 5:
+        if gk == 3:
             newdata = ser.readline().decode('utf-8').strip()
             if newdata[0:6] == "$GPRMC":
                 newmsg = pynmea2.parse(newdata)  
@@ -218,10 +196,10 @@ with open(output_file_path, 'w') as output_file:
                             zona = zone+1
                             inside_zone = True
                             if zona == 1:
-                                rk = 15
+                                rk = 8
                                 print("Estamos es zona " + str(zona))
                             if zona == 2:
-                                rk = 30
+                                rk = 10
                                 print("Estamos es zona " + str(zona))
                             break
                     
@@ -253,10 +231,10 @@ with open(output_file_path, 'w') as output_file:
                                         zona = zone+1
                                         inside_zone = True
                                         if zona == 1:
-                                            rk = 15
+                                            rk = 8
                                             print("Estamos es zona " + str(zona))
                                         if zona == 2:
-                                            rk = 30
+                                            rk = 10
                                             print("Estamos es zona " + str(zona))
                                         break
 
@@ -265,9 +243,6 @@ with open(output_file_path, 'w') as output_file:
             k =0
 
 
-        set_speed(pwm1, 1200)  # Señal de 1200 microsegundos para el primer motor
-        set_speed(pwm2, 1200)  # Señal de 1200 microsegundos para el segundo motor
-        
         #Lectura de Flancos para medir velocidad
         flancos_totales_1 = numero_flancos_A + numero_flancos_B
         FPS = flancos_totales_1 / (600.0)
