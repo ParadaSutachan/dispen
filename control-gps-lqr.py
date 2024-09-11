@@ -256,7 +256,7 @@ with open(output_file_path, 'w') as output_file:
         k += 1
         gk +=1
 
-        if gk == 6:
+        if gk == 3:
             newdata = ser.readline().decode('utf-8').strip()
             if newdata[0:6] == "$GPRMC":
                 newmsg = pynmea2.parse(newdata)  
@@ -299,6 +299,7 @@ with open(output_file_path, 'w') as output_file:
                     while not inside_zone:
                         print("Estas Fuera del Aerea a implementar . . .")
                         control_motor(motor1_pwm_pin, motor1_dir_pin, 0, 'forward')
+                        control_motor(motor1_pwm_pin, motor2_dir_pin, 0, 'forward')
                         ek = 0.0
                         ek2 = 0.0
                         ek_1 = 0.0
@@ -370,7 +371,7 @@ with open(output_file_path, 'w') as output_file:
 
         t1 = TicToc()       # Tic
         t1.tic()
-        
+
         set_speed(pwm1, 1200)  # Señal de 1200 microsegundos para el primer motor
         set_speed(pwm2, 1200)  # Señal de 1200 microsegundos para el segundo motor
 
@@ -460,7 +461,9 @@ with open(output_file_path, 'w') as output_file:
         ek2_int = ek2_1 + ek2_int_1
         uik2 = ek2_int*Ki
         ux_k2= K@x2k
-        uk2 = -uik-float(ux_k2[0]) #Accion de Control
+        uk2 = -uik-float(ux_k2[0]) #Accion de 
+        
+        print(uk2)
 
         if uk2 < 0 or uk2 > 100:
             if uk2 < 0 :
@@ -475,7 +478,7 @@ with open(output_file_path, 'w') as output_file:
         ## FIN Control M2 ------------------------------------------------------------------
 
         control_motor(motor1_pwm_pin, motor1_dir_pin, motor1_speed, 'forward')
-        control_motor(motor1_pwm_pin, motor1_dir_pin, motor2_speed, 'forward')
+        control_motor(motor2_pwm_pin, motor2_dir_pin, motor2_speed, 'forward')
         
         delta_f_2 = delta_f_1
         delta_f_1 = delta_f
