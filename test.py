@@ -65,6 +65,7 @@ iek_m_1= 0.0    #PARA M1
 upi_m= 0.0
 up_m = 0.0
 ui_m = 0.0
+
 rk_m2= 0.0
 yk_m2= 0.0
 ek_m2= 0.0
@@ -73,6 +74,7 @@ iek_m_12= 0.0
 upi_m2= 0.0
 up_m2 = 0.0
 ui_m2 = 0.0
+
 rk_s= 0.0
 yk_s= 0.0
 ek_s= 0.0
@@ -82,6 +84,7 @@ upi_s= 0.0
 up_s = 0.0
 ui_s = 0.0
 k= 0.0
+
 rk_s2= 0.0
 yk_s2= 0.0
 ek_s2= 0.0
@@ -155,11 +158,13 @@ def control_motor(pin_pwm, pin_dir, speed_percent, direction):
         pi.write(pin_dir, 0)  # Dirección hacia atrás
     else:
         raise ValueError("Dirección no válida. Usa 'forward' o 'backward'.")
+    
 def check(lon, lat):
     # build a shapely point from your geopoint
     point = Point(lon, lat)
     # the contains function does exactly what you want
     return polygon.contains(point)
+
 while True:
     newdata = ser.readline().decode('utf-8').strip()  
     
@@ -190,8 +195,8 @@ dosis_m2 = 0.0
 
 # Loop de Control
 start_time = time.time()
-rk_m= float(speed_mps*d*rate)
-rk_m2= float(speed_mps*d*rate) #  M2
+#rk_m= float(speed_mps*d*rate)
+#rk_m2= float(speed_mps*d*rate) #  M2
 # Habilitar motores
 pi.write(motor1_en_pin, 1)
 pi.write(motor2_en_pin, 1)
@@ -211,6 +216,7 @@ with open(output_file_path, 'w') as output_file:
 
  # Bucle principal de control
     while True:
+        time.sleep(10)
         t1 = TicToc()
         t1.tic()
         k += 1
@@ -228,7 +234,7 @@ with open(output_file_path, 'w') as output_file:
                     print(gps)
                     speed = newmsg.spd_over_grnd  # velocidad en nudos
                     speed_mps = speed * 0.514444  # convertir nudos a m/s
-                    print(f"Speed: {speed_mps:.2f} m/s")
+                    print(f"velocidad : {speed_mps:.2f} m/s")
 
                     # Verifica si estamos dentro de una zona
                     poly_file = 'poligono_casona.shp'
@@ -354,6 +360,7 @@ with open(output_file_path, 'w') as output_file:
         control_motor(motor1_pwm_pin, motor1_dir_pin, motor_speed, 'forward')
         motor2_speed = upi_s2  # Asegurar que motor1_speed esté en el rango 0-100
         control_motor(motor2_pwm_pin, motor2_dir_pin, motor2_speed, 'forward')
+        
 #       Reemplazo Variables m1
         delta_fn_2 = delta_fn_1
         delta_fn_1 = delta_fn
