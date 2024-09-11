@@ -323,22 +323,3 @@ async def main():
 
 # Iniciar el programa
 asyncio.run(main())
-
-# Deshabilitar motores
-pi.set_PWM_dutycycle(motor1_pwm_pin, 0)
-pi.set_PWM_dutycycle(motor2_pwm_pin, 0)
-pi.write(motor1_en_pin, 0)
-pi.write(motor2_en_pin, 0)
-
-# Detener los motores
-print("Deteniendo motores...")
-set_speed(pwm1, 1000)  # Señal mínima para detener el primer motor
-set_speed(pwm2, 1000)  # Señal mínima para detener el segundo motor
-# Limpiar y detener PWM
-pwm1.stop()
-pwm2.stop()
-GPIO.cleanup()
-print("Proceso finalizado.")
-# Detener Pigpio
-pi.stop()
-print('Tiempo de funcionamiento de los motores completado.')
