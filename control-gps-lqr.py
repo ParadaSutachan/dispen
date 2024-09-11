@@ -187,7 +187,7 @@ with open(output_file_path, 'w') as output_file:
         if gk == 5:
             # Verifica si se recibe una sentencia GPRMC
             newdata = ser.readline().decode('utf-8').strip() 
-            rk = 25  
+             
             if newdata[0:6] == "$GPRMC":  
                 newmsg = pynmea2.parse(newdata)  
                 status = newmsg.status
@@ -211,6 +211,7 @@ with open(output_file_path, 'w') as output_file:
                         polygon = shape(shapes[k])    
                         zone_def = check(lon, lat)
                         if zone_def:
+                            rk = 25 
                             zona = k+1
                             print('El punto corresponde a la zona ' + str(zona))
                             inside_zone = True
