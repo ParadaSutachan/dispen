@@ -11,12 +11,14 @@ import shapefile
 from shapely.geometry import shape, Point
 
 # Inicialización de Pigpio
+print("Iniciando pigpio...")
 pi = pigpio.pi()
-pi_m = math.pi
 
 if not pi.connected:
     print("No se pudo conectar a pigpio. Verifica que el demonio esté corriendo.")
     exit()
+
+print("Conectado a pigpio.")
 
 # Configuración del puerto serie para GPS
 port = "/dev/ttyAMA0"  
@@ -41,28 +43,16 @@ numero_flancos_B = 0
 numero_flancos_A2 = 0
 numero_flancos_B2 = 0
 
-# Variables para RPM y RPS
-RPS = 0.0
-RPM = 0.0
-RPS2 = 0.0
-RPM2 = 0.0
-
-# Variables control maestro esclavo
-Kp_m = 0.049398
-ki_m = 0.241
-kp_s = 0.36612
-ki_s = 1.097
-Kp_m2 = 0.049398
-ki_m2 = 0.241
-kp_s2 = 0.36612
-ki_s2 = 1.097
-
-# Inicialización de controladores para ambos motores
-rk_m, yk_m, ek_m, iek_m, upi_m = 0.0, 0.0, 0.0, 0.0, 0.0
-rk_s, yk_s, ek_s, iek_s, upi_s = 0.0, 0.0, 0.0, 0.0, 0.0
-
-rk_m2, yk_m2, ek_m2, iek_m2, upi_m2 = 0.0, 0.0, 0.0, 0.0, 0.0
-rk_s2, yk_s2, ek_s2, iek_s2, upi_s2 = 0.0, 0.0, 0.0, 0.0, 0.0
+# Variables de control maestro-esclavo y de flujo
+setpoint_f, setpoint_W = 21.3465, 28
+delta_fn, delta_fn_1, delta_fn_2 = 0.0, 0.0, 0.0
+delta_fn2, delta_fn_12, delta_fn_22 = 0.0, 0.0, 0.0
+W, W2 = 0.0, 0.0
+fm_n, fm_n2 = 0.0, 0.0
+rk_m, rk_m2 = 0.0, 0.0
+upi_m, upi_m2 = 0.0, 0.0
+ek_m, ek_m2 = 0.0, 0.0
+iek_m, iek_m_1, iek_m2, iek_m_12 = 0.0, 0.0, 0.0, 0.0
 
 # Configuración de los pines A y B con pull-up y detección de flancos
 def rotary_interrupt(channel):
@@ -76,11 +66,13 @@ def rotary_interrupt(channel):
     elif channel == PIN_ENCODER2_B:
         numero_flancos_B2 += 1
 
+print("Configurando pines GPIO...")
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(PIN_ENCODER_A, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(PIN_ENCODER_B, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(PIN_ENCODER2_A, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(PIN_ENCODER2_B, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
 GPIO.add_event_detect(PIN_ENCODER_A, GPIO.BOTH, callback=rotary_interrupt)
 GPIO.add_event_detect(PIN_ENCODER_B, GPIO.BOTH, callback=rotary_interrupt)
 GPIO.add_event_detect(PIN_ENCODER2_A, GPIO.BOTH, callback=rotary_interrupt)
@@ -97,74 +89,95 @@ def check(lon, lat, polygon):
     point = Point(lon, lat)
     return polygon.contains(point)
 
+# Función de softsensor para flujo
+def softsensor(delta_W, delta_fn_1, delta_fn_2):
+    return 0.1969 * delta_W + 1.359 * delta_fn_1 - 0.581 * delta_fn_2
+
 # Bucle principal de control
 start_time = time.time()
-setpoint_f, setpoint_W = 21.3465, 28
 
+print("Iniciando bucle de control...")
 with open('/home/santiago/Documents/dispensador/dispen/uwurrr.txt', 'w') as output_file:
     output_file.write("Tiempo \t PWM_1 \t PWM_M2 \t W1 \t W2 \tFlujo \tFlujo2\n")
     while True:
-        # Leer datos del GPS
-        newdata = ser.readline().decode('utf-8').strip()
-        if newdata[0:6] == "$GPRMC":
-            newmsg = pynmea2.parse(newdata)
-            if newmsg.status == "A":  # Señal válida
-                lat, lon = newmsg.latitude, newmsg.longitude
-                speed_mps = newmsg.spd_over_grnd * 0.514444  # Convertir a m/s
-                # Comprobar si está en una zona definida
-                poly_file = 'poligono_casona.shp'
-                r = shapefile.Reader(poly_file)
-                for j, shape_rec in enumerate(r.shapes()):
-                    polygon = shape(shape_rec)
-                    if check(lon, lat, polygon):
-                        rk_m, rk_m2 = (8, 12) if j == 0 else (6, 11)
-                        break
-                else:
-                    rk_m, rk_m2 = 0.0, 0.0
-                    control_motor(motor1_pwm_pin, motor1_dir_pin, 0, 'forward')
-                    control_motor(motor2_pwm_pin, motor2_dir_pin, 0, 'forward')
-                    continue
+        try:
+            # Leer datos del GPS
+            newdata = ser.readline().decode('utf-8').strip()
+            if newdata and newdata[0:6] == "$GPRMC":
+                newmsg = pynmea2.parse(newdata)
+                if newmsg.status == "A":  # Señal válida
+                    lat, lon = newmsg.latitude, newmsg.longitude
+                    speed_mps = newmsg.spd_over_grnd * 0.514444  # Convertir a m/s
+                    print(f"GPS: Lat {lat}, Lon {lon}, Velocidad {speed_mps} m/s")
 
-        # Cálculo de la velocidad en radianes por segundo (W y W2)
-        FPS1 = (numero_flancos_A + numero_flancos_B) / 1200.0
-        W1 = FPS1 * (2 * pi_m / INTERVALO)
+                    # Comprobar si está en una zona definida
+                    poly_file = 'poligono_casona.shp'
+                    r = shapefile.Reader(poly_file)
+                    for j, shape_rec in enumerate(r.shapes()):
+                        polygon = shape(shape_rec)
+                        if check(lon, lat, polygon):
+                            rk_m, rk_m2 = (8, 12) if j == 0 else (6, 11)
+                            print(f"Dentro de zona {j+1}")
+                            break
+                    else:
+                        rk_m, rk_m2 = 0.0, 0.0
+                        control_motor(motor1_pwm_pin, motor1_dir_pin, 0, 'forward')
+                        control_motor(motor2_pwm_pin, motor2_dir_pin, 0, 'forward')
+                        print("Fuera de zona")
+                        continue
 
-        FPS2 = (numero_flancos_A2 + numero_flancos_B2) / 1200.0
-        W2 = FPS2 * (2 * pi_m / INTERVALO)
+            # Cálculo de la velocidad en radianes por segundo (W y W2)
+            FPS1 = (numero_flancos_A + numero_flancos_B) / 1200.0
+            W1 = FPS1 * (2 * math.pi / INTERVALO)
 
-        # Control maestro-esclavo para motor 1
-        ek_m = rk_m - W1
-        iek_m += ek_m
-        upi_m = Kp_m * ek_m + ki_m * iek_m
-        upi_m = max(0, min(upi_m, 100))  # Limitar a 0-100%
+            FPS2 = (numero_flancos_A2 + numero_flancos_B2) / 1200.0
+            W2 = FPS2 * (2 * math.pi / INTERVALO)
 
-        ek_s = upi_m - W1
-        iek_s += ek_s
-        upi_s = kp_s * ek_s + ki_s * iek_s
-        upi_s = max(0, min(upi_s, 100))  # Limitar a 0-100%
-        control_motor(motor1_pwm_pin, motor1_dir_pin, upi_s, 'forward')
+            print(f"Velocidades: Motor 1: {W1} rad/s, Motor 2: {W2} rad/s")
 
-        # Control maestro-esclavo para motor 2
-        ek_m2 = rk_m2 - W2
-        iek_m2 += ek_m2
-        upi_m2 = Kp_m2 * ek_m2 + ki_m2 * iek_m2
-        upi_m2 = max(0, min(upi_m2, 100))  # Limitar a 0-100%
+            # Cálculo del flujo usando softsensor para M1
+            delta_W = W1 - setpoint_W
+            fm_n = softsensor(delta_W, delta_fn_1, delta_fn_2)
 
-        ek_s2 = upi_m2 - W2
-        iek_s2 += ek_s2
-        upi_s2 = kp_s2 * ek_s2 + ki_s2 * iek_s2
-        upi_s2 = max(0, min(upi_s2, 100))  # Limitar a 0-100%
-        control_motor(motor2_pwm_pin, motor2_dir_pin, upi_s2, 'forward')
+            # Control maestro-esclavo para motor 1
+            ek_m = rk_m - fm_n
+            iek_m = ek_m + iek_m_1
+            upi_m = 0.049398 * ek_m + 0.241 * iek_m
+            upi_m = max(0, min(upi_m, 100))  # Limitar a 0-100%
+            print(f"upi_m motor 1 = {upi_m}")
 
-        # Registro de datos
-        ts = time.time() - start_time
-        output_file.write(f"{ts:.2f}\t{upi_s:.2f}\t{upi_s2:.2f}\t{W1:.2f}\t{W2:.2f}\t{setpoint_f}\t{setpoint_f:.2f}\n")
+            # Cálculo del flujo usando softsensor para M2
+            delta_W2 = W2 - setpoint_W
+            fm_n2 = softsensor(delta_W2, delta_fn_12, delta_fn_22)
 
-        # Restablecer contadores de flancos
-        numero_flancos_A = numero_flancos_B = numero_flancos_A2 = numero_flancos_B2 = 0
+            # Control maestro-esclavo para motor 2
+            ek_m2 = rk_m2 - fm_n2
+            iek_m2 = ek_m2 + iek_m_12
+            upi_m2 = 0.049398 * ek_m2 + 0.241 * iek_m2
+            upi_m2 = max(0, min(upi_m2, 100))  # Limitar a 0-100%
+            print(f"upi_m motor 2 = {upi_m2}")
 
-        # Esperar hasta el siguiente ciclo
-        time.sleep(INTERVALO)
+            # Actualizar PWM de los motores
+            control_motor(motor1_pwm_pin, motor1_dir_pin, upi_m, 'forward')
+            control_motor(motor2_pwm_pin, motor2_dir_pin, upi_m2, 'forward')
+
+            # Registro de datos
+            ts = time.time() - start_time
+            output_file.write(f"{ts:.2f}\t{upi_m:.2f}\t{upi_m2:.2f}\t{W1:.2f}\t{W2:.2f}\t{fm_n:.2f}\t{fm_n2:.2f}\n")
+
+            # Restablecer contadores de flancos
+            numero_flancos_A = numero_flancos_B = numero_flancos_A2 = numero_flancos_B2 = 0
+            delta_fn_2 = delta_fn_1
+            delta_fn_1 = delta_fn
+            delta_fn_22 = delta_fn_12
+            delta_fn_12 = delta_fn2
+
+            # Esperar hasta el siguiente ciclo
+            time.sleep(INTERVALO)
+
+        except Exception as e:
+            print(f"Error en la lectura o procesamiento: {str(e)}")
+            continue
 
 # Finalizar el control de motores
 pi.set_PWM_dutycycle(motor1_pwm_pin, 0)
