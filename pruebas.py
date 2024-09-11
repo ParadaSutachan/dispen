@@ -45,13 +45,12 @@ RPS2 = 0.0
 RPM2 = 0.0
 
 # Variables de flujo
-fm_n= 0.0
-fm_n2= 0.0
-W=0.0
-W2= 0.0
+fm_n = 0.0
+fm_n2 = 0.0
+W = 0.0
+W2 = 0.0
 
 # Variables control maestro esclavo
-
 Kp_m = 0.049398
 ki_m = 0.241
 kp_s = 0.36612
@@ -62,48 +61,48 @@ ki_m2 = 0.241
 kp_s2 = 0.36612
 ki_s2 = 1.097
 
-rk_m= 0.0
-yk_m= 0.0
-ek_m= 0.0
-iek_m= 0.0
-iek_m_1= 0.0    #PARA M1
-upi_m= 0.0
+rk_m = 0.0
+yk_m = 0.0
+ek_m = 0.0
+iek_m = 0.0
+iek_m_1 = 0.0  # PARA M1
+upi_m = 0.0
 up_m = 0.0
 ui_m = 0.0
 
-rk_m2= 0.0
-yk_m2= 0.0
-ek_m2= 0.0
-iek_m2= 0.0     #PARA M2
-iek_m_12= 0.0
-upi_m2= 0.0
+rk_m2 = 0.0
+yk_m2 = 0.0
+ek_m2 = 0.0
+iek_m2 = 0.0  # PARA M2
+iek_m_12 = 0.0
+upi_m2 = 0.0
 up_m2 = 0.0
 ui_m2 = 0.0
 
-rk_s= 0.0
-yk_s= 0.0
-ek_s= 0.0
-iek_s= 0.0
-iek_s_1= 0.0    #PARA M1
-upi_s= 0.0
+rk_s = 0.0
+yk_s = 0.0
+ek_s = 0.0
+iek_s = 0.0
+iek_s_1 = 0.0  # PARA M1
+upi_s = 0.0
 up_s = 0.0
 ui_s = 0.0
 
-rk_s2= 0.0
-yk_s2= 0.0
-ek_s2= 0.0
-iek_s2= 0.0        #PARA M2
-iek_s_12= 0.0   
-upi_s2= 0.0
+rk_s2 = 0.0
+yk_s2 = 0.0
+ek_s2 = 0.0
+iek_s2 = 0.0  # PARA M2
+iek_s_12 = 0.0
+upi_s2 = 0.0
 up_s2 = 0.0
 ui_s2 = 0.0
-k= 0.0
-k2=0.0
+k = 0.0
+k2 = 0.0
 
-setpoint_f= 21.3465
+setpoint_f = 21.3465
 setpoint_W = 28
-delta_fn= 0.0
-delta_fn_2= 0.0
+delta_fn = 0.0
+delta_fn_2 = 0.0
 
 # Inicializar GPIO y PWM para ESC
 GPIO.setwarnings(False)
