@@ -299,7 +299,7 @@ with open(output_file_path, 'w') as output_file:
                     while not inside_zone:
                         print("Estas Fuera del Aerea a implementar . . .")
                         control_motor(motor1_pwm_pin, motor1_dir_pin, 0, 'forward')
-                        control_motor(motor1_pwm_pin, motor2_dir_pin, 0, 'forward')
+                        #control_motor(motor1_pwm_pin, motor2_dir_pin, 0, 'forward')
                         ek = 0.0
                         ek2 = 0.0
                         ek_1 = 0.0
@@ -478,7 +478,7 @@ with open(output_file_path, 'w') as output_file:
         ## FIN Control M2 ------------------------------------------------------------------
 
         control_motor(motor1_pwm_pin, motor1_dir_pin, motor1_speed, 'forward')
-        control_motor(motor2_pwm_pin, motor2_dir_pin, motor2_speed, 'forward')
+        #control_motor(motor2_pwm_pin, motor2_dir_pin, motor2_speed, 'forward')
         
         delta_f_2 = delta_f_1
         delta_f_1 = delta_f
