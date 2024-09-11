@@ -240,7 +240,6 @@ with open(output_file_path, 'w') as output_file:
 
                         time.sleep(0.2)
             gk=0
-            k =0
 
 
         #Lectura de Flancos para medir velocidad
