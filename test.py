@@ -207,92 +207,52 @@ output_file_path = '/home/santiago/Documents/dispensador/dispen/uwurrr.txt'
 with open(output_file_path, 'w') as output_file:
     output_file.write("Tiempo \t PWM_1 \t PWM_M2 \t W1 \t W2 \tFlujo \t Flujo2\n")
     start_time = time.time()
-    while(True):
-        
-        t1 = TicToc()       # Tic
-        t1.tic()
-        k += 1
-        gk +=1
-        if gk == 3:
-            newdata = ser.readline().decode('utf-8').strip()
-            if newdata[0:6] == "$GPRMC":
-                newmsg = pynmea2.parse(newdata)  
-                status = newmsg.status
-                # read your shapefile
-                poly_file='poligono_casona.shp'
+inside_zone = False  # Bandera inicial
+
+# Bucle principal de control
+while True:
+    t1 = TicToc()
+    t1.tic()
+    k += 1
+    gk += 1
+
+    if gk == 5:  # Solo leer los datos del GPS cada 5 iteraciones
+        newdata = ser.readline().decode('utf-8').strip()
+        if newdata[0:6] == "$GPRMC":
+            newmsg = pynmea2.parse(newdata)
+            status = newmsg.status
+            if status == "A":
+                lat = newmsg.latitude
+                lon = newmsg.longitude
+                gps = f"Lat = {lat} Lng = {lon}"
+                print(gps)
+                speed = newmsg.spd_over_grnd  # velocidad en nudos
+                speed_mps = speed * 0.514444  # convertir nudos a m/s
+                print(f"Speed: {speed_mps:.2f} m/s")
+
+                # Verifica si estamos dentro de una zona
+                poly_file = 'poligono_casona.shp'
                 r = shapefile.Reader(poly_file)
-                # Maneja los estados A y V
-                if status == "A":
-                    lat = newmsg.latitude
-                    lon = newmsg.longitude
-                    gps = f"Lat = {lat} Lng = {lon}"
-                    print(gps)
-                    speed = newmsg.spd_over_grnd  # velocidad en nudos
-                    speed_mps = speed * (0.514444)  # convertimos de nudos a m/s  
-                    print(f"Speed: {speed_mps:.2f} m/s")
-                    # get the shapes
-                    shapes = r.shapes()
-                    inside_zone = False # Bandera para verificar si está dentro de alguna zona
-                    for j in range(len(shapes)):
-                        polygon = shape(shapes[j])
-                        zone_def = check(lon,lat)
-                        if zone_def:
-                            zone = j
-                            zona = zone+1
-                            inside_zone = True
-                            if zona == 1:
-                                dosis_m1 = float(0.7*rate)
-                                dosis_m2=  float(0.3*rate)
-                                print(("dosis m1= ") + str(dosis_m1))
-                                print(("dosis m2= ") + str(dosis_m2))
-                            if zona == 2:
-                                dosis_m1 = float(0.4*rate)
-                                dosis_m2=  float(0.6*rate)
-                                print(("dosis m1= ") + str(dosis_m1))
-                                print(("dosis m2= ") + str(dosis_m2))
-                            break
-                    
-                    while not inside_zone:
-                        print("Estas Fuera del Aerea a implementar . . .")
-                        rk_m = 0.0
-                        rk_m2 = 0.0
-                        control_motor(motor1_pwm_pin, motor1_dir_pin, 0, 'forward')
-                        newdata = ser.readline().decode('utf-8').strip()
-                        if newdata[0:6] == "$GPRMC":
-                            newmsg = pynmea2.parse(newdata)  
-                            status = newmsg.status
-                            # read your shapefile
-                            poly_file='poligono_casona.shp'
-                            r = shapefile.Reader(poly_file)
-                            # Maneja los estados A y V
-                            if status == "A":
-                                lat = newmsg.latitude
-                                lon = newmsg.longitude
-                                gps = f"Lat = {lat} Lng = {lon}"
-                                print(gps)
-                                # get the shapes
-                                shapes = r.shapes()
-                                inside_zone = False # Bandera para verificar si está dentro de alguna zona
-                                for j in range(len(shapes)):
-                                    polygon = shape(shapes[j])
-                                    zone_def = check(lon,lat)
-                                    if zone_def:
-                                        zone = j
-                                        zona = zone+1
-                                        inside_zone = True
-                                    if zona == 1:
-                                        dosis_m1 = float(0.7*rate)
-                                        dosis_m2=  float(0.3*rate)
-                                        print(("dosis m1= ") + str(dosis_m1))
-                                        print(("dosis m2= ") + str(dosis_m2))
-                                    if zona == 2:
-                                        dosis_m1 = float(0.4*rate)
-                                        dosis_m2=  float(0.6*rate)
-                                        print(("dosis m1= ") + str(dosis_m1))
-                                        print(("dosis m2= ") + str(dosis_m2))
-                                        break
-                        time.sleep(0.2)
-            gk=0
+                shapes = r.shapes()
+                inside_zone = False  # Reinicia la bandera para cada lectura
+                for j in range(len(shapes)):
+                    polygon = shape(shapes[j])
+                    if check(lon, lat):  # Verifica si está dentro de la zona
+                        inside_zone = True
+                        zona = j + 1
+                        if zona == 1:
+                            rk = 8
+                            print("Estamos en zona 1")
+                        elif zona == 2:
+                            rk = 10
+                            print("Estamos en zona 2")
+                        break  # Sal del bucle una vez que encontremos la zona
+                if not inside_zone:
+                    print("Fuera de zona")
+                    rk = 0.0
+                    control_motor(motor1_pwm_pin, motor1_dir_pin, 0, 'forward')
+        gk = 0  # Reinicia el contador de `gk`
+
         
         rk_m = float(d*speed_mps*dosis_m1)
         rk_m2 = float(d*speed_mps*dosis_m2)
