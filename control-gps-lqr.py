@@ -315,7 +315,7 @@ with open(output_file_path, 'w') as output_file:
         W = FPS * ((2 * pi_m) / T)      #Velocidad del motor
         print("Velocidad M1: " + str(W))
         FPS2 = count2/(600.0)
-        W2 = # FPS2 *((2*pi_m)/T)
+        W2 = FPS2 *((2*pi_m)/T)
         print("Velocidad M2: " + str(W2))
 
         # Soft Sensor M1 --------------------------------------------------------------------------
