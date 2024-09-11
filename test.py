@@ -207,182 +207,182 @@ output_file_path = '/home/santiago/Documents/dispensador/dispen/uwurrr.txt'
 with open(output_file_path, 'w') as output_file:
     output_file.write("Tiempo \t PWM_1 \t PWM_M2 \t W1 \t W2 \tFlujo \t Flujo2\n")
     start_time = time.time()
-inside_zone = False  # Bandera inicial
+    inside_zone = False  # Bandera inicial
 
 # Bucle principal de control
-while True:
-    t1 = TicToc()
-    t1.tic()
-    k += 1
-    gk += 1
+    while True:
+        t1 = TicToc()
+        t1.tic()
+        k += 1
+        gk += 1
 
-    if gk == 5:  # Solo leer los datos del GPS cada 5 iteraciones
-        newdata = ser.readline().decode('utf-8').strip()
-        if newdata[0:6] == "$GPRMC":
-            newmsg = pynmea2.parse(newdata)
-            status = newmsg.status
-            if status == "A":
-                lat = newmsg.latitude
-                lon = newmsg.longitude
-                gps = f"Lat = {lat} Lng = {lon}"
-                print(gps)
-                speed = newmsg.spd_over_grnd  # velocidad en nudos
-                speed_mps = speed * 0.514444  # convertir nudos a m/s
-                print(f"Speed: {speed_mps:.2f} m/s")
+        if gk == 5:  # Solo leer los datos del GPS cada 5 iteraciones
+            newdata = ser.readline().decode('utf-8').strip()
+            if newdata[0:6] == "$GPRMC":
+                newmsg = pynmea2.parse(newdata)
+                status = newmsg.status
+                if status == "A":
+                    lat = newmsg.latitude
+                    lon = newmsg.longitude
+                    gps = f"Lat = {lat} Lng = {lon}"
+                    print(gps)
+                    speed = newmsg.spd_over_grnd  # velocidad en nudos
+                    speed_mps = speed * 0.514444  # convertir nudos a m/s
+                    print(f"Speed: {speed_mps:.2f} m/s")
 
-                # Verifica si estamos dentro de una zona
-                poly_file = 'poligono_casona.shp'
-                r = shapefile.Reader(poly_file)
-                shapes = r.shapes()
-                inside_zone = False  # Reinicia la bandera para cada lectura
-                for j in range(len(shapes)):
-                    polygon = shape(shapes[j])
-                    if check(lon, lat):  # Verifica si está dentro de la zona
-                        inside_zone = True
-                        zona = j + 1
-                        if zona == 1:
-                            rk = 8
-                            print("Estamos en zona 1")
-                        elif zona == 2:
-                            rk = 10
-                            print("Estamos en zona 2")
-                        break  # Sal del bucle una vez que encontremos la zona
-                if not inside_zone:
-                    print("Fuera de zona")
-                    rk = 0.0
-                    control_motor(motor1_pwm_pin, motor1_dir_pin, 0, 'forward')
-        gk = 0  # Reinicia el contador de `gk`
+                    # Verifica si estamos dentro de una zona
+                    poly_file = 'poligono_casona.shp'
+                    r = shapefile.Reader(poly_file)
+                    shapes = r.shapes()
+                    inside_zone = False  # Reinicia la bandera para cada lectura
+                    for j in range(len(shapes)):
+                        polygon = shape(shapes[j])
+                        if check(lon, lat):  # Verifica si está dentro de la zona
+                            inside_zone = True
+                            zona = j + 1
+                            if zona == 1:
+                                rk = 8
+                                print("Estamos en zona 1")
+                            elif zona == 2:
+                                rk = 10
+                                print("Estamos en zona 2")
+                            break  # Sal del bucle una vez que encontremos la zona
+                    if not inside_zone:
+                        print("Fuera de zona")
+                        rk = 0.0
+                        control_motor(motor1_pwm_pin, motor1_dir_pin, 0, 'forward')
+            gk = 0  # Reinicia el contador de `gk`
 
+            
+            rk_m = float(d*speed_mps*dosis_m1)
+            rk_m2 = float(d*speed_mps*dosis_m2)
+
+            # Calcular FPS y W
+            FPS = FLANCOS_M1 / 1200.0
+            W = FPS*((2 * pi_m) / 0.2)
+            print("W: " + str(W))
+
+
+            # Calcular FPS y W
+            FPS2 = FLANCOS_M2 / 1200.0
+            W = FPS2*((2 * pi_m) / 0.2)
+            print("W2: " + str(W))
+
+
+            #Msoft sensor 
+            delta_W = W - setpoint_W
+            delta_fn= 0.1969*delta_W_1 + 1.359 * delta_fn_1 - 0.581*delta_fn_2 
+            if k <= 3:
+                fm_n= 0
+            else :
+                fm_n = delta_fn + setpoint_f            # PARA M1
+    #-------------------------------------------------------------------------------------------------
+            delta_W2 = W2 - setpoint_W
+            delta_fn2= 0.1969*delta_W_12 + 1.359 * delta_fn_12 - 0.581*delta_fn_22 
+            if k2 <= 3:
+                fm_n2= 0
+            else :                                                          # Softsensor PARA M2
+                fm_n2 = delta_fn2 + setpoint_f
+    #----------------------------------------------------------------------------------------------------
+            #Control maestro para M1
+            yk_m = fm_n
+            ek_m= rk_m - yk_m
+            iek_m = ek_m + iek_m_1
+            up_m = Kp_m*ek_m
+            ui_m = ki_m*iek_m
+            upi_m = up_m  + ui_m
+            if upi_m < 0 or upi_m > 100:
+                if upi_m < 0 :
+                    ui_m = 0 - up_m
+                if upi_m >100:
+                    ui_m = 100 - up_m
+            upi_m = ui_m  + up_m
+            print("upi_m = "+ str(upi_m))
+            #Control maestro para M2
+            yk_m2 = fm_n2
+            ek_m2= rk_m2 - yk_m2
+            iek_m2 = ek_m2 + iek_m_12
+            up_m2 = Kp_m2*ek_m2
+            ui_m2 = ki_m2*iek_m2
+            upi_m2 = up_m2  + ui_m2
+            if upi_m2 < 0 or upi_m2 > 100:
+                if upi_m2 < 0 :
+                    ui_m2 = 0 - up_m2
+                if upi_m2 >100:
+                    ui_m2 = 100 - up_m2
+            upi_m2 = ui_m2  + up_m2
+            print("upi_m motor 2= "+ str(upi_m2))
+            #Control esclavo para M1
+            rk_s = upi_m
+            yk_s = W
+            ek_s= rk_s - yk_s
+            iek_s = ek_s + iek_s_1
+            ui_s = ki_s*iek_s
+            up_s= kp_s*ek_s
+            upi_s = up_s + ui_s
+            if upi_s < 0 or upi_s > 100:
+                if upi_s < 0 :
+                    ui_s = 0 - up_s
+                if upi_s >100:
+                    ui_s = 100 - up_s
+            upi_s = ui_s + up_s
+            print("rks = "+ str(rk_s))
+            print("pwm = "+ str(upi_s))
+            print("flujo = "+ str(fm_n))
+            #Control esclavo para M2
+            rk_s2 = upi_m2
+            yk_s2 = W2
+            ek_s2= rk_s2 - yk_s2
+            iek_s2 = ek_s2 + iek_s_12
+            ui_s2 = ki_s2*iek_s2
+            up_s2= kp_s2*ek_s2
+            upi_s2 = up_s2 + ui_s2
+            if upi_s2 < 0 or upi_s2 > 100:
+                if upi_s2 < 0 :
+                    ui_s2 = 0 - up_s2
+                if upi_s2 >100:
+                    ui_s2 = 100 - up_s2
+            upi_s2 = ui_s2 + up_s2
+            print("rks2 = "+ str(rk_s2))
+            print("pwm2 = "+ str(upi_s2))
+            print("flujo2 = "+ str(fm_n2))
+            
+            motor_speed = upi_s  # Asegurar que motor1_speed esté en el rango 0-100
+            control_motor(motor1_pwm_pin, motor1_dir_pin, motor_speed, 'forward')
+            motor2_speed = upi_s2  # Asegurar que motor1_speed esté en el rango 0-100
+            control_motor(motor2_pwm_pin, motor2_dir_pin, motor2_speed, 'forward')
+    #       Reemplazo Variables m1
+            delta_fn_2 = delta_fn_1
+            delta_fn_1 = delta_fn
+            delta_W_1 = delta_W
+            iek_m_1 = iek_m
+            iek_s_1 = iek_s
+    #       Reemplazo Variables m2
+            delta_fn_22 = delta_fn_12
+            delta_fn_12 = delta_fn2
+            delta_W_12 = delta_W2
+            iek_m_12 = iek_m2
+            iek_s_12 = iek_s2
+            
+            # Registrar los datos en el archivo
+            ts = time.time() - start_time
+            
+            # Restablecer contadores
+            FLANCOS_M1_A=0.0
+            FLANCOS_M1_B=0.0  
+            FLANCOS_M1=0.0
+
+            FLANCOS_M1_A2=0.0
+            FLANCOS_M1_B2=0.0  
+            FLANCOS_M2=0.0
+
+
+            e_time= t1.tocvalue()
+            toc= abs(INTERVALO- e_time)
+            time.sleep(toc)
         
-        rk_m = float(d*speed_mps*dosis_m1)
-        rk_m2 = float(d*speed_mps*dosis_m2)
-
-        # Calcular FPS y W
-        FPS = FLANCOS_M1 / 1200.0
-        W = FPS*((2 * pi_m) / 0.2)
-        print("W: " + str(W))
-
-
-        # Calcular FPS y W
-        FPS2 = FLANCOS_M2 / 1200.0
-        W = FPS2*((2 * pi_m) / 0.2)
-        print("W2: " + str(W))
-
-
-        #Msoft sensor 
-        delta_W = W - setpoint_W
-        delta_fn= 0.1969*delta_W_1 + 1.359 * delta_fn_1 - 0.581*delta_fn_2 
-        if k <= 3:
-            fm_n= 0
-        else :
-            fm_n = delta_fn + setpoint_f            # PARA M1
-#-------------------------------------------------------------------------------------------------
-        delta_W2 = W2 - setpoint_W
-        delta_fn2= 0.1969*delta_W_12 + 1.359 * delta_fn_12 - 0.581*delta_fn_22 
-        if k2 <= 3:
-            fm_n2= 0
-        else :                                                          # Softsensor PARA M2
-            fm_n2 = delta_fn2 + setpoint_f
-#----------------------------------------------------------------------------------------------------
-        #Control maestro para M1
-        yk_m = fm_n
-        ek_m= rk_m - yk_m
-        iek_m = ek_m + iek_m_1
-        up_m = Kp_m*ek_m
-        ui_m = ki_m*iek_m
-        upi_m = up_m  + ui_m
-        if upi_m < 0 or upi_m > 100:
-            if upi_m < 0 :
-                ui_m = 0 - up_m
-            if upi_m >100:
-                ui_m = 100 - up_m
-        upi_m = ui_m  + up_m
-        print("upi_m = "+ str(upi_m))
-        #Control maestro para M2
-        yk_m2 = fm_n2
-        ek_m2= rk_m2 - yk_m2
-        iek_m2 = ek_m2 + iek_m_12
-        up_m2 = Kp_m2*ek_m2
-        ui_m2 = ki_m2*iek_m2
-        upi_m2 = up_m2  + ui_m2
-        if upi_m2 < 0 or upi_m2 > 100:
-            if upi_m2 < 0 :
-                ui_m2 = 0 - up_m2
-            if upi_m2 >100:
-                ui_m2 = 100 - up_m2
-        upi_m2 = ui_m2  + up_m2
-        print("upi_m motor 2= "+ str(upi_m2))
-        #Control esclavo para M1
-        rk_s = upi_m
-        yk_s = W
-        ek_s= rk_s - yk_s
-        iek_s = ek_s + iek_s_1
-        ui_s = ki_s*iek_s
-        up_s= kp_s*ek_s
-        upi_s = up_s + ui_s
-        if upi_s < 0 or upi_s > 100:
-            if upi_s < 0 :
-                ui_s = 0 - up_s
-            if upi_s >100:
-                ui_s = 100 - up_s
-        upi_s = ui_s + up_s
-        print("rks = "+ str(rk_s))
-        print("pwm = "+ str(upi_s))
-        print("flujo = "+ str(fm_n))
-        #Control esclavo para M2
-        rk_s2 = upi_m2
-        yk_s2 = W2
-        ek_s2= rk_s2 - yk_s2
-        iek_s2 = ek_s2 + iek_s_12
-        ui_s2 = ki_s2*iek_s2
-        up_s2= kp_s2*ek_s2
-        upi_s2 = up_s2 + ui_s2
-        if upi_s2 < 0 or upi_s2 > 100:
-            if upi_s2 < 0 :
-                ui_s2 = 0 - up_s2
-            if upi_s2 >100:
-                ui_s2 = 100 - up_s2
-        upi_s2 = ui_s2 + up_s2
-        print("rks2 = "+ str(rk_s2))
-        print("pwm2 = "+ str(upi_s2))
-        print("flujo2 = "+ str(fm_n2))
-        
-        motor_speed = upi_s  # Asegurar que motor1_speed esté en el rango 0-100
-        control_motor(motor1_pwm_pin, motor1_dir_pin, motor_speed, 'forward')
-        motor2_speed = upi_s2  # Asegurar que motor1_speed esté en el rango 0-100
-        control_motor(motor2_pwm_pin, motor2_dir_pin, motor2_speed, 'forward')
-#       Reemplazo Variables m1
-        delta_fn_2 = delta_fn_1
-        delta_fn_1 = delta_fn
-        delta_W_1 = delta_W
-        iek_m_1 = iek_m
-        iek_s_1 = iek_s
-#       Reemplazo Variables m2
-        delta_fn_22 = delta_fn_12
-        delta_fn_12 = delta_fn2
-        delta_W_12 = delta_W2
-        iek_m_12 = iek_m2
-        iek_s_12 = iek_s2
-        
-        # Registrar los datos en el archivo
-        ts = time.time() - start_time
-        
-        # Restablecer contadores
-        FLANCOS_M1_A=0.0
-        FLANCOS_M1_B=0.0  
-        FLANCOS_M1=0.0
-
-        FLANCOS_M1_A2=0.0
-        FLANCOS_M1_B2=0.0  
-        FLANCOS_M2=0.0
-
-
-        e_time= t1.tocvalue()
-        toc= abs(INTERVALO- e_time)
-        time.sleep(toc)
         
         
-    
 # Deshabilitar motores
 pi.set_PWM_dutycycle(motor1_pwm_pin, 0)
 pi.set_PWM_dutycycle(motor2_pwm_pin, 0)
