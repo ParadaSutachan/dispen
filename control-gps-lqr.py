@@ -25,6 +25,18 @@ motor2_pwm_pin = 13
 motor2_dir_pin = 25
 motor2_en_pin = 23
 
+# Configuración de pines
+ESC_PIN_1 = 21  # Pin GPIO donde está conectado el primer ESC
+ESC_PIN_2 = 20  # Pin GPIO donde está conectado el segundo ESC
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(ESC_PIN_1, GPIO.OUT)
+GPIO.setup(ESC_PIN_2, GPIO.OUT)
+
+# Configurar la señal PWM para los ESC (50 Hz)
+pwm1 = GPIO.PWM(ESC_PIN_1, 50)  # Frecuencia de 50 Hz (20ms ciclo completo)
+pwm2 = GPIO.PWM(ESC_PIN_2, 50)  # Frecuencia de 50 Hz (20ms ciclo completo)
+
 T = 0.2
 # Configuración de pines de entrada para los encoders
 # Configuración de pines  
@@ -79,6 +91,11 @@ def check(lon, lat):
     point = Point(lon, lat)
     # the contains function does exactly what you want
     return polygon.contains(point)
+
+def set_speed(pwm, pulse_width):
+    duty_cycle = pulse_width / 20000 * 100  # Convertir microsegundos a ciclo de trabajo
+    pwm.ChangeDutyCycle(duty_cycle)
+    
 # Configuración GPIO  
 GPIO.setmode(GPIO.BCM)  
 GPIO.setup(pin_a, GPIO.IN, pull_up_down=GPIO.PUD_UP)  
@@ -172,6 +189,10 @@ while True:
 pi.write(motor1_en_pin, 1)
 pi.write(motor2_en_pin, 1)
 
+# Inicializar PWM
+pwm1.start(0)  # Iniciar con un duty cycle de 0%
+pwm2.start(0)  # Iniciar con un duty cycle de 0%
+
 # Crear el archivo de salida para guardar los datos
 output_file_path = '/home/santiago/Documents/dispensador/dispen/beta-test.txt'
 with open(output_file_path, 'w') as output_file:
@@ -224,12 +245,17 @@ with open(output_file_path, 'w') as output_file:
                         rk = 0
                         ek = 0
                         fk = 0
+                        uk = 0
+                        control_motor(motor1_pwm_pin, motor1_dir_pin, motor1_speed, 'forward')
                         print("Estas Fuera de Rango . . .")
 
                 elif status == "V":  
                     print("Buscando señal . . .")
             gk = 0
 
+        set_speed(pwm1, 1200)  # Señal de 1200 microsegundos para el primer motor
+        set_speed(pwm2, 1200)  # Señal de 1200 microsegundos para el segundo motor
+        
         #Lectura de Flancos para medir velocidad
         FPS = count / (600.0)
         W = FPS * ((2 * pi_m) / T)      #Velocidad del motor
