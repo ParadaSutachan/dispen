@@ -1,4 +1,3 @@
-@@ -1,194 +1,194 @@
 # -- coding: utf-8 --
 #!/usr/bin/env python3
 import time
@@ -281,7 +280,7 @@ with open(output_file_path, 'w') as output_file:
         RPS2 = flancos_totales_1 / (600.0)
         W2 = RPS2 * ((2 * pi_m) / INTERVALO)
         print("Velocidad: " + str(W2))
-        
+
         #Msoft sensor 
         delta_W = W - setpoint_W
         delta_fn= 0.1969*delta_W_1 + 1.359 * delta_fn_1 - 0.581*delta_fn_2 
