@@ -415,7 +415,7 @@ with open(output_file_path, 'w') as output_file:
         else :                                                          # Softsensor PARA M2
             fm_n2 = delta_fn2 + setpoint_f
 #----------------------------------------------------------------------------------------------------
-        if speed_mps <= 0.2:
+        if speed_mps <= 0.4:
             speed_mps =0.0
 
         rk_m= float(speed_mps*d*rate)
