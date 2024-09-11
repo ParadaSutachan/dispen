@@ -235,6 +235,8 @@ async def main():
                 rk_m2 = float(35)
 
                 print("rk_m2" + str(rk_m2))
+            else:
+                print("fuera de zona socio")
 
             
 
@@ -320,7 +322,7 @@ async def main():
                     ui_s2 = 100 - up_s2
 
             upi_s2 = ui_s2 + up_s2
-            print("rk 2 =" + str(rk))
+            print("rk 2 =" + str(rk_m2))
             print("pwm motor 2 = " + str(upi_s2))
 
             # Aplicar los valores de control a los motores
