@@ -246,7 +246,7 @@ with open(output_file_path, 'w') as output_file:
         k += 1
         gk +=1
 
-        if gk == 6:
+        if gk == 2:
             newdata = ser.readline().decode('ISO-8859-1').strip()
             if newdata[0:6] == "$GPRMC":
                 newmsg = pynmea2.parse(newdata)  
@@ -377,7 +377,7 @@ with open(output_file_path, 'w') as output_file:
                                            
                                         break
 
-                        time.sleep(0.2)
+                        time.sleep(0.05)
             gk=0
 
             # Mover los motores a velocidad de 1200 microsegundos por 5 segundos
@@ -431,7 +431,7 @@ with open(output_file_path, 'w') as output_file:
             motor2_speed = 0.0
             control_motor(motor1_pwm_pin, motor1_dir_pin, motor_speed, 'forward')
             control_motor(motor2_pwm_pin, motor2_dir_pin, motor2_speed, 'forward')
-            continue  # Salir del bucle si no hay movimiento
+           
 
 
         rk_m= float(speed_mps*d*dosis_m1)
