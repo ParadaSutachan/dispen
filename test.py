@@ -254,11 +254,11 @@ with open(output_file_path, 'w') as output_file:
                         if zone_def: 
                             zona = j+1
                             if zona == 1:
-                                rk_m = 20
-                                rk_m2 = 20
+                                dosis_m1 = 0.7*rate
+                                dosis_m2 = 0.3*rate
                             elif zona == 2:
-                                rk_m = 35
-                                rk_m2 = 35
+                                dosis_m1 = 0.4*rate
+                                dosis_m2 = 0.6*rate
                             print('Estas en zona ' + str(zona))
                             inside_zone = True
                             break  # Sal del bucle si se encuentra una zona#
@@ -283,9 +283,15 @@ with open(output_file_path, 'w') as output_file:
         
         set_speed(pwm1, 1200)  # Señal de 1200 microsegundos para el primer motor
         set_speed(pwm2, 1200)  # Señal de 1200 microsegundos para el segundo motor
+        print("Dosis M1 =" +str(dosis_m1))
+        print("Dosis M2 =" +str(dosis_m2))
+
+        float(speed_mps)
+        if speed_mps <= 0.3:
+            speed_mps =0.0
         
-        #rk_m = float(d*speed_mps*dosis_m1)
-        #rk_m2 = float(d*speed_mps*dosis_m2)
+        rk_m = float(d*speed_mps*dosis_m1)
+        rk_m2 = float(d*speed_mps*dosis_m2)
 
         # Calcular FPS y W
         FPS = count / (600.0)
@@ -319,9 +325,6 @@ with open(output_file_path, 'w') as output_file:
             fm_n2 = delta_fn2 + setpoint_f
         print("FLUJO 2= " + str(fm_n2))
         
-        float(speed_mps)
-        if speed_mps <= 0.3:
-            speed_mps =0.0
             
 #----------------------------------------------------------------------------------------------------
         #Control maestro para M1
