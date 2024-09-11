@@ -13,11 +13,6 @@ from shapely.geometry import shape, Point   #type: ignore
 pi = pigpio.pi()
 pi_m = math.pi
 
-pi = pigpio.pi()
-if not pi.connected:
-    print("No se pudo conectar a pigpio. Verifica que el demonio esté corriendo.")
-    exit()
-
 # Configura el puerto serie  
 port = "/dev/ttyAMA0"  
 ser = serial.Serial(port, baudrate=9600, timeout=0.1) 
@@ -28,26 +23,19 @@ motor1_en_pin = 22
 motor2_pwm_pin = 13
 motor2_dir_pin = 25
 motor2_en_pin = 23
+
 pin_a = 17  # Pin A del encoder  M1
 pin_b = 18  # Pin B del encoder  M1
 pin_a2 = 16 # Pin A del enconder M2
 pin_b2 = 19 # Pin B del enconder M2
 INTERVALO = 0.2  # Intervalo de tiempo en segundos para cálculo de RPM
-# Contadores de flancos
-numero_flancos_A = 0
-numero_flancos_B = 0
-numero_flancos_A2 = 0
-numero_flancos_B2 = 0
-# Variables para RPM y RPS
-RPS = 0.0
-RPM = 0.0
-RPS2 = 0.0
-RPM2 = 0.0
+
 # Variables de flujo
 fm_n= 0.0
 fm_n2= 0.0
 W=0.0
 W2= 0.0
+
 # Variables control maestro esclavo
 Kp_m = 0.049398
 ki_m = 0.241
@@ -57,6 +45,7 @@ Kp_m2 = 0.049398
 ki_m2 = 0.241
 kp_s2 = 0.36612
 ki_s2 = 1.097
+
 rk_m= 0.0
 yk_m= 0.0
 ek_m= 0.0
@@ -83,7 +72,6 @@ iek_s_1= 0.0    #PARA M1
 upi_s= 0.0
 up_s = 0.0
 ui_s = 0.0
-k= 0.0
 
 rk_s2= 0.0
 yk_s2= 0.0
@@ -95,20 +83,13 @@ up_s2 = 0.0
 ui_s2 = 0.0
 k= 0.0
 k2=0.0
+
 setpoint_f= 21.3465
 setpoint_W = 28
 delta_fn= 0.0
 delta_fn_2= 0.0
-# Variable Voltaje
-v1 = 0.0
-v2 = 0.0
+
 rate= 12.82
-FLANCOS_M1= 0.0
-FLANCOS_M2=0.0
-FLANCOS_M1_A=0.0
-FLANCOS_M1_B=0.0
-FLANCOS_M1_A2=0.0
-FLANCOS_M1_B2=0.0
 FPS=0.0
 FPS2=0.0
 
@@ -194,8 +175,6 @@ gk=0.0
 dosis_m1= 0.0
 dosis_m2 = 0.0
 
-
-
 delta_W_1= 0.0
 delta_fn_1 =0.0
 delta_fn_2 = 0.0
@@ -274,11 +253,11 @@ with open(output_file_path, 'w') as output_file:
                         if zone_def: 
                             zona = j+1
                             if zona == 1:
-                                rk_s = 20
-                                rk_s2 = 20
+                                rk_m = 20
+                                rk_m2 = 20
                             elif zona == 2:
-                                rk_s = 35
-                                rk_s2 = 35
+                                rk_m = 35
+                                rk_m2 = 35
                             print('Estas en zona ' + str(zona))
                             inside_zone = True
                             break  # Sal del bucle si se encuentra una zona
@@ -302,8 +281,6 @@ with open(output_file_path, 'w') as output_file:
         
         set_speed(pwm1, 1200)  # Señal de 1200 microsegundos para el primer motor
         set_speed(pwm2, 1200)  # Señal de 1200 microsegundos para el segundo motor
-        
-
         
         #rk_m = float(d*speed_mps*dosis_m1)
         #rk_m2 = float(d*speed_mps*dosis_m2)
@@ -358,6 +335,8 @@ with open(output_file_path, 'w') as output_file:
                 ui_m = 100 - up_m
         upi_m = ui_m  + up_m
         print("upi_m = "+ str(upi_m))
+        print("RK_M = "+ str(rk_m))
+
         #Control maestro para M2
         yk_m2 = fm_n2
         ek_m2= rk_m2 - yk_m2
@@ -371,7 +350,9 @@ with open(output_file_path, 'w') as output_file:
             if upi_m2 >100:
                 ui_m2 = 100 - up_m2
         upi_m2 = ui_m2  + up_m2
-        print("upi_m motor 2= "+ str(upi_m2))
+        print("upi_m2= "+ str(upi_m2))
+        print("RK_M2 = "+ str(rk_m2))
+
         #Control esclavo para M1
         rk_s = upi_m
         yk_s = W
@@ -389,6 +370,7 @@ with open(output_file_path, 'w') as output_file:
         print("rks = "+ str(rk_s))
         print("pwm = "+ str(upi_s))
         print("flujo = "+ str(fm_n))
+
         #Control esclavo para M2
         rk_s2 = upi_m2
         yk_s2 = W2
