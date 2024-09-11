@@ -281,7 +281,7 @@ with open(output_file_path, 'w') as output_file:
                     print("Buscando señal . . .")
             gk = 0
         
-        set_speed(pwm1, 1200)  # Señal de 1200 microsegundos para el primer motor
+        set_speed(pwm1, 1200)  # Señal de 1200 microsegundos para el primer motor # # 
         set_speed(pwm2, 1200)  # Señal de 1200 microsegundos para el segundo motor
         print("Dosis M1 =" +str(dosis_m1))
         print("Dosis M2 =" +str(dosis_m2))
