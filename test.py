@@ -95,6 +95,7 @@ try:
 
         # Reiniciar el contador
         count = 0    
+        FLANCOS_M1=0.0
         time.sleep(0.2)
 
 except KeyboardInterrupt:
