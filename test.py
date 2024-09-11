@@ -131,7 +131,7 @@ def rotary_interrupt2(channel):
             count2 += 1  
         else:  
             count2 += 1  
-    last_state2 = GPIO.input(pin_a)  
+    last_state2 = GPIO.input(pin_a2)  
 # Configuración de pines de entrada para los encoders
 # Configuración de los pines A y B con pull-up y detección de ambos flancos
 
@@ -222,6 +222,7 @@ with open(output_file_path, 'w') as output_file:
         t1 = TicToc()       # Tic
         t1.tic()
         k += 1
+        k2 += 1
         gk +=1
 
         if gk == 5:
@@ -304,20 +305,18 @@ with open(output_file_path, 'w') as output_file:
             fm_n= 0
         else :
             fm_n = delta_fn + setpoint_f            # PARA M1
-            print("FLUJO = "+str(fm_n))
+        print("FLUJO = "+str(fm_n))
 
-        float(speed_mps)
-        if speed_mps <= 0.3:
-            speed_mps =0.0
 
 #-------------------------------------------------------------------------------------------------
         delta_W2 = W2 - setpoint_W
         delta_fn2= 0.1969*delta_W_12 + 1.359 * delta_fn_12 - 0.581*delta_fn_22 
+
         if k2 <= 3:
             fm_n2= 0
         else :                                                          # Softsensor PARA M2
             fm_n2 = delta_fn2 + setpoint_f
-            print("FLUJO 2= "+str(fm_n2))
+        print("FLUJO 2= " + str(fm_n2))
         
         float(speed_mps)
         if speed_mps <= 0.3:
