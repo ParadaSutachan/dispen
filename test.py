@@ -153,8 +153,8 @@ def control_motor(pin_pwm, pin_dir, speed_percent, direction):
 # Loop de Control
 start_time = time.time()
 
-rk_m= float(19)
-rk_m2= float(36) #  M2
+rk_m= float(35)
+rk_m2= float(35) #  M2
 # Habilitar motores
 pi.write(motor1_en_pin, 1)
 pi.write(motor2_en_pin, 1)
@@ -219,11 +219,11 @@ with open(output_file_path, 'w') as output_file:
              fm_n2 = delta_fn2 + setpoint_f
 
         if k2 == 60:
-            rk_m2= 5
+            rk_m2= 30
         if k2 == 110:
-            rk_m2= 45
+            rk_m2= 5
         if k2 == 160:
-            rk_m2= 15
+            rk_m2= 40
 #----------------------------------------------------------------------------------------------------
 
 
