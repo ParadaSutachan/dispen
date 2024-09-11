@@ -131,7 +131,7 @@ def rotary_interrupt2(channel):
             count2 += 1  
         else:  
             count2 += 1  
-    last_state2 = GPIO.input(pin_a)  
+    last_state2 = GPIO.input(pin_a2)  
 # Configuración de pines de entrada para los encoders
 # Configuración de los pines A y B con pull-up y detección de ambos flancos
 
@@ -222,6 +222,7 @@ with open(output_file_path, 'w') as output_file:
         t1 = TicToc()       # Tic
         t1.tic()
         k += 1
+        k2 += 1
         gk +=1
 
         if gk == 5:
@@ -260,7 +261,8 @@ with open(output_file_path, 'w') as output_file:
                                 rk_m2 = 35
                             print('Estas en zona ' + str(zona))
                             inside_zone = True
-                            break  # Sal del bucle si se encuentra una zona
+                            break  # Sal del bucle si se encuentra una zona#
+
 
                     if not inside_zone:
                         rk_m = 0
@@ -299,22 +301,23 @@ with open(output_file_path, 'w') as output_file:
         #Msoft sensor 
         delta_W = W - setpoint_W
         delta_fn= 0.1969*delta_W_1 + 1.359 * delta_fn_1 - 0.581*delta_fn_2 
+
         if k <= 3:
             fm_n= 0
         else :
             fm_n = delta_fn + setpoint_f            # PARA M1
+        print("FLUJO = "+str(fm_n))
 
-        float(speed_mps)
-        if speed_mps <= 0.3:
-            speed_mps =0.0
 
 #-------------------------------------------------------------------------------------------------
         delta_W2 = W2 - setpoint_W
         delta_fn2= 0.1969*delta_W_12 + 1.359 * delta_fn_12 - 0.581*delta_fn_22 
+
         if k2 <= 3:
             fm_n2= 0
         else :                                                          # Softsensor PARA M2
             fm_n2 = delta_fn2 + setpoint_f
+        print("FLUJO 2= " + str(fm_n2))
         
         float(speed_mps)
         if speed_mps <= 0.3:
@@ -334,8 +337,7 @@ with open(output_file_path, 'w') as output_file:
             if upi_m >100:
                 ui_m = 100 - up_m
         upi_m = ui_m  + up_m
-        print("upi_m = "+ str(upi_m))
-        print("RK_M = "+ str(rk_m))
+        print("RK_M1 = "+ str(rk_m))
 
         #Control maestro para M2
         yk_m2 = fm_n2
@@ -350,7 +352,6 @@ with open(output_file_path, 'w') as output_file:
             if upi_m2 >100:
                 ui_m2 = 100 - up_m2
         upi_m2 = ui_m2  + up_m2
-        print("upi_m2= "+ str(upi_m2))
         print("RK_M2 = "+ str(rk_m2))
 
         #Control esclavo para M1
@@ -367,9 +368,7 @@ with open(output_file_path, 'w') as output_file:
             if upi_s >100:
                 ui_s = 100 - up_s
         upi_s = ui_s + up_s
-        print("rks = "+ str(rk_s))
         print("pwm = "+ str(upi_s))
-        print("flujo = "+ str(fm_n))
 
         #Control esclavo para M2
         rk_s2 = upi_m2
@@ -385,9 +384,7 @@ with open(output_file_path, 'w') as output_file:
             if upi_s2 >100:
                 ui_s2 = 100 - up_s2
         upi_s2 = ui_s2 + up_s2
-        print("rks2 = "+ str(rk_s2))
         print("pwm2 = "+ str(upi_s2))
-        print("flujo2 = "+ str(fm_n2))
         
         motor_speed = upi_s  # Asegurar que motor1_speed esté en el rango 0-100
         control_motor(motor1_pwm_pin, motor1_dir_pin, motor_speed, 'forward')
@@ -412,6 +409,7 @@ with open(output_file_path, 'w') as output_file:
         output_file.write(f"{ts:.2f}\t{upi_s:.2f}\t{upi_s2:.2f}\t{W:.2f}\t{W2:.2f}\t{fm_n}\t{fm_n2:.2f}")
         # Restablecer 
         count = 0
+        count2 = 0
 
 
         e_time= t1.tocvalue()
