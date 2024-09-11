@@ -183,79 +183,49 @@ with open(output_file_path, 'w') as output_file:
         t1.tic()
         k += 1
         gk +=1
+
         if gk == 5:
-            newdata = ser.readline().decode('utf-8').strip()
+            newdata = ser.readline().decode('utf-8').strip
+
+            #leer poligono
+            poly_file='poligono_casona.shp'
+            r = shapefile.Reader(poly_file)
+            # Verificas si se recibe una sentencia GPRMC
             if newdata[0:6] == "$GPRMC":
-                newmsg = pynmea2.parse(newdata)  
+                newmsg = pynmea2.parse(newdata)
                 status = newmsg.status
-                # read your shapefile
-                poly_file='poligono_casona.shp'
-                r = shapefile.Reader(poly_file)
-                # Maneja los estados A y V
+                # Verifica si son validos o no los datos
                 if status == "A":
                     lat = newmsg.latitude
                     lon = newmsg.longitude
-                    gps = f"Lat = {lat} Lng = {lon}"
-                    print(gps)
-                    speed = newmsg.spd_over_grnd  # velocidad en nudos
-                    speed_mps = speed * (0.514444)  # convertimos de nudos a m/s  
+                    gps = f"Lat = {lat} Lng = {lon}"  
+                    print(gps) 
+                    speed = newmsg.spd_over_grnd
+                    speed_mps = speed * (0.514444)
                     print(f"Speed: {speed_mps:.2f} m/s")
-                    # get the shapes
+
+                    #obtiene la forma
                     shapes = r.shapes()
-                    inside_zone = False # Bandera para verificar si está dentro de alguna zona
-                    for j in range(len(shapes)):
-                        polygon = shape(shapes[j])
+                    inside_zone = False
+                    for k in range(len(shapes)):
+                        polygon = shape(shapes[k])
                         zone_def = check(lon,lat)
                         if zone_def:
-                            zone = j
-                            zona = zone+1
                             inside_zone = True
+                            zona = k + 1
                             if zona == 1:
-                                rk = 8
-                                print("Estamos es zona " + str(zona))
+                                rk = 20
                             if zona == 2:
-                                rk = 10
-                                print("Estamos es zona " + str(zona))
+                                rk = 40
+                            print('El punto corresponde a la zona ' + str(zona))
                             break
-                    
-                    while not inside_zone:
-                        print("Estas Fuera del Aerea a implementar . . .")
+                    if not inside_zone:
                         rk = 0.0
+                        fk = 0.0
                         control_motor(motor1_pwm_pin, motor1_dir_pin, 0, 'forward')
-                        newdata = ser.readline().decode('utf-8').strip()
-                        if newdata[0:6] == "$GPRMC":
-                            newmsg = pynmea2.parse(newdata)  
-                            status = newmsg.status
-                            # read your shapefile
-                            poly_file='poligono_casona.shp'
-                            r = shapefile.Reader(poly_file)
-                            # Maneja los estados A y V
-                            if status == "A":
-                                lat = newmsg.latitude
-                                lon = newmsg.longitude
-                                gps = f"Lat = {lat} Lng = {lon}"
-                                print(gps)
-                                # get the shapes
-                                shapes = r.shapes()
-                                inside_zone = False # Bandera para verificar si está dentro de alguna zona
-                                for j in range(len(shapes)):
-                                    polygon = shape(shapes[j])
-                                    zone_def = check(lon,lat)
-                                    if zone_def:
-                                        zone = j
-                                        zona = zone+1
-                                        inside_zone = True
-                                        if zona == 1:
-                                            rk = 25
-                                            print("Estamos es zona " + str(zona))
-                                        if zona == 2:
-                                            rk = 40
-                                            print("Estamos es zona " + str(zona))
-                                        break
-
-                        time.sleep(0.2)
-            gk=0
-
+                        print("Estas Fuera de Rango . . .")
+                elif status == "V":
+                    print("Buscando señal")
 
         #Lectura de Flancos para medir velocidad
         FPS = count / (600.0)
