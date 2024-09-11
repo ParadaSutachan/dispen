@@ -256,7 +256,7 @@ with open(output_file_path, 'w') as output_file:
         k += 1
         gk +=1
 
-        if gk == 6:
+        if gk == 3:
             newdata = ser.readline().decode('utf-8').strip()
             if newdata[0:6] == "$GPRMC":
                 newmsg = pynmea2.parse(newdata)  
@@ -461,7 +461,9 @@ with open(output_file_path, 'w') as output_file:
         ek2_int = ek2_1 + ek2_int_1
         uik2 = ek2_int*Ki
         ux_k2= K@x2k
-        uk2 = -uik-float(ux_k2[0]) #Accion de Control
+        uk2 = -uik-float(ux_k2[0]) #Accion de 
+        
+        print(uk2)
 
         if uk2 < 0 or uk2 > 100:
             if uk2 < 0 :
