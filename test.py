@@ -382,9 +382,9 @@ with open(output_file_path, 'w') as output_file:
         print("flujo2 = "+ str(fm_n2))
         
         motor_speed = upi_s  # Asegurar que motor1_speed esté en el rango 0-100
-        control_motor(motor1_pwm_pin, motor1_dir_pin, 100, 'forward')
+        control_motor(motor1_pwm_pin, motor1_dir_pin, motor_speed, 'forward')
         motor2_speed = upi_s2  # Asegurar que motor1_speed esté en el rango 0-100
-        control_motor(motor2_pwm_pin, motor2_dir_pin, 50, 'forward')
+        control_motor(motor2_pwm_pin, motor2_dir_pin, motor2_speed, 'forward')
 #       Reemplazo Variables m1
         delta_fn_2 = delta_fn_1
         delta_fn_1 = delta_fn
