@@ -201,6 +201,7 @@ with open(output_file_path, 'w') as output_file:
                     print(f"Speed: {speed_mps:.2f} m/s")
                 elif status == "V":  
                     print("Buscando señal . . .")
+            gk = 0
 
         #Lectura de Flancos para medir velocidad
         FPS = count / (600.0)
