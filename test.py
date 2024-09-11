@@ -123,6 +123,8 @@ def rotary_interrupt(channel):
     FLANCOS_M1 = FLANCOS_M1_A + FLANCOS_M1_B
     FLANCOS_M2= FLANCOS_M1_A2 + FLANCOS_M1_B2
 
+# Configuración GPIO
+GPIO.setmode(GPIO.BCM)
 
 GPIO.setup(PIN_ENCODER_A, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(PIN_ENCODER_B, GPIO.IN, pull_up_down=GPIO.PUD_UP)
