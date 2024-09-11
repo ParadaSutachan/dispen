@@ -10,6 +10,7 @@ import asyncio  # Asincronía para GPS y lectura de datos
 
 # Configuración inicial
 pi = pigpio.pi()
+pi_m = math.pi
 port = "/dev/ttyAMA0"
 ser = serial.Serial(port, baudrate=9600, timeout=0.1)
 
@@ -225,20 +226,27 @@ async def main():
             set_speed(pwm2, 1200)  # Señal de 1200 microsegundos para el segundo moto
 
             # Calcular referencias de control (lógica dejada intacta)
-            rk_m = float(speed_mps * ancho_faja * dosis_m1)
-            rk_m2 = float(speed_mps * ancho_faja * dosis_m2)
+            #rk_m = float(speed_mps * ancho_faja * dosis_m1)
+            #rk_m2 = float(speed_mps * ancho_faja * dosis_m2)
+            if zona:
+                rk_m = float(25)
+                rk_m2 = float(35)
+
+            
 
             # Restablecer todas las variables tal como estaban
             # (Mantenido todo el bloque original de maestro-esclavo)
 
             # Calcular la velocidad del motor a partir de los flancos
             flancos_totales_1 = numero_flancos_A + numero_flancos_B
-            RPS = flancos_totales_1 / (600.0)  # Usando el tiempo de INTERVALO
-            W = RPS * ((2 * math.pi) / INTERVALO)
+            RPS = flancos_totales_1 / (600.0)
+            W = RPS * ((2 * pi_m) / INTERVALO)
+            print("Velocidad: " + str(W))
 
             flancos_totales_2 = numero_flancos_A2 + numero_flancos_B2
             RPS2 = flancos_totales_2 / (600.0)
-            W2 = RPS2 * ((2 * math.pi) / INTERVALO)
+            W2 = RPS2 * ((2 * pi_m) / INTERVALO)
+            print("Velocidad: " + str(W2))
 
             # Control maestro para M1
             yk_m = fm_n
@@ -308,6 +316,7 @@ async def main():
                     ui_s2 = 100 - up_s2
 
             upi_s2 = ui_s2 + up_s2
+            print("rk 2 =" + str(rk))
             print("pwm motor 2 = " + str(upi_s2))
 
             # Aplicar los valores de control a los motores
