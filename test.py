@@ -213,10 +213,11 @@ with open(output_file_path, 'w') as output_file:
     output_file.write("Tiempo \t PWM_1 \t PWM_M2 \t W1 \t W2 \tFlujo \t Flujo2\n")
     start_time = time.time()
     inside_zone = False  # Bandera inicial
+    time.sleep(10)
 
  # Bucle principal de control
     while True:
-        time.sleep(10)
+        
         t1 = TicToc()
         t1.tic()
         k += 1
@@ -360,7 +361,7 @@ with open(output_file_path, 'w') as output_file:
         control_motor(motor1_pwm_pin, motor1_dir_pin, motor_speed, 'forward')
         motor2_speed = upi_s2  # Asegurar que motor1_speed esté en el rango 0-100
         control_motor(motor2_pwm_pin, motor2_dir_pin, motor2_speed, 'forward')
-        
+
 #       Reemplazo Variables m1
         delta_fn_2 = delta_fn_1
         delta_fn_1 = delta_fn
