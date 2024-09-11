@@ -24,10 +24,7 @@ motor1_en_pin = 22
 motor2_pwm_pin = 13
 motor2_dir_pin = 25
 motor2_en_pin = 23
-PIN_ENCODER_A = 18
-PIN_ENCODER_B = 17
-PIN_ENCODER2_A = 16
-PIN_ENCODER2_B = 19
+
 T = 0.2
 # Configuración de pines de entrada para los encoders
 # Configuración de pines  
@@ -171,8 +168,10 @@ while True:
             print("Buscando señal . . .")
 # Loop de Control
 # Habilitar motores
+
 pi.write(motor1_en_pin, 1)
 pi.write(motor2_en_pin, 1)
+
 # Crear el archivo de salida para guardar los datos
 output_file_path = '/home/santiago/Documents/dispensador/dispen/beta-test.txt'
 with open(output_file_path, 'w') as output_file:
