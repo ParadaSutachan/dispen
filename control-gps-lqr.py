@@ -315,11 +315,11 @@ with open(output_file_path, 'w') as output_file:
         #Lectura de Flancos para medir velocidad
         FPS = count / (600.0)
         W = FPS * ((2 * pi_m) / T)      #Velocidad del motor
-        print("Velocidad M1: " + str(count))
+        print("Velocidad M1: " + str(W))
 
         FPS2 = count2/(600.0)
         W2 = FPS2 *((2*pi_m)/T)
-        print("Velocidad M2: " + str(count2))
+        print("Velocidad M2: " + str(W2))
 
         # Soft Sensor M1 --------------------------------------------------------------------------
         delta_w = W-W_b
