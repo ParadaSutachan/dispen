@@ -22,7 +22,7 @@ def check(lon, lat):
 while True:  
     newdata = ser.readline().decode('utf-8').strip()  
     # read your shapefile
-    poly_file='poligono_casona.shp'
+    poly_file='poligono_casona1.shp'
     r = shapefile.Reader(poly_file)
 
     # Verifica si se recibe una sentencia GPRMC  
