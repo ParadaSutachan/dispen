@@ -213,9 +213,9 @@ pwm1.start(0)  # Iniciar con un duty cycle de 0%
 pwm2.start(0)  # Iniciar con un duty cycle de 0%
 
 # Crear el archivo de salida para guardar los datos
-output_file_path = '/home/santiago/Documents/dispensador/dispen/beta-test.txt'
+output_file_path = '/home/santiago/Documents/dispensador/dispen/final_maestro_esclavo.txt'
 with open(output_file_path, 'w') as output_file:
-    output_file.write("Tiempo \t PWM \t W \t Referencia \t Flujo \n")
+    output_file.write("Tiempo \t PWM1 \t PWM2 \t W1 \t W2 \t Flujo1 \t Flujo2 \t Zona  \n")
     start_time = time.time()
     while(True):
         
@@ -409,7 +409,7 @@ with open(output_file_path, 'w') as output_file:
         
         # Registrar los datos en el archivo
         ts = time.time() - start_time
-        output_file.write(f"{ts:.2f}\t{upi_s:.2f}\t{upi_s2:.2f}\t{W:.2f}\t{W2:.2f}\t{fm_n}\t{fm_n2:.2f}")
+        output_file.write(f"{ts:.2f}\t{upi_s:.2f}\t{upi_s2:.2f}\t{W:.2f}\t{W2:.2f}\t{fm_n}\t{fm_n2:.2f}\t{zona}")
         # Restablecer 
         count = 0
         count2 = 0
