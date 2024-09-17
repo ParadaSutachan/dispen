@@ -233,7 +233,7 @@ with open(output_file_path, 'w') as output_file:
                 newmsg = pynmea2.parse(newdata)  
                 status = newmsg.status
                 # read your shapefile
-                poly_file='poligono_casona.shp'
+                poly_file='poligono_casona1.shp'
                 r = shapefile.Reader(poly_file)
                 # Maneja los estados A y V  
                 if status == "A":  
