@@ -315,11 +315,11 @@ with open(output_file_path, 'w') as output_file:
         #Lectura de Flancos para medir velocidad
         FPS = count / (600.0)
         W = FPS * ((2 * pi_m) / T)      #Velocidad del motor
-        print("Velocidad M1: " + str(W))
+        #print("Velocidad M1: " + str(W))
 
         FPS2 = count2/(600.0)
         W2 = FPS2 *((2*pi_m)/T)
-        print("Velocidad M2: " + str(W2))
+        #print("Velocidad M2: " + str(W2))
 
         # Soft Sensor M1 --------------------------------------------------------------------------
         delta_w = W-W_b
@@ -330,7 +330,7 @@ with open(output_file_path, 'w') as output_file:
         else :
              fk=delta_f+F_b
 
-        print("Flujo 1: " + str(fk))
+        #print("Flujo 1: " + str(fk))
 
         # Soft Sensor M2 ---------------------------------------------------------------------------
 
@@ -342,19 +342,19 @@ with open(output_file_path, 'w') as output_file:
         else :
              fk2=delta_f2+F_b
 
-        print("Flujo 2: " + str(fk2))
+        #print("Flujo 2: " + str(fk2))
 
 
         # Calulo de la referencia #
-        print(float(speed_mps))
+        #print(float(speed_mps))
         if speed_mps <= 0.3:
             speed_mps =0.0
 
         rk = speed_mps*dosis_m1*faja
         rk2 = speed_mps*dosis_m2*faja
 
-        print("rk: " + str(rk))
-        print("rk2: " + str(rk2))
+        #print("rk: " + str(rk))
+        #print("rk2: " + str(rk2))
 
         ##Observador ------------------------------------------------------------------------------------
 
@@ -371,7 +371,7 @@ with open(output_file_path, 'w') as output_file:
 
         ## Controlador M1 ---------------------------------------------------------------------------------
         ek = rk - fk
-        print("ek: "+str(ek))
+        #print("ek: "+str(ek))
 
         ek_int = ek_1 + ek_int_1
         uik = ek_int*Ki
@@ -384,11 +384,11 @@ with open(output_file_path, 'w') as output_file:
                 uik = -100 - float(ux_k[0])
         uk = -uik-float(ux_k[0])        
         motor1_speed = uk  
-        print("uk = " + str(uk))
+        #print("uk = " + str(uk))
 
         ## COntrolador M2 --------------------------------------------------------------------------------------
         ek2 = rk2 - fk2
-        print("ek2: "+str(ek2))
+        #print("ek2: "+str(ek2))
 
         ek2_int = ek2_1 + ek2_int_1
         uik2 = ek2_int*Ki
@@ -401,7 +401,7 @@ with open(output_file_path, 'w') as output_file:
                 uik2 = -100 - float(ux2_k[0])
         uk2 = -uik2-float(ux2_k[0])    
         motor2_speed = uk2  
-        print("uk2 = " + str(uk2))
+        #print("uk2 = " + str(uk2))
 
         control_motor(motor1_pwm_pin, motor1_dir_pin, motor1_speed, 'forward')
         control_motor(motor2_pwm_pin, motor2_dir_pin, motor2_speed, 'forward')
